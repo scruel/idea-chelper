@@ -9,7 +9,7 @@ import net.egork.chelper.actions.NewTaskDefaultAction;
 import net.egork.chelper.parser.*;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.util.Messenger;
-import net.egork.chelper.util.Utilities;
+import net.egork.chelper.util.ProjectUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -107,7 +107,7 @@ public class ChromeParser implements ProjectComponent {
                                             if (projectFrame.getState() == JFrame.ICONIFIED)
                                                 projectFrame.setState(Frame.NORMAL);
                                             for (Task task : tasks) {
-                                                task = task.setTemplate(Utilities.getDefaultTask().template);
+                                                task = task.setTemplate(ProjectUtils.getDefaultTask().template);
                                                 NewTaskDefaultAction.createTaskInDefaultDirectory(project, task);
                                             }
                                         } else {
@@ -173,7 +173,7 @@ public class ChromeParser implements ProjectComponent {
             panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
             dialog.setContentPane(panel);
             dialog.pack();
-            Point center = Utilities.getLocation(project, panel.getSize());
+            Point center = ProjectUtils.getLocation(project, panel.getSize());
             dialog.setLocation(center);
             dialog.setVisible(true);
             configuration.completeExtensionProposal(project);

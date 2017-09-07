@@ -5,8 +5,8 @@ import com.intellij.openapi.util.IconLoader;
 import com.intellij.psi.PsiDirectory;
 import net.egork.chelper.ProjectData;
 import net.egork.chelper.task.Task;
-import net.egork.chelper.util.FileUtilities;
-import net.egork.chelper.util.Utilities;
+import net.egork.chelper.util.FileUtils;
+import net.egork.chelper.util.ProjectUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,7 +24,7 @@ public class CreateTaskDialog extends JDialog {
 
     public CreateTaskDialog(Task task, boolean canEditName, Project project) {
         super(null, "Task", ModalityType.APPLICATION_MODAL);
-        setIconImage(Utilities.iconToImage(IconLoader.getIcon("/icons/newTask.png")));
+        setIconImage(ProjectUtils.iconToImage(IconLoader.getIcon("/icons/newTask.png")));
         setAlwaysOnTop(true);
         setResizable(false);
         this.task = task;
@@ -63,16 +63,16 @@ public class CreateTaskDialog extends JDialog {
         main.add(panel, BorderLayout.CENTER);
         setContentPane(main);
         pack();
-        Point center = Utilities.getLocation(project, main.getSize());
+        Point center = ProjectUtils.getLocation(project, main.getSize());
         setLocation(center);
     }
 
     public static Task showDialog(PsiDirectory directory, String defaultName, Task template, boolean allowNameChange) {
-        Task defaultTask = template == null ? Utilities.getDefaultTask() : template;
+        Task defaultTask = template == null ? ProjectUtils.getDefaultTask() : template;
         String name = defaultName == null ? "Task" : defaultName;
         Project project = directory.getProject();
-        String location = FileUtilities.getRelativePath(project.getBaseDir(), directory.getVirtualFile());
-        ProjectData data = Utilities.getData(project);
+        String location = FileUtils.getRelativePath(project.getBaseDir(), directory.getVirtualFile());
+        ProjectData data = ProjectUtils.getData(project);
         Task task = new Task(name, defaultTask.testType, defaultTask.input, defaultTask.output, defaultTask.tests, location,
             defaultTask.vmArgs, defaultTask.mainClass, defaultTask.taskClass == null ? name : defaultTask.taskClass,
             defaultTask.checkerClass, defaultTask.checkerParameters, defaultTask.testClasses,
@@ -81,9 +81,9 @@ public class CreateTaskDialog extends JDialog {
             data.failOnIntegerOverflowForNewTasks, defaultTask.template);
         CreateTaskDialog dialog = new CreateTaskDialog(task, allowNameChange, project);
         dialog.setVisible(true);
-        Utilities.updateDefaultTask(dialog.task);
+        ProjectUtils.updateDefaultTask(dialog.task);
         if (dialog.task != null)
-            dialog.task = dialog.task.setTaskClass(FileUtilities.createIfNeeded(dialog.task, dialog.task.taskClass, project, dialog.task.location));
+            dialog.task = dialog.task.setTaskClass(FileUtils.createIfNeeded(dialog.task, dialog.task.taskClass, project, dialog.task.location));
         return dialog.task;
     }
 

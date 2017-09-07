@@ -4,8 +4,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.VerticalFlowLayout;
 import com.intellij.openapi.util.IconLoader;
 import net.egork.chelper.util.FileCreator;
+import net.egork.chelper.util.ProjectUtils;
 import net.egork.chelper.util.Provider;
-import net.egork.chelper.util.Utilities;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,7 +28,7 @@ public class TestClassesDialog extends JDialog {
     public TestClassesDialog(String[] testClasses, final Project project, final String location, FileCreator fileCreator, final String baseName) {
         super(null, "Test classes", ModalityType.APPLICATION_MODAL);
         this.fileCreator = fileCreator;
-        setIconImage(Utilities.iconToImage(IconLoader.getIcon("/icons/check.png")));
+        setIconImage(ProjectUtils.iconToImage(IconLoader.getIcon("/icons/check.png")));
         setAlwaysOnTop(true);
         setResizable(false);
         this.testClasses = testClasses;
@@ -70,7 +70,7 @@ public class TestClassesDialog extends JDialog {
         main.add(buttonPanel, BorderLayout.SOUTH);
         setContentPane(main);
         rebuild();
-        Point center = Utilities.getLocation(project, main.getSize());
+        Point center = ProjectUtils.getLocation(project, main.getSize());
         setLocation(center);
     }
 

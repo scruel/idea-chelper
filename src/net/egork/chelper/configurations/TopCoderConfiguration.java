@@ -17,10 +17,10 @@ import net.egork.chelper.actions.TopCoderAction;
 import net.egork.chelper.codegeneration.SolutionGenerator;
 import net.egork.chelper.task.TopCoderTask;
 import net.egork.chelper.ui.TopCoderConfigurationEditor;
-import net.egork.chelper.util.FileUtilities;
+import net.egork.chelper.util.FileUtils;
 import net.egork.chelper.util.InputReader;
-import net.egork.chelper.util.TaskUtilities;
-import net.egork.chelper.util.Utilities;
+import net.egork.chelper.util.ProjectUtils;
+import net.egork.chelper.util.TaskUtils;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 
@@ -66,8 +66,8 @@ public class TopCoderConfiguration extends ModuleBasedConfiguration<JavaRunConfi
             @Override
             protected JavaParameters createJavaParameters() throws ExecutionException {
                 JavaParameters parameters = new JavaParameters();
-                PsiDirectory directory = FileUtilities.getPsiDirectory(getProject(),
-                    Utilities.getData(getProject()).defaultDirectory);
+                PsiDirectory directory = FileUtils.getPsiDirectory(getProject(),
+                    ProjectUtils.getData(getProject()).defaultDirectory);
                 Module module = ProjectRootManager.getInstance(getProject()).getFileIndex().getModuleForFile(
                     directory.getVirtualFile());
                 parameters.configureByModule(module, JavaParameters.JDK_AND_CLASSES);
@@ -78,10 +78,10 @@ public class TopCoderConfiguration extends ModuleBasedConfiguration<JavaRunConfi
                     parameters.getVMParametersList().add("-javaagent:" + path + "=-Cints -Clongs -Ccasts -Cmath");
                 }
                 parameters.setWorkingDirectory(getProject().getBaseDir().getPath());
-                String taskFileName = TaskUtilities.getTopCoderTaskFileName(Utilities.getData(getProject()).defaultDirectory, configuration.name);
+                String taskFileName = TaskUtils.getTopCoderTaskFileName(ProjectUtils.getData(getProject()).defaultDirectory, configuration.name);
                 parameters.getProgramParametersList().add(taskFileName);
-                if (Utilities.getData(getProject()).smartTesting) {
-                    VirtualFile report = FileUtilities.getFile(getProject(), "CHelperReport.txt");
+                if (ProjectUtils.getData(getProject()).smartTesting) {
+                    VirtualFile report = FileUtils.getFile(getProject(), "CHelperReport.txt");
                     if (report != null) {
                         try {
                             InputReader reader = new InputReader(report.getInputStream());
@@ -119,7 +119,7 @@ public class TopCoderConfiguration extends ModuleBasedConfiguration<JavaRunConfi
         String fileName = element.getChildText("taskConf");
         if (fileName != null && fileName.trim().length() != 0) {
             try {
-                configuration = FileUtilities.readTopCoderTask(fileName, getProject());
+                configuration = FileUtils.readTopCoderTask(fileName, getProject());
             } catch (NullPointerException ignored) {
             }
         }
@@ -130,17 +130,17 @@ public class TopCoderConfiguration extends ModuleBasedConfiguration<JavaRunConfi
         super.writeExternal(element);
         Element configurationElement = new Element("taskConf");
         element.addContent(configurationElement);
-        String configurationFile = TaskUtilities.getTopCoderTaskFileName(Utilities.getData(getProject()).defaultDirectory, configuration.name);
+        String configurationFile = TaskUtils.getTopCoderTaskFileName(ProjectUtils.getData(getProject()).defaultDirectory, configuration.name);
         if (configurationFile != null && configuration.tests != null)
             configurationElement.setText(configurationFile);
     }
 
     private void saveConfiguration(TopCoderTask configuration) {
-        if (Utilities.getData(getProject()) == null)
+        if (ProjectUtils.getData(getProject()) == null)
             return;
-        String location = Utilities.getData(getProject()).defaultDirectory;
+        String location = ProjectUtils.getData(getProject()).defaultDirectory;
         if (configuration != null && location != null && configuration.name != null && configuration.name.length() != 0 && configuration.tests != null)
-            FileUtilities.saveConfiguration(location, configuration.name + ".tctask", configuration, getProject());
+            FileUtils.saveConfiguration(location, configuration.name + ".tctask", configuration, getProject());
     }
 
 

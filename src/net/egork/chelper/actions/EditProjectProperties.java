@@ -18,19 +18,19 @@ import com.intellij.openapi.vfs.VirtualFileManager;
 import net.egork.chelper.ProjectData;
 import net.egork.chelper.tester.NewTester;
 import net.egork.chelper.ui.ProjectDataDialog;
-import net.egork.chelper.util.Utilities;
+import net.egork.chelper.util.ProjectUtils;
 
 /**
  * @author Egor Kulikov (egorku@yandex-team.ru)
  */
 public class EditProjectProperties extends AnAction {
     public void actionPerformed(AnActionEvent e) {
-        final Project project = Utilities.getProject(e.getDataContext());
-        ProjectData data = Utilities.getData(project);
+        final Project project = ProjectUtils.getProject(e.getDataContext());
+        ProjectData data = ProjectUtils.getData(project);
         ProjectData result = ProjectDataDialog.edit(project, data);
         if (result != null) {
             result.save(project);
-            Utilities.addProjectData(project, result);
+            ProjectUtils.addProjectData(project, result);
             ApplicationManager.getApplication().runWriteAction(new Runnable() {
                 public void run() {
                     LibraryTable table = ProjectLibraryTable.getInstance(project);

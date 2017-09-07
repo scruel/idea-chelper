@@ -6,7 +6,7 @@ import com.intellij.openapi.util.IconLoader;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
 import net.egork.chelper.task.Test;
-import net.egork.chelper.util.Utilities;
+import net.egork.chelper.util.ProjectUtils;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -39,7 +39,7 @@ public class EditTestsDialog extends JDialog {
 
     public EditTestsDialog(Test[] tests, Project project) {
         super(null, "Tests", ModalityType.APPLICATION_MODAL);
-        setIconImage(Utilities.iconToImage(IconLoader.getIcon("/icons/editTests.png")));
+        setIconImage(ProjectUtils.iconToImage(IconLoader.getIcon("/icons/editTests.png")));
         setAlwaysOnTop(true);
         setResizable(false);
         this.tests = new ArrayList<Test>(Arrays.asList(tests));
@@ -208,7 +208,7 @@ public class EditTestsDialog extends JDialog {
         setSelectedTest(Math.min(0, tests.length - 1));
         pack();
         setSize(600, 400);
-        setLocation(Utilities.getLocation(project, this.getSize()));
+        setLocation(ProjectUtils.getLocation(project, this.getSize()));
     }
 
     private JCheckBox createCheckBox(final Test test) {

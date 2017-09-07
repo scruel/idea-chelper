@@ -7,7 +7,7 @@ import net.egork.chelper.task.Task;
 import net.egork.chelper.task.Test;
 import net.egork.chelper.task.TestType;
 import net.egork.chelper.tester.StringInputStream;
-import net.egork.chelper.util.FileUtilities;
+import net.egork.chelper.util.FileUtils;
 import net.egork.chelper.util.InputReader;
 
 import javax.swing.*;
@@ -27,7 +27,7 @@ public class GCJParser implements Parser {
     }
 
     public void getContests(DescriptionReceiver receiver) {
-        String info = FileUtilities.getWebPageContent("https://code.google.com/codejam/contest/microsite-info");
+        String info = FileUtils.getWebPageContent("https://code.google.com/codejam/contest/microsite-info");
         if (info != null) {
             Map<String, Value> parsedInfo = jsonParse(new InputReader(new StringInputStream(info)));
             if ("true".equals(parsedInfo.get("contestExists").nonJSON) && parsedInfo.containsKey("secsToEnd") &&
@@ -43,7 +43,7 @@ public class GCJParser implements Parser {
         }
         if (receiver.isStopped())
             return;
-        String historyPage = FileUtilities.getWebPageContent("https://code.google.com/codejam/past-contests/past-contests-page.html");
+        String historyPage = FileUtils.getWebPageContent("https://code.google.com/codejam/past-contests/past-contests-page.html");
         if (historyPage != null) {
             System.err.println(historyPage);
             if (true) {
@@ -165,7 +165,7 @@ public class GCJParser implements Parser {
     }
 
     public void parseContest(String id, DescriptionReceiver receiver) {
-        String info = FileUtilities.getWebPageContent("https://code.google.com/codejam/contest/" + id + "/dashboard/ContestInfo");
+        String info = FileUtils.getWebPageContent("https://code.google.com/codejam/contest/" + id + "/dashboard/ContestInfo");
         if (info == null)
             return;
         Value problems = jsonParse(new InputReader(new StringInputStream(info))).get("problems");
@@ -191,7 +191,7 @@ public class GCJParser implements Parser {
         String[] tokens = description.id.split(" ");
         String contestID = tokens[0];
         String taskID = tokens[1];
-        String info = FileUtilities.getWebPageContent("https://code.google.com/codejam/contest/" + contestID + "/dashboard/ContestInfo");
+        String info = FileUtils.getWebPageContent("https://code.google.com/codejam/contest/" + contestID + "/dashboard/ContestInfo");
         Value problems = jsonParse(new InputReader(new StringInputStream(info))).get("problems");
         if (problems == null || problems.type != Value.Type.JSON)
             return null;

@@ -6,7 +6,7 @@ import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
 import net.egork.chelper.task.NewTopCoderTest;
 import net.egork.chelper.task.TopCoderTask;
-import net.egork.chelper.util.Utilities;
+import net.egork.chelper.util.ProjectUtils;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -232,7 +232,7 @@ public class TopCoderEditTestsDialog extends JDialog {
         setSelectedTest(Math.min(0, task.tests.length - 1));
         pack();
         setSize(600, 400);
-        setLocation(Utilities.getLocation(project, this.getSize()));
+        setLocation(ProjectUtils.getLocation(project, this.getSize()));
     }
 
     private JPanel createPanel(String label, JTextField editor) {

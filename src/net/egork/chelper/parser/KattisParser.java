@@ -6,7 +6,7 @@ import net.egork.chelper.task.StreamConfiguration;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.task.Test;
 import net.egork.chelper.task.TestType;
-import net.egork.chelper.util.FileUtilities;
+import net.egork.chelper.util.FileUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import javax.swing.*;
@@ -29,7 +29,7 @@ public class KattisParser implements Parser {
     }
 
     public void getContests(DescriptionReceiver receiver) {
-        String contestsPage = FileUtilities.getWebPageContent("https://open.kattis.com/contests");
+        String contestsPage = FileUtils.getWebPageContent("https://open.kattis.com/contests");
         if (contestsPage == null) {
             return;
         }
@@ -79,7 +79,7 @@ public class KattisParser implements Parser {
     }
 
     private boolean isNotEmpty(int index) {
-        String page = FileUtilities.getWebPageContent("https://open.kattis.com/problems?page=" + index);
+        String page = FileUtils.getWebPageContent("https://open.kattis.com/problems?page=" + index);
         if (page == null) {
             return false;
         }
@@ -94,7 +94,7 @@ public class KattisParser implements Parser {
 
     public void parseContest(String id, DescriptionReceiver receiver) {
         if (id.indexOf(' ') == -1) {
-            String mainPage = FileUtilities.getWebPageContent("https://open.kattis.com/contests/" + id + "/problems");
+            String mainPage = FileUtils.getWebPageContent("https://open.kattis.com/contests/" + id + "/problems");
             if (mainPage == null) {
                 return;
             }
@@ -117,7 +117,7 @@ public class KattisParser implements Parser {
                 receiver.receiveDescriptions(ids);
             }
         } else {
-            String mainPage = FileUtilities.getWebPageContent(
+            String mainPage = FileUtils.getWebPageContent(
                 "https://open.kattis.com/problems?page=" + id.substring(id.indexOf(' ') + 1));
             if (mainPage == null) {
                 return;
@@ -143,7 +143,7 @@ public class KattisParser implements Parser {
         int space = description.id.indexOf(' ');
         String id = space == -1 ?
             description.id : description.id.substring(0, space);
-        String text = FileUtilities.getWebPageContent("https://open.kattis.com" + id);
+        String text = FileUtils.getWebPageContent("https://open.kattis.com" + id);
         if (text == null) {
             return null;
         }

@@ -6,7 +6,7 @@ import net.egork.chelper.task.StreamConfiguration;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.task.Test;
 import net.egork.chelper.task.TestType;
-import net.egork.chelper.util.FileUtilities;
+import net.egork.chelper.util.FileUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import javax.swing.*;
@@ -29,7 +29,7 @@ public class CodeforcesParser implements Parser {
     }
 
     public void getContests(DescriptionReceiver receiver) {
-        String contestsPage = FileUtilities.getWebPageContent("http://codeforces.com/contests?complete=true");
+        String contestsPage = FileUtils.getWebPageContent("http://codeforces.com/contests?complete=true");
         if (contestsPage == null)
             return;
         List<Description> contests = new ArrayList<Description>();
@@ -61,7 +61,7 @@ public class CodeforcesParser implements Parser {
             return;
         }
         for (int i = 2; i <= additionalPagesCount; i++) {
-            String page = FileUtilities.getWebPageContent("http://codeforces.com/contests/page/" + i);
+            String page = FileUtils.getWebPageContent("http://codeforces.com/contests/page/" + i);
             if (page == null)
                 continue;
             parser = new StringParser(page);
@@ -86,7 +86,7 @@ public class CodeforcesParser implements Parser {
     }
 
     public void parseContest(String id, DescriptionReceiver receiver) {
-        String mainPage = FileUtilities.getWebPageContent("http://codeforces.com/contest/" + id);
+        String mainPage = FileUtils.getWebPageContent("http://codeforces.com/contest/" + id);
         if (mainPage == null)
             return;
         List<Description> ids = new ArrayList<Description>();
@@ -118,7 +118,7 @@ public class CodeforcesParser implements Parser {
             return null;
         String contestId = tokens[0];
         id = tokens[1];
-        String text = FileUtilities.getWebPageContent("http://codeforces.com/contest/" + contestId + "/problem/" + id);
+        String text = FileUtils.getWebPageContent("http://codeforces.com/contest/" + contestId + "/problem/" + id);
         if (text == null)
             return null;
         Collection<Task> tasks = parseTaskFromHTML(text);

@@ -3,7 +3,7 @@ package net.egork.chelper.ui;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.VerticalFlowLayout;
 import net.egork.chelper.ProjectData;
-import net.egork.chelper.util.Utilities;
+import net.egork.chelper.util.ProjectUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -103,7 +103,7 @@ public class ProjectDataDialog extends JDialog {
         setContentPane(main);
         onChange();
         pack();
-        Point center = Utilities.getLocation(project, main.getSize());
+        Point center = ProjectUtils.getLocation(project, main.getSize());
         setLocation(center);
     }
 

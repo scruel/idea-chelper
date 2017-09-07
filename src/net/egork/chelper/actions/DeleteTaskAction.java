@@ -16,8 +16,8 @@ import net.egork.chelper.configurations.TaskConfiguration;
 import net.egork.chelper.configurations.TopCoderConfiguration;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.task.TopCoderTask;
-import net.egork.chelper.util.FileUtilities;
-import net.egork.chelper.util.Utilities;
+import net.egork.chelper.util.FileUtils;
+import net.egork.chelper.util.ProjectUtils;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -27,9 +27,9 @@ import java.io.IOException;
  */
 public class DeleteTaskAction extends AnAction {
     public void actionPerformed(AnActionEvent e) {
-        if (!Utilities.isEligible(e.getDataContext()))
+        if (!ProjectUtils.isEligible(e.getDataContext()))
             return;
-        final Project project = Utilities.getProject(e.getDataContext());
+        final Project project = ProjectUtils.getProject(e.getDataContext());
         final RunManagerImpl manager = RunManagerImpl.getInstanceImpl(project);
         RunnerAndConfigurationSettings selectedConfiguration =
             manager.getSelectedConfiguration();
@@ -59,7 +59,7 @@ public class DeleteTaskAction extends AnAction {
                             if (testFile != null)
                                 testFile.delete(this);
                         }
-                        VirtualFile taskFile = FileUtilities.getFile(project, task.location + "/" + ArchiveAction.canonize(task.name) + ".task");
+                        VirtualFile taskFile = FileUtils.getFile(project, task.location + "/" + ArchiveAction.canonize(task.name) + ".task");
                         if (taskFile != null)
                             taskFile.delete(this);
                         manager.removeConfiguration(manager.getSelectedConfiguration());
@@ -74,7 +74,7 @@ public class DeleteTaskAction extends AnAction {
             ApplicationManager.getApplication().runWriteAction(new Runnable() {
                 public void run() {
                     try {
-                        VirtualFile mainFile = FileUtilities.getFile(project, Utilities.getData(project).defaultDirectory
+                        VirtualFile mainFile = FileUtils.getFile(project, ProjectUtils.getData(project).defaultDirectory
                             + "/" + task.name + ".java");
                         if (mainFile != null)
                             mainFile.delete(this);
@@ -84,7 +84,7 @@ public class DeleteTaskAction extends AnAction {
                             if (testFile != null)
                                 testFile.delete(this);
                         }
-                        VirtualFile taskFile = FileUtilities.getFile(project, Utilities.getData(project).defaultDirectory + "/" + task.name + ".tctask");
+                        VirtualFile taskFile = FileUtils.getFile(project, ProjectUtils.getData(project).defaultDirectory + "/" + task.name + ".tctask");
                         if (taskFile != null)
                             taskFile.delete(this);
                         manager.removeConfiguration(manager.getSelectedConfiguration());

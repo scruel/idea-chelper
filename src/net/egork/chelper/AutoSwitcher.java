@@ -18,9 +18,9 @@ import net.egork.chelper.configurations.TaskConfiguration;
 import net.egork.chelper.configurations.TopCoderConfiguration;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.task.TopCoderTask;
-import net.egork.chelper.util.FileUtilities;
-import net.egork.chelper.util.TaskUtilities;
-import net.egork.chelper.util.Utilities;
+import net.egork.chelper.util.FileUtils;
+import net.egork.chelper.util.ProjectUtils;
+import net.egork.chelper.util.TaskUtils;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -68,9 +68,9 @@ public class AutoSwitcher implements ProjectComponent {
                 busy = true;
                 VirtualFile toOpen = null;
                 if (configuration instanceof TopCoderConfiguration)
-                    toOpen = TaskUtilities.getFile(Utilities.getData(project).defaultDirectory, ((TopCoderConfiguration) configuration).getConfiguration().name, project);
+                    toOpen = TaskUtils.getFile(ProjectUtils.getData(project).defaultDirectory, ((TopCoderConfiguration) configuration).getConfiguration().name, project);
                 else if (configuration instanceof TaskConfiguration)
-                    toOpen = FileUtilities.getFileByFQN(((TaskConfiguration) configuration).getConfiguration().taskClass, configuration.getProject());
+                    toOpen = FileUtils.getFileByFQN(((TaskConfiguration) configuration).getConfiguration().taskClass, configuration.getProject());
                 if (toOpen != null) {
                     final VirtualFile finalToOpen = toOpen;
                     TransactionGuard.getInstance().submitTransactionAndWait(new Runnable() {
@@ -111,13 +111,13 @@ public class AutoSwitcher implements ProjectComponent {
                         RunManagerImpl runManager = RunManagerImpl.getInstanceImpl(project);
 
                         VirtualFile taskFile;
-                        if (null == (taskFile = TaskUtilities.getTaskFile(file))) return;
+                        if (null == (taskFile = TaskUtils.getTaskFile(file))) return;
                         RunnerAndConfigurationSettings old = runManager.findConfigurationByName(taskFile.getNameWithoutExtension());
                         if (old != null) {
                             RunConfiguration configuration = old.getConfiguration();
                             if (configuration instanceof TopCoderConfiguration) {
                                 TopCoderTask task = ((TopCoderConfiguration) configuration).getConfiguration();
-                                if (file.equals(TaskUtilities.getFile(Utilities.getData(project).defaultDirectory, task.name, project))) {
+                                if (file.equals(TaskUtils.getFile(ProjectUtils.getData(project).defaultDirectory, task.name, project))) {
                                     busy = true;
                                     runManager.setSelectedConfiguration(new RunnerAndConfigurationSettingsImpl(runManager,
                                         configuration, false));
@@ -125,8 +125,8 @@ public class AutoSwitcher implements ProjectComponent {
                                 }
                             } else if (configuration instanceof TaskConfiguration) {
                                 Task task = ((TaskConfiguration) configuration).getConfiguration();
-                                task = TaskUtilities.taskOfFixedPath(project, task, taskFile);
-                                if (file.equals(FileUtilities.getFileByFQN(task.taskClass, configuration.getProject()))) {
+                                task = TaskUtils.taskOfFixedPath(project, task, taskFile);
+                                if (file.equals(FileUtils.getFileByFQN(task.taskClass, configuration.getProject()))) {
                                     busy = true;
                                     runManager.setSelectedConfiguration(new RunnerAndConfigurationSettingsImpl(runManager,
                                         configuration, false));
@@ -136,9 +136,9 @@ public class AutoSwitcher implements ProjectComponent {
                             return;
                         }
 
-                        Task task = FileUtilities.readTask(FileUtilities.getRelativePath(project.getBaseDir(), taskFile), project);
-                        task = TaskUtilities.taskOfFixedPath(project, task, taskFile);
-                        Utilities.createConfiguration(task, true, project);
+                        Task task = FileUtils.readTask(FileUtils.getRelativePath(project.getBaseDir(), taskFile), project);
+                        task = TaskUtils.taskOfFixedPath(project, task, taskFile);
+                        ProjectUtils.createConfiguration(task, true, project);
                     }
                 };
                 DumbService.getInstance(project).smartInvokeLater(selectTaskRunnable);

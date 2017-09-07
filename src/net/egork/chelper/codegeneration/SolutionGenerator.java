@@ -11,9 +11,9 @@ import net.egork.chelper.task.StreamConfiguration;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.task.TestType;
 import net.egork.chelper.task.TopCoderTask;
-import net.egork.chelper.util.FileUtilities;
+import net.egork.chelper.util.FileUtils;
 import net.egork.chelper.util.Messenger;
-import net.egork.chelper.util.Utilities;
+import net.egork.chelper.util.ProjectUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -430,7 +430,7 @@ public class SolutionGenerator {
         builder.append("/**\n" +
             " * Built using CHelper plug-in\n" +
             " * Actual solution is at the top\n");
-        String author = Utilities.getData(project).author;
+        String author = ProjectUtils.getData(project).author;
         if (!author.isEmpty()) {
             builder.append(" * @author ").append(author).append("\n");
         }
@@ -480,13 +480,13 @@ public class SolutionGenerator {
             builder.append("\t\t\tthrow new RuntimeException(e);\n");
             builder.append("\t\t}\n");
         }
-        String inputClass = CodeGenerationUtilities.getSimpleName(task.inputClass);
+        String inputClass = CodeGenerationUtils.getSimpleName(task.inputClass);
         builder.append("\t\t").append(inputClass).append(" in = new ").append(inputClass).
             append("(inputStream);\n");
-        String outputClass = CodeGenerationUtilities.getSimpleName(task.outputClass);
+        String outputClass = CodeGenerationUtils.getSimpleName(task.outputClass);
         builder.append("\t\t").append(outputClass).append(" out = new ").append(outputClass).
             append("(outputStream);\n");
-        String className = CodeGenerationUtilities.getSimpleName(task.taskClass);
+        String className = CodeGenerationUtils.getSimpleName(task.taskClass);
         builder.append("\t\t").append(className).append(" solver = new ").append(className).append("();\n");
         switch (task.testType) {
             case SINGLE:
@@ -514,9 +514,9 @@ public class SolutionGenerator {
         builder.append("}\n\n");
         List<PsiElement> entryPoints = new ArrayList<PsiElement>(Arrays.asList(MainFileTemplate.getInputConstructor(project),
             MainFileTemplate.getOutputConstructor(project)));
-        entryPoints.add(MainFileTemplate.getMethod(project, Utilities.getData(project).outputClass, "close", "void"));
+        entryPoints.add(MainFileTemplate.getMethod(project, ProjectUtils.getData(project).outputClass, "close", "void"));
         if (task.testType == TestType.MULTI_NUMBER) {
-            entryPoints.add(MainFileTemplate.getMethod(project, Utilities.getData(project).inputClass, "next", "java.lang.String"));
+            entryPoints.add(MainFileTemplate.getMethod(project, ProjectUtils.getData(project).inputClass, "next", "java.lang.String"));
         }
         Set<String> toImport = new HashSet<String>();
         toImport.add("java.io.InputStream");
@@ -538,8 +538,8 @@ public class SolutionGenerator {
     public static void createSourceFile(final Task task, final Project project) {
         ApplicationManager.getApplication().runWriteAction(new Runnable() {
             public void run() {
-                String outputDirectory = Utilities.getData(project).outputDirectory;
-                VirtualFile directory = FileUtilities.createDirectoryIfMissing(project, outputDirectory);
+                String outputDirectory = ProjectUtils.getData(project).outputDirectory;
+                VirtualFile directory = FileUtils.createDirectoryIfMissing(project, outputDirectory);
                 if (directory == null)
                     return;
                 for (VirtualFile file : directory.getChildren()) {
@@ -551,14 +551,14 @@ public class SolutionGenerator {
                         }
                     }
                 }
-                SolutionGenerator generator = new SolutionGenerator(new HashSet<String>(Arrays.asList(Utilities.getData(project).excludedPackages)),
+                SolutionGenerator generator = new SolutionGenerator(new HashSet<String>(Arrays.asList(ProjectUtils.getData(project).excludedPackages)),
                     createMainClassTemplate(task, project), true, MainFileTemplate.getMethod(project, task.taskClass, "solve", "void", "int", task.inputClass, task.outputClass));
                 String source = generator.createInlinedSource();
-                final VirtualFile file = FileUtilities.writeTextFile(directory, task.mainClass + ".java", source);
-                FileUtilities.synchronizeFile(file);
+                final VirtualFile file = FileUtils.writeTextFile(directory, task.mainClass + ".java", source);
+                FileUtils.synchronizeFile(file);
                 ReformatCodeProcessor processor = new ReformatCodeProcessor(PsiManager.getInstance(project).findFile(file), false);
                 processor.run();
-                FileUtilities.synchronizeFile(file);
+                FileUtils.synchronizeFile(file);
             }
         });
     }
@@ -567,12 +567,12 @@ public class SolutionGenerator {
         ApplicationManager.getApplication().runWriteAction(new Runnable() {
             public void run() {
                 SolutionGenerator generator = new SolutionGenerator(
-                    new HashSet<String>(Arrays.asList(Utilities.getData(project).excludedPackages)),
+                    new HashSet<String>(Arrays.asList(ProjectUtils.getData(project).excludedPackages)),
                     new MainFileTemplate("%IMPORTS%\npublic %INLINED_SOURCE%", Collections.<PsiElement>emptySet(),
                         Collections.<String>emptySet()), false, task.getMethod(project));
                 String text = generator.createInlinedSource();
-                String outputDirectory = Utilities.getData(project).outputDirectory;
-                VirtualFile directory = FileUtilities.createDirectoryIfMissing(project, outputDirectory);
+                String outputDirectory = ProjectUtils.getData(project).outputDirectory;
+                VirtualFile directory = FileUtils.createDirectoryIfMissing(project, outputDirectory);
                 if (directory == null)
                     return;
                 for (VirtualFile file : directory.getChildren()) {
@@ -584,12 +584,12 @@ public class SolutionGenerator {
                         }
                     }
                 }
-                final VirtualFile file = FileUtilities.writeTextFile(directory, task.name + ".java", text);
-                FileUtilities.synchronizeFile(file);
+                final VirtualFile file = FileUtils.writeTextFile(directory, task.name + ".java", text);
+                FileUtils.synchronizeFile(file);
                 ReformatCodeProcessor processor = new ReformatCodeProcessor(PsiManager.getInstance(project).findFile(file), false);
                 processor.run();
-                String source = FileUtilities.readTextFile(file);
-                VirtualFile virtualFile = FileUtilities.writeTextFile(LocalFileSystem.getInstance().findFileByPath(System.getProperty("user.home")), ".java", source);
+                String source = FileUtils.readTextFile(file);
+                VirtualFile virtualFile = FileUtils.writeTextFile(LocalFileSystem.getInstance().findFileByPath(System.getProperty("user.home")), ".java", source);
                 new File(virtualFile.getCanonicalPath()).deleteOnExit();
             }
         });

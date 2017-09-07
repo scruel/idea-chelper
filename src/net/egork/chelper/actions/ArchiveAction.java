@@ -14,14 +14,14 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
-import net.egork.chelper.codegeneration.CodeGenerationUtilities;
+import net.egork.chelper.codegeneration.CodeGenerationUtils;
 import net.egork.chelper.configurations.TaskConfiguration;
 import net.egork.chelper.configurations.TopCoderConfiguration;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.task.TopCoderTask;
-import net.egork.chelper.util.FileUtilities;
+import net.egork.chelper.util.FileUtils;
 import net.egork.chelper.util.Messenger;
-import net.egork.chelper.util.Utilities;
+import net.egork.chelper.util.ProjectUtils;
 
 import java.io.IOException;
 
@@ -30,13 +30,13 @@ import java.io.IOException;
  */
 public class ArchiveAction extends AnAction {
     public void actionPerformed(AnActionEvent e) {
-        if (!Utilities.isEligible(e.getDataContext()))
+        if (!ProjectUtils.isEligible(e.getDataContext()))
             return;
-        final Project project = Utilities.getProject(e.getDataContext());
+        final Project project = ProjectUtils.getProject(e.getDataContext());
         final RunManagerImpl manager = RunManagerImpl.getInstanceImpl(project);
         RunnerAndConfigurationSettings selectedConfiguration =
             manager.getSelectedConfiguration();
-        if (selectedConfiguration == null || !Utilities.isSupported(selectedConfiguration.getConfiguration())) {
+        if (selectedConfiguration == null || !ProjectUtils.isSupported(selectedConfiguration.getConfiguration())) {
             Messenger.publishMessage("Configuration not selected or selected configuration not supported",
                 NotificationType.ERROR);
             return;
@@ -44,19 +44,19 @@ public class ArchiveAction extends AnAction {
         final RunConfiguration configuration = selectedConfiguration.getConfiguration();
         if (configuration instanceof TaskConfiguration) {
             final Task task = ((TaskConfiguration) configuration).getConfiguration();
-            String archiveDir = Utilities.getData(project).archiveDirectory;
+            String archiveDir = ProjectUtils.getData(project).archiveDirectory;
             String dateAndContest = getDateAndContest(task);
-            final VirtualFile directory = FileUtilities.createDirectoryIfMissing(project, archiveDir + "/" + dateAndContest);
+            final VirtualFile directory = FileUtils.createDirectoryIfMissing(project, archiveDir + "/" + dateAndContest);
             if (directory == null) {
                 Messenger.publishMessage("Cannot create directory '" + archiveDir + "/" + dateAndContest + "' in archive",
                     NotificationType.ERROR);
                 return;
             }
-            CodeGenerationUtilities.createUnitTest(task, project);
+            CodeGenerationUtils.createUnitTest(task, project);
             ApplicationManager.getApplication().runWriteAction(new Runnable() {
                 public void run() {
                     try {
-                        VirtualFile mainFile = FileUtilities.getFileByFQN(task.taskClass, project);
+                        VirtualFile mainFile = FileUtils.getFileByFQN(task.taskClass, project);
                         if (mainFile != null) {
                             VfsUtil.copyFile(this, mainFile, directory);
                             mainFile.delete(this);
@@ -68,13 +68,13 @@ public class ArchiveAction extends AnAction {
                             checkerFile.delete(this);
                         }
                         for (String testClass : task.testClasses) {
-                            VirtualFile testFile = FileUtilities.getFileByFQN(testClass, project);
+                            VirtualFile testFile = FileUtils.getFileByFQN(testClass, project);
                             if (testFile != null) {
                                 VfsUtil.copyFile(this, testFile, directory);
                                 testFile.delete(this);
                             }
                         }
-                        VirtualFile taskFile = FileUtilities.getFile(project, task.location + "/" + canonize(task.name) + ".task");
+                        VirtualFile taskFile = FileUtils.getFile(project, task.location + "/" + canonize(task.name) + ".task");
                         if (taskFile != null) {
                             VfsUtil.copyFile(this, taskFile, directory);
                             taskFile.delete(this);
@@ -92,29 +92,29 @@ public class ArchiveAction extends AnAction {
             });
         } else if (configuration instanceof TopCoderConfiguration) {
             final TopCoderTask task = ((TopCoderConfiguration) configuration).getConfiguration();
-            String archiveDir = Utilities.getData(project).archiveDirectory;
+            String archiveDir = ProjectUtils.getData(project).archiveDirectory;
             String dateAndContest = getDateAndContest(task);
-            final VirtualFile directory = FileUtilities.createDirectoryIfMissing(project, archiveDir + "/" + dateAndContest);
+            final VirtualFile directory = FileUtils.createDirectoryIfMissing(project, archiveDir + "/" + dateAndContest);
             if (directory == null)
                 return;
-            CodeGenerationUtilities.createUnitTest(task, project);
+            CodeGenerationUtils.createUnitTest(task, project);
             ApplicationManager.getApplication().runWriteAction(new Runnable() {
                 public void run() {
                     try {
-                        VirtualFile mainFile = FileUtilities.getFile(project, Utilities.getData(project).defaultDirectory
+                        VirtualFile mainFile = FileUtils.getFile(project, ProjectUtils.getData(project).defaultDirectory
                             + "/" + task.name + ".java");
                         if (mainFile != null) {
                             VfsUtil.copyFile(this, mainFile, directory);
                             mainFile.delete(this);
                         }
                         for (String testClass : task.testClasses) {
-                            VirtualFile testFile = FileUtilities.getFileByFQN(testClass, project);
+                            VirtualFile testFile = FileUtils.getFileByFQN(testClass, project);
                             if (testFile != null) {
                                 VfsUtil.copyFile(this, testFile, directory);
                                 testFile.delete(this);
                             }
                         }
-                        VirtualFile taskFile = FileUtilities.getFile(project, Utilities.getData(project).defaultDirectory + "/" + task.name + ".tctask");
+                        VirtualFile taskFile = FileUtils.getFile(project, ProjectUtils.getData(project).defaultDirectory + "/" + task.name + ".tctask");
                         if (taskFile != null) {
                             VfsUtil.copyFile(this, taskFile, directory);
                             taskFile.delete(this);

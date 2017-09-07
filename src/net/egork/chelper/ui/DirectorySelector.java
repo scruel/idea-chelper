@@ -7,7 +7,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.Consumer;
-import net.egork.chelper.util.FileUtilities;
+import net.egork.chelper.util.FileUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -44,12 +44,12 @@ public class DirectorySelector extends JPanel {
                 PathChooserDialog dialog = FileChooserFactory.getInstance().createPathChooser(new FileChooserDescriptor(false, true, false, false, false, false) {
                     @Override
                     public boolean isFileSelectable(VirtualFile file) {
-                        return super.isFileSelectable(file) && (allowAllDirectories || FileUtilities.isChild(project.getBaseDir(), file));
+                        return super.isFileSelectable(file) && (allowAllDirectories || FileUtils.isChild(project.getBaseDir(), file));
                     }
 
                     @Override
                     public boolean isFileVisible(VirtualFile file, boolean showHiddenFiles) {
-                        return super.isFileVisible(file, showHiddenFiles) && (allowAllDirectories || (FileUtilities.isChild(project.getBaseDir(), file) || FileUtilities.isChild(file, project.getBaseDir())));
+                        return super.isFileVisible(file, showHiddenFiles) && (allowAllDirectories || (FileUtils.isChild(project.getBaseDir(), file) || FileUtils.isChild(file, project.getBaseDir())));
                     }
                 }, project, DirectorySelector.this);
                 VirtualFile toSelect = allowAllDirectories ? VfsUtil.findFileByIoFile(new File(textField.getText()), false) : project.getBaseDir().findFileByRelativePath(textField.getText());
@@ -58,7 +58,7 @@ public class DirectorySelector extends JPanel {
                 dialog.choose(toSelect, new Consumer<List<VirtualFile>>() {
                     public void consume(List<VirtualFile> virtualFiles) {
                         if (virtualFiles.size() == 1) {
-                            String path = allowAllDirectories ? virtualFiles.get(0).getPath() : FileUtilities.getRelativePath(project.getBaseDir(), virtualFiles.get(0));
+                            String path = allowAllDirectories ? virtualFiles.get(0).getPath() : FileUtils.getRelativePath(project.getBaseDir(), virtualFiles.get(0));
                             if (path != null)
                                 textField.setText(path);
                         }

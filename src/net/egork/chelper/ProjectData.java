@@ -3,8 +3,8 @@ package net.egork.chelper;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import net.egork.chelper.util.FileUtilities;
-import net.egork.chelper.util.Utilities;
+import net.egork.chelper.util.FileUtils;
+import net.egork.chelper.util.ProjectUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -73,7 +73,7 @@ public class ProjectData {
         VirtualFile config = root.findChild("chelper.properties");
         if (config == null)
             return null;
-        Properties properties = FileUtilities.loadProperties(config);
+        Properties properties = FileUtils.loadProperties(config);
         if (properties == null)
             return null;
         return new ProjectData(properties);
@@ -127,13 +127,13 @@ public class ProjectData {
         ProjectData newData = new ProjectData(inputClass, outputClass, excludedPackages, outputDirectory, author,
             archiveDirectory, defaultDirectory, testDirectory, enableUnitTests, failOnIntegerOverflowForNewTasks, true, smartTesting, extensionProposed);
         newData.save(project);
-        Utilities.addProjectData(project, newData);
+        ProjectUtils.addProjectData(project, newData);
     }
 
     public void completeExtensionProposal(Project project) {
         ProjectData newData = new ProjectData(inputClass, outputClass, excludedPackages, outputDirectory, author,
             archiveDirectory, defaultDirectory, testDirectory, enableUnitTests, failOnIntegerOverflowForNewTasks, libraryMigrated, smartTesting, true);
         newData.save(project);
-        Utilities.addProjectData(project, newData);
+        ProjectUtils.addProjectData(project, newData);
     }
 }

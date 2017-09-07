@@ -5,7 +5,7 @@ import com.intellij.openapi.ui.VerticalFlowLayout;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import net.egork.chelper.task.Test;
-import net.egork.chelper.util.FileUtilities;
+import net.egork.chelper.util.FileUtils;
 
 import javax.swing.*;
 import java.io.File;
@@ -45,8 +45,8 @@ public class BulkAddTestsPanel extends JPanel {
         for (VirtualFile file : directory.getChildren()) {
             if (!file.isDirectory() && answerExtension.getText().equals(file.getExtension()) && inputs.containsKey(file.getNameWithoutExtension())) {
                 VirtualFile inputFile = inputs.get(file.getNameWithoutExtension());
-                String input = FileUtilities.readTextFile(inputFile);
-                String answer = FileUtilities.readTextFile(file);
+                String input = FileUtils.readTextFile(inputFile);
+                String answer = FileUtils.readTextFile(file);
                 tests.add(new Test(input, answer));
             }
         }

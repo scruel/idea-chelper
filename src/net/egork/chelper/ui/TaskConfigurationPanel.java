@@ -6,9 +6,9 @@ import net.egork.chelper.task.StreamConfiguration;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.task.TestType;
 import net.egork.chelper.util.FileCreator;
-import net.egork.chelper.util.FileUtilities;
+import net.egork.chelper.util.FileUtils;
+import net.egork.chelper.util.ProjectUtils;
 import net.egork.chelper.util.Provider;
-import net.egork.chelper.util.Utilities;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -163,22 +163,22 @@ public class TaskConfigurationPanel extends JPanel {
         };
         taskClass = new SelectOrCreateClass(task.taskClass, project, locationProvider, new FileCreator() {
             public String createFile(Project project, String path, String name) {
-                return FileUtilities.createTaskClass(task, project, path, name);
+                return FileUtils.createTaskClass(task, project, path, name);
             }
 
             public boolean isValid(String name) {
-                return FileUtilities.isValidClassName(name);
+                return FileUtils.isValidClassName(name);
             }
         });
         leftAdvanced.add(taskClass);
         leftAdvanced.add(new JLabel("Checker class:"));
         checkerClass = new SelectOrCreateClass(task.checkerClass, project, locationProvider, new FileCreator() {
             public String createFile(Project project, String path, String name) {
-                return FileUtilities.createCheckerClass(project, path, name, task);
+                return FileUtils.createCheckerClass(project, path, name, task);
             }
 
             public boolean isValid(String name) {
-                return FileUtilities.isValidClassName(name);
+                return FileUtils.isValidClassName(name);
             }
         });
         leftAdvanced.add(checkerClass);
@@ -204,17 +204,17 @@ public class TaskConfigurationPanel extends JPanel {
         hasTestCase = new JCheckBox();
         hasTestCase.setSelected(task.testClasses.length != 0);
         testClassPanel.add(hasTestCase, BorderLayout.WEST);
-        testClass = new SelectOrCreateClass(task.testClasses.length != 0 ? task.testClasses[0] : (Utilities.getSimpleName(task.taskClass) + "TestCase"), project, new Provider<String>() {
+        testClass = new SelectOrCreateClass(task.testClasses.length != 0 ? task.testClasses[0] : (ProjectUtils.getSimpleName(task.taskClass) + "TestCase"), project, new Provider<String>() {
             public String provide() {
                 return task.location;
             }
         }, new FileCreator() {
             public String createFile(Project project, String path, String name) {
-                return FileUtilities.createTestClass(project, path, name, task);
+                return FileUtils.createTestClass(project, path, name, task);
             }
 
             public boolean isValid(String name) {
-                return FileUtilities.isValidClassName(name);
+                return FileUtils.isValidClassName(name);
             }
         });
         testClass.setEnabled(hasTestCase.isSelected());

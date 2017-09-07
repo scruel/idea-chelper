@@ -10,27 +10,27 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiPackage;
 import net.egork.chelper.ProjectData;
 import net.egork.chelper.task.Task;
-import net.egork.chelper.util.FileUtilities;
+import net.egork.chelper.util.FileUtils;
 import net.egork.chelper.util.Messenger;
-import net.egork.chelper.util.Utilities;
+import net.egork.chelper.util.ProjectUtils;
 
 /**
  * @author Egor Kulikov (egor@egork.net)
  */
 public class NewTaskDefaultAction extends AnAction {
     public void actionPerformed(AnActionEvent e) {
-        if (!Utilities.isEligible(e.getDataContext()))
+        if (!ProjectUtils.isEligible(e.getDataContext()))
             return;
-        Project project = Utilities.getProject(e.getDataContext());
+        Project project = ProjectUtils.getProject(e.getDataContext());
         createTaskInDefaultDirectory(project, null);
     }
 
     public static void createTaskInDefaultDirectory(Project project, Task task) {
-        ProjectData data = Utilities.getData(project);
-        PsiDirectory directory = FileUtilities.getPsiDirectory(project, data.defaultDirectory);
+        ProjectData data = ProjectUtils.getData(project);
+        PsiDirectory directory = FileUtils.getPsiDirectory(project, data.defaultDirectory);
         if (directory == null) {
-            FileUtilities.createDirectoryIfMissing(project, data.defaultDirectory);
-            directory = FileUtilities.getPsiDirectory(project, data.defaultDirectory);
+            FileUtils.createDirectoryIfMissing(project, data.defaultDirectory);
+            directory = FileUtils.getPsiDirectory(project, data.defaultDirectory);
             if (directory == null) {
                 Messenger.publishMessage("Unable to create default directory", NotificationType.ERROR);
                 return;
@@ -43,7 +43,7 @@ public class NewTaskDefaultAction extends AnAction {
         }
         PsiElement[] result = NewTaskAction.createTask(task == null ? null : task.name, directory, task, true);
         for (PsiElement element : result) {
-            Utilities.openElement(project, element);
+            ProjectUtils.openElement(project, element);
         }
     }
 

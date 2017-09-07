@@ -6,7 +6,7 @@ import net.egork.chelper.task.StreamConfiguration;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.task.Test;
 import net.egork.chelper.task.TestType;
-import net.egork.chelper.util.FileUtilities;
+import net.egork.chelper.util.FileUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import javax.swing.*;
@@ -29,7 +29,7 @@ public class TimusParser implements Parser {
     }
 
     public void getContests(DescriptionReceiver receiver) {
-        String currentContestPage = FileUtilities.getWebPageContent("http://acm.timus.ru/schedule.aspx?locale=en");
+        String currentContestPage = FileUtils.getWebPageContent("http://acm.timus.ru/schedule.aspx?locale=en");
         if (currentContestPage != null) {
             StringParser parser = new StringParser(currentContestPage);
             try {
@@ -46,7 +46,7 @@ public class TimusParser implements Parser {
             } catch (ParseException ignored) {
             }
         }
-        String problemsetPage = FileUtilities.getWebPageContent("http://acm.timus.ru/problemset.aspx?locale=en");
+        String problemsetPage = FileUtils.getWebPageContent("http://acm.timus.ru/problemset.aspx?locale=en");
         if (problemsetPage != null) {
             StringParser parser = new StringParser(problemsetPage);
             int index = 1;
@@ -60,7 +60,7 @@ public class TimusParser implements Parser {
             else
                 return;
         }
-        String archivePage = FileUtilities.getWebPageContent("http://acm.timus.ru/archive.aspx?locale=en");
+        String archivePage = FileUtils.getWebPageContent("http://acm.timus.ru/archive.aspx?locale=en");
         if (archivePage != null) {
             StringParser parser = new StringParser(archivePage);
             List<Description> contests = new ArrayList<Description>();
@@ -92,7 +92,7 @@ public class TimusParser implements Parser {
             else
                 return;
         }
-        String mainPage = FileUtilities.getWebPageContent(url);
+        String mainPage = FileUtils.getWebPageContent(url);
         if (mainPage == null)
             return;
         List<Description> tasks = new ArrayList<Description>();
@@ -128,7 +128,7 @@ public class TimusParser implements Parser {
             index = tokens[1];
         }
         url = "http://acm.timus.ru/problem.aspx?space=" + tokens[0] + "&num=" + tokens[1] + "&locale=en";
-        String text = FileUtilities.getWebPageContent(url);
+        String text = FileUtils.getWebPageContent(url);
         if (text == null)
             return null;
         StringParser parser = new StringParser(text);

@@ -13,9 +13,9 @@ import net.egork.chelper.parser.Parser;
 import net.egork.chelper.parser.ParserTask;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.task.TestType;
-import net.egork.chelper.util.FileUtilities;
+import net.egork.chelper.util.FileUtils;
 import net.egork.chelper.util.Messenger;
-import net.egork.chelper.util.Utilities;
+import net.egork.chelper.util.ProjectUtils;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -50,15 +50,15 @@ public class ParseDialog extends JDialog {
 
     private ParseDialog(final Project project) {
         super(null, "Parse Contest", ModalityType.APPLICATION_MODAL);
-        setIconImage(Utilities.iconToImage(IconLoader.getIcon("/icons/parseContest.png")));
-        ProjectData data = Utilities.getData(project);
+        setIconImage(ProjectUtils.iconToImage(IconLoader.getIcon("/icons/parseContest.png")));
+        ProjectData data = ProjectUtils.getData(project);
         OkCancelPanel contentPanel = new OkCancelPanel(new BorderLayout(5, 5)) {
             @Override
             public void onOk() {
                 List<Task> list = new ArrayList<Task>();
                 Object[] tasks = taskList.getSelectedValues();
                 Parser parser = (Parser) parserCombo.getSelectedItem();
-                ProjectData data = Utilities.getData(project);
+                ProjectData data = ProjectUtils.getData(project);
                 for (Object taskDescription : tasks) {
                     Description description = (Description) taskDescription;
                     Task raw = parser.parseTask(description);
@@ -71,7 +71,7 @@ public class ParseDialog extends JDialog {
                     raw = raw.setTemplate(template.getText());
                     Task task = new Task(raw.name, (TestType) testType.getSelectedItem(), raw.input, raw.output,
                         raw.tests, location.getText(), raw.vmArgs, raw.mainClass,
-                        FileUtilities.createIfNeeded(raw, raw.taskClass, project, location.getText()), raw.checkerClass,
+                        FileUtils.createIfNeeded(raw, raw.taskClass, project, location.getText()), raw.checkerClass,
                         raw.checkerParameters, raw.testClasses, date.getText(), contestName.getText(),
                         truncate.isSelected(), data.inputClass, data.outputClass, raw.includeLocale,
                         data.failOnIntegerOverflowForNewTasks, raw.template);
@@ -79,10 +79,10 @@ public class ParseDialog extends JDialog {
                 }
                 result = list;
                 if (!result.isEmpty()) {
-                    Utilities.updateDefaultTask(result.iterator().next());
+                    ProjectUtils.updateDefaultTask(result.iterator().next());
                 }
                 ParseDialog.this.setVisible(false);
-                Utilities.setDefaultParser(parser);
+                ProjectUtils.setDefaultParser(parser);
             }
 
             @Override
@@ -103,7 +103,7 @@ public class ParseDialog extends JDialog {
                 return label;
             }
         });
-        parserCombo.setSelectedItem(Utilities.getDefaultParser());
+        parserCombo.setSelectedItem(ProjectUtils.getDefaultParser());
         parserCombo.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 testType.setSelectedItem(((Parser) parserCombo.getSelectedItem()).defaultTestType());
@@ -186,10 +186,10 @@ public class ParseDialog extends JDialog {
                 return size;
             }
         };
-        Task defaultTask = Utilities.getDefaultTask();
+        Task defaultTask = ProjectUtils.getDefaultTask();
         leftPanel.add(new JLabel("Test type:"));
         testType = new JComboBox(TestType.values());
-        testType.setSelectedItem(Utilities.getDefaultParser().defaultTestType());
+        testType.setSelectedItem(ProjectUtils.getDefaultParser().defaultTestType());
         leftPanel.add(testType);
         leftPanel.add(new JLabel("Location:"));
         location = new DirectorySelector(project, data.defaultDirectory);
@@ -225,7 +225,7 @@ public class ParseDialog extends JDialog {
         setContentPane(contentPanel);
         refresh();
         pack();
-        Point center = Utilities.getLocation(project, contentPanel.getSize());
+        Point center = ProjectUtils.getLocation(project, contentPanel.getSize());
         setLocation(center);
         setVisible(true);
     }

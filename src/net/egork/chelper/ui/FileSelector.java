@@ -7,7 +7,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.Consumer;
-import net.egork.chelper.util.FileUtilities;
+import net.egork.chelper.util.FileUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -45,15 +45,15 @@ public class FileSelector extends JPanel {
                     @Override
                     public boolean isFileSelectable(VirtualFile file) {
                         return super.isFileSelectable(file) &&
-                            (allowAllFiles || FileUtilities.isChild(project.getBaseDir(), file)) &&
+                            (allowAllFiles || FileUtils.isChild(project.getBaseDir(), file)) &&
                             hasCorrectExtension(file);
                     }
 
                     @Override
                     public boolean isFileVisible(VirtualFile file, boolean showHiddenFiles) {
                         return super.isFileVisible(file, showHiddenFiles) &&
-                            (allowAllFiles || (FileUtilities.isChild(project.getBaseDir(), file) ||
-                                FileUtilities.isChild(file, project.getBaseDir()))) &&
+                            (allowAllFiles || (FileUtils.isChild(project.getBaseDir(), file) ||
+                                FileUtils.isChild(file, project.getBaseDir()))) &&
                             (file.isDirectory() || hasCorrectExtension(file));
                     }
 
@@ -67,7 +67,7 @@ public class FileSelector extends JPanel {
                 dialog.choose(toSelect, new Consumer<List<VirtualFile>>() {
                     public void consume(List<VirtualFile> virtualFiles) {
                         if (virtualFiles.size() == 1) {
-                            String path = allowAllFiles ? virtualFiles.get(0).getPath() : FileUtilities.getRelativePath(project.getBaseDir(), virtualFiles.get(0));
+                            String path = allowAllFiles ? virtualFiles.get(0).getPath() : FileUtils.getRelativePath(project.getBaseDir(), virtualFiles.get(0));
                             if (path != null)
                                 textField.setText(path);
                         }

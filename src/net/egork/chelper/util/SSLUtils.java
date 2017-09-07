@@ -12,6 +12,8 @@ import java.security.cert.X509Certificate;
  * @author Francis Labrie
  */
 public final class SSLUtils {
+    private SSLUtils() {
+    }
 
     /**
      * Hostname verifier for the Sun's deprecated API.
@@ -309,4 +311,4 @@ public final class SSLUtils {
             return (_AcceptedIssuers);
         } // getAcceptedIssuers
     } // FakeX509TrustManager
-} // SSLUtilities
+}

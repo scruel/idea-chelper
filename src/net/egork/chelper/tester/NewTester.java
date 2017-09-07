@@ -4,7 +4,7 @@ import net.egork.chelper.checkers.Checker;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.task.Test;
 import net.egork.chelper.task.TestType;
-import net.egork.chelper.util.EncodingUtilities;
+import net.egork.chelper.util.EncodingUtils;
 import net.egork.chelper.util.InputReader;
 import net.egork.chelper.util.OutputWriter;
 
@@ -207,7 +207,7 @@ public class NewTester {
         String[] tokens = s.split("::", -1);
         Test[] tests = new Test[tokens.length];
         for (int i = 0; i < tests.length; i++)
-            tests[i] = EncodingUtilities.decodeTest(i, tokens[i]);
+            tests[i] = EncodingUtils.decodeTest(i, tokens[i]);
         return tests;
     }
 }

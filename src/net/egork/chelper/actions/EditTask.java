@@ -12,17 +12,17 @@ import net.egork.chelper.task.Task;
 import net.egork.chelper.task.TopCoderTask;
 import net.egork.chelper.ui.CreateTaskDialog;
 import net.egork.chelper.ui.EditTCDialog;
-import net.egork.chelper.util.FileUtilities;
-import net.egork.chelper.util.Utilities;
+import net.egork.chelper.util.FileUtils;
+import net.egork.chelper.util.ProjectUtils;
 
 /**
  * @author egorku@yandex-team.ru
  */
 public class EditTask extends AnAction {
     public void actionPerformed(AnActionEvent e) {
-        if (!Utilities.isEligible(e.getDataContext()))
+        if (!ProjectUtils.isEligible(e.getDataContext()))
             return;
-        Project project = Utilities.getProject(e.getDataContext());
+        Project project = ProjectUtils.getProject(e.getDataContext());
         RunnerAndConfigurationSettings selectedConfiguration =
             RunManagerImpl.getInstanceImpl(project).getSelectedConfiguration();
         if (selectedConfiguration == null)
@@ -32,7 +32,7 @@ public class EditTask extends AnAction {
             TaskConfiguration taskConfiguration = (TaskConfiguration) configuration;
             Task task = taskConfiguration.getConfiguration();
             task = CreateTaskDialog.showDialog(
-                FileUtilities.getPsiDirectory(project, task.location), task.name, task, false);
+                FileUtils.getPsiDirectory(project, task.location), task.name, task, false);
             if (task != null)
                 taskConfiguration.setConfiguration(task);
         }

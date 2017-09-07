@@ -6,7 +6,7 @@ import net.egork.chelper.task.StreamConfiguration;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.task.Test;
 import net.egork.chelper.task.TestType;
-import net.egork.chelper.util.FileUtilities;
+import net.egork.chelper.util.FileUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import javax.swing.*;
@@ -36,7 +36,7 @@ public class CodeChefParser implements Parser {
     public void getContests(DescriptionReceiver receiver) {
         String mainPage;
         while (true) {
-            mainPage = FileUtilities.getWebPageContent("http://www.codechef.com/contests");
+            mainPage = FileUtils.getWebPageContent("http://www.codechef.com/contests");
             if (mainPage != null)
                 break;
             if (receiver.isStopped())
@@ -91,7 +91,7 @@ public class CodeChefParser implements Parser {
     }
 
     public void parseContest(String id, DescriptionReceiver receiver) {
-        String mainPage = FileUtilities.getWebPageContent("http://www.codechef.com/" + id);
+        String mainPage = FileUtils.getWebPageContent("http://www.codechef.com/" + id);
         if (mainPage == null)
             return;
         if (SPECIAL.contains(id)) {
@@ -138,7 +138,7 @@ public class CodeChefParser implements Parser {
             url = "http://www.codechef.com/" + tokens[0] + "/problems/" + tokens[1];
         else
             url = "http://www.codechef.com/problems/" + tokens[0];
-        String text = FileUtilities.getWebPageContent(url);
+        String text = FileUtils.getWebPageContent(url);
         if (text == null) {
             return null;
         }

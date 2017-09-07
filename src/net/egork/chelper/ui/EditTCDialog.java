@@ -3,7 +3,7 @@ package net.egork.chelper.ui;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
 import net.egork.chelper.task.TopCoderTask;
-import net.egork.chelper.util.Utilities;
+import net.egork.chelper.util.ProjectUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,7 +18,7 @@ public class EditTCDialog extends JDialog {
 
     public EditTCDialog(TopCoderTask task, Project project) {
         super(null, task.name, ModalityType.APPLICATION_MODAL);
-        setIconImage(Utilities.iconToImage(IconLoader.getIcon("/icons/topcoder.png")));
+        setIconImage(ProjectUtils.iconToImage(IconLoader.getIcon("/icons/topcoder.png")));
         setAlwaysOnTop(true);
         setResizable(false);
         this.task = task;
@@ -44,7 +44,7 @@ public class EditTCDialog extends JDialog {
         main.add(buttonPanel, BorderLayout.SOUTH);
         setContentPane(main);
         pack();
-        Point center = Utilities.getLocation(project, main.getSize());
+        Point center = ProjectUtils.getLocation(project, main.getSize());
         setLocation(center);
     }
 

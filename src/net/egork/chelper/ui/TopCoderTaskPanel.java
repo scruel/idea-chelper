@@ -4,9 +4,9 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.VerticalFlowLayout;
 import net.egork.chelper.task.TopCoderTask;
 import net.egork.chelper.util.FileCreator;
-import net.egork.chelper.util.FileUtilities;
+import net.egork.chelper.util.FileUtils;
+import net.egork.chelper.util.ProjectUtils;
 import net.egork.chelper.util.Provider;
-import net.egork.chelper.util.Utilities;
 
 import javax.swing.*;
 import java.awt.*;
@@ -49,15 +49,15 @@ public class TopCoderTaskPanel extends JPanel {
         testClassPanel.add(hasTestCase, BorderLayout.WEST);
         testClass = new SelectOrCreateClass(task.testClasses.length != 0 ? task.testClasses[0] : (task.name + "TestCase"), project, new Provider<String>() {
             public String provide() {
-                return Utilities.getData(project).defaultDirectory;
+                return ProjectUtils.getData(project).defaultDirectory;
             }
         }, new FileCreator() {
             public String createFile(Project project, String path, String name) {
-                return FileUtilities.createTopCoderTestClass(project, path, name);
+                return FileUtils.createTopCoderTestClass(project, path, name);
             }
 
             public boolean isValid(String name) {
-                return FileUtilities.isValidClassName(name);
+                return FileUtils.isValidClassName(name);
             }
         });
         testClass.setEnabled(hasTestCase.isSelected());

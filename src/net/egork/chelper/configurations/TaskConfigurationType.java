@@ -5,7 +5,7 @@ import com.intellij.execution.configurations.ConfigurationType;
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
-import net.egork.chelper.util.Utilities;
+import net.egork.chelper.util.ProjectUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -22,7 +22,7 @@ public class TaskConfigurationType implements ConfigurationType {
         factory = new ConfigurationFactory(this) {
             @Override
             public RunConfiguration createTemplateConfiguration(Project project) {
-                return new TaskConfiguration("Task", project, Utilities.getDefaultTask(), factory);
+                return new TaskConfiguration("Task", project, ProjectUtils.getDefaultTask(), factory);
             }
         };
         INSTANCE = this;

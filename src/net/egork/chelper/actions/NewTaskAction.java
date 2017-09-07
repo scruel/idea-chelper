@@ -8,8 +8,8 @@ import com.intellij.psi.PsiElement;
 import com.intellij.util.IncorrectOperationException;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.ui.CreateTaskDialog;
-import net.egork.chelper.util.FileUtilities;
-import net.egork.chelper.util.Utilities;
+import net.egork.chelper.util.FileUtils;
+import net.egork.chelper.util.ProjectUtils;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -32,15 +32,15 @@ public class NewTaskAction extends CreateElementActionBase {
     }
 
     public static PsiElement[] createTask(String s, PsiDirectory psiDirectory, Task template, boolean allowNameChange) {
-        if (!FileUtilities.isJavaDirectory(psiDirectory))
+        if (!FileUtils.isJavaDirectory(psiDirectory))
             return PsiElement.EMPTY_ARRAY;
         Task task = CreateTaskDialog.showDialog(psiDirectory, s, template, allowNameChange);
         if (task == null)
             return PsiElement.EMPTY_ARRAY;
-        PsiElement main = Utilities.getPsiElement(psiDirectory.getProject(), task.taskClass);
+        PsiElement main = ProjectUtils.getPsiElement(psiDirectory.getProject(), task.taskClass);
         if (main == null)
             return PsiElement.EMPTY_ARRAY;
-        Utilities.createConfiguration(task, true, psiDirectory.getProject());
+        ProjectUtils.createConfiguration(task, true, psiDirectory.getProject());
         return new PsiElement[]{main};
     }
 
@@ -61,9 +61,9 @@ public class NewTaskAction extends CreateElementActionBase {
 
     @Override
     protected boolean isAvailable(DataContext dataContext) {
-        if (!Utilities.isEligible(dataContext))
+        if (!ProjectUtils.isEligible(dataContext))
             return false;
-        PsiDirectory directory = FileUtilities.getDirectory(dataContext);
-        return FileUtilities.isJavaDirectory(directory);
+        PsiDirectory directory = FileUtils.getDirectory(dataContext);
+        return FileUtils.isJavaDirectory(directory);
     }
 }

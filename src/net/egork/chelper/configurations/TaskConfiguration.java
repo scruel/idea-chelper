@@ -13,14 +13,15 @@ import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiDocumentManager;
 import net.egork.chelper.actions.ArchiveAction;
 import net.egork.chelper.actions.TopCoderAction;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.ui.TaskConfigurationEditor;
-import net.egork.chelper.util.FileUtilities;
+import net.egork.chelper.util.FileUtils;
 import net.egork.chelper.util.InputReader;
-import net.egork.chelper.util.TaskUtilities;
-import net.egork.chelper.util.Utilities;
+import net.egork.chelper.util.ProjectUtils;
+import net.egork.chelper.util.TaskUtils;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 
@@ -61,12 +62,12 @@ public class TaskConfiguration extends ModuleBasedConfiguration<JavaRunConfigura
 
     public RunProfileState getState(@NotNull Executor executor, @NotNull ExecutionEnvironment env)
         throws ExecutionException {
-        TaskUtilities.createSourceFile(configuration, getProject());
+        TaskUtils.createSourceFile(configuration, getProject());
         JavaCommandLineState state = new JavaCommandLineState(env) {
             @Override
             protected JavaParameters createJavaParameters() throws ExecutionException {
                 JavaParameters parameters = new JavaParameters();
-                PsiDirectory directory = FileUtilities.getPsiDirectory(getProject(), configuration.location);
+                PsiDirectory directory = FileUtils.getPsiDirectory(getProject(), configuration.location);
                 Module module = ProjectRootManager.getInstance(getProject()).getFileIndex().getModuleForFile(
                     directory.getVirtualFile());
                 parameters.configureByModule(module, JavaParameters.JDK_AND_CLASSES);
@@ -79,10 +80,10 @@ public class TaskConfiguration extends ModuleBasedConfiguration<JavaRunConfigura
                     String path = TopCoderAction.getJarPathForClass(com.github.cojac.CojacAgent.class);
                     parameters.getVMParametersList().add("-javaagent:" + path + "=-Cints -Clongs -Ccasts -Cmath");
                 }
-                String taskFileName = TaskUtilities.getTaskFileName(configuration.location, configuration.name);
+                String taskFileName = TaskUtils.getTaskFileName(configuration.location, configuration.name);
                 parameters.getProgramParametersList().add(taskFileName);
-                if (Utilities.getData(getProject()).smartTesting) {
-                    VirtualFile report = FileUtilities.getFile(getProject(), "CHelperReport.txt");
+                if (ProjectUtils.getData(getProject()).smartTesting) {
+                    VirtualFile report = FileUtils.getFile(getProject(), "CHelperReport.txt");
                     if (report != null) {
                         try {
                             InputReader reader = new InputReader(report.getInputStream());
@@ -111,12 +112,16 @@ public class TaskConfiguration extends ModuleBasedConfiguration<JavaRunConfigura
 
     public void setConfiguration(Task configuration) {
         this.configuration = configuration;
+        PsiDocumentManager psiDocumentManager = PsiDocumentManager.getInstance(getProject());
+        if (psiDocumentManager.hasUncommitedDocuments()) {
+            psiDocumentManager.commitAllDocuments();
+        }
         saveConfiguration(configuration);
     }
 
     private void saveConfiguration(Task configuration) {
         if (configuration != null && configuration.location != null && configuration.name != null && configuration.name.length() != 0)
-            FileUtilities.saveConfiguration(configuration.location, ArchiveAction.canonize(configuration.name) + ".task", configuration, getProject());
+            FileUtils.saveConfiguration(configuration.location, ArchiveAction.canonize(configuration.name) + ".task", configuration, getProject());
     }
 
     @Override
@@ -125,7 +130,7 @@ public class TaskConfiguration extends ModuleBasedConfiguration<JavaRunConfigura
         String fileName = element.getChildText("taskConf");
         if (fileName != null && fileName.trim().length() != 0) {
             try {
-                configuration = FileUtilities.readTask(fileName, getProject());
+                configuration = FileUtils.readTask(fileName, getProject());
             } catch (NullPointerException ignored) {
             }
         }
@@ -136,7 +141,7 @@ public class TaskConfiguration extends ModuleBasedConfiguration<JavaRunConfigura
         super.writeExternal(element);
         Element configurationElement = new Element("taskConf");
         element.addContent(configurationElement);
-        String configurationFile = TaskUtilities.getTaskFileName(configuration.location, configuration.name);
+        String configurationFile = TaskUtils.getTaskFileName(configuration.location, configuration.name);
         if (configurationFile != null)
             configurationElement.setText(configurationFile);
     }

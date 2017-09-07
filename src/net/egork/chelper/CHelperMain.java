@@ -1,8 +1,8 @@
 package net.egork.chelper;
 
 import com.intellij.openapi.components.ApplicationComponent;
+import net.egork.chelper.util.ProjectUtils;
 import net.egork.chelper.util.SSLUtils;
-import net.egork.chelper.util.Utilities;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -14,7 +14,7 @@ public class CHelperMain implements ApplicationComponent {
 
     @Override
     public void initComponent() {
-        Utilities.addListeners();
+        ProjectUtils.addListeners();
         SSLUtils.trustAllHostnames();
         SSLUtils.trustAllHttpsCertificates();
     }

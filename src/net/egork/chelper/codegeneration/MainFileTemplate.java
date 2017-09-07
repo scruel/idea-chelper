@@ -3,7 +3,7 @@ package net.egork.chelper.codegeneration;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
-import net.egork.chelper.util.Utilities;
+import net.egork.chelper.util.ProjectUtils;
 
 import java.util.Collection;
 
@@ -71,11 +71,11 @@ public class MainFileTemplate extends Template {
     }
 
     public static PsiElement getInputConstructor(Project project) {
-        return getConstructor(project, Utilities.getData(project).inputClass, "java.io.InputStream");
+        return getConstructor(project, ProjectUtils.getData(project).inputClass, "java.io.InputStream");
     }
 
     public static PsiElement getOutputConstructor(Project project) {
-        return getConstructor(project, Utilities.getData(project).outputClass, "java.io.OutputStream");
+        return getConstructor(project, ProjectUtils.getData(project).outputClass, "java.io.OutputStream");
     }
 
     private static PsiElement getConstructor(Project project, String aClass, String... arguments) {

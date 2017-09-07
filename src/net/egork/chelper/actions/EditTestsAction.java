@@ -12,16 +12,16 @@ import net.egork.chelper.task.Task;
 import net.egork.chelper.task.TopCoderTask;
 import net.egork.chelper.ui.EditTestsDialog;
 import net.egork.chelper.ui.TopCoderEditTestsDialog;
-import net.egork.chelper.util.Utilities;
+import net.egork.chelper.util.ProjectUtils;
 
 /**
  * @author Egor Kulikov (kulikov@devexperts.com)
  */
 public class EditTestsAction extends AnAction {
     public void actionPerformed(AnActionEvent e) {
-        if (!Utilities.isEligible(e.getDataContext()))
+        if (!ProjectUtils.isEligible(e.getDataContext()))
             return;
-        Project project = Utilities.getProject(e.getDataContext());
+        Project project = ProjectUtils.getProject(e.getDataContext());
         RunnerAndConfigurationSettings selectedConfiguration =
             RunManagerImpl.getInstanceImpl(project).getSelectedConfiguration();
         if (selectedConfiguration == null)

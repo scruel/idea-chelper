@@ -3,7 +3,7 @@ package net.egork.chelper.ui;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
 import net.egork.chelper.task.Test;
-import net.egork.chelper.util.Utilities;
+import net.egork.chelper.util.ProjectUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,7 +22,7 @@ public class BulkAddTestsDialog extends JDialog {
 
     public BulkAddTestsDialog(Project project) {
         super(null, "Bulk Add Tests", ModalityType.APPLICATION_MODAL);
-        setIconImage(Utilities.iconToImage(IconLoader.getIcon("/icons/editTests.png")));
+        setIconImage(ProjectUtils.iconToImage(IconLoader.getIcon("/icons/editTests.png")));
         setAlwaysOnTop(true);
         setResizable(false);
         JPanel buttonPanel = new JPanel(new GridLayout(1, 2));
@@ -46,7 +46,7 @@ public class BulkAddTestsDialog extends JDialog {
         main.add(buttonPanel, BorderLayout.SOUTH);
         setContentPane(main);
         pack();
-        Point center = Utilities.getLocation(project, main.getSize());
+        Point center = ProjectUtils.getLocation(project, main.getSize());
         setLocation(center);
     }
 

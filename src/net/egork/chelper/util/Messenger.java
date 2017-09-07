@@ -8,6 +8,9 @@ import com.intellij.notification.Notifications;
  * @author egorku@yandex-team.ru
  */
 public class Messenger {
+    private Messenger() {
+    }
+
     public static void publishMessage(String message, NotificationType type) {
         Notifications.Bus.notify(new Notification("chelper", "CHelper", message, type));
     }

@@ -6,7 +6,7 @@ import net.egork.chelper.task.StreamConfiguration;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.task.Test;
 import net.egork.chelper.task.TestType;
-import net.egork.chelper.util.FileUtilities;
+import net.egork.chelper.util.FileUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import javax.swing.*;
@@ -30,7 +30,7 @@ public class RCCParser implements Parser {
 
     public void getContests(DescriptionReceiver receiver) {
         int currentRound = -1;
-        String currentPage = FileUtilities.getWebPageContent("http://russiancodecup.ru/en/championship/", "UTF-8");
+        String currentPage = FileUtils.getWebPageContent("http://russiancodecup.ru/en/championship/", "UTF-8");
         StringParser parser = new StringParser(currentPage);
         List<Integer> championshipIDs = new ArrayList<Integer>();
         try {
@@ -45,7 +45,7 @@ public class RCCParser implements Parser {
         } catch (NumberFormatException ignored) {
         }
         for (int id : championshipIDs)
-            processChampionshipPage(receiver, id, FileUtilities.getWebPageContent("http://russiancodecup.ru/en/championship/round/" + id + "/problem/A/", "UTF-8"));
+            processChampionshipPage(receiver, id, FileUtils.getWebPageContent("http://russiancodecup.ru/en/championship/round/" + id + "/problem/A/", "UTF-8"));
         for (int i = 70; i > 0; i--) {
             processArchivePage(receiver, i);
         }
@@ -65,7 +65,7 @@ public class RCCParser implements Parser {
 
     private void processArchivePage(DescriptionReceiver receiver, int id) {
         String page;
-        page = FileUtilities.getWebPageContent("http://russiancodecup.ru/ru/tasks/round/" + id, "UTF-8");
+        page = FileUtils.getWebPageContent("http://russiancodecup.ru/ru/tasks/round/" + id, "UTF-8");
         if (page == null || page.contains("<title>RCC | 404</title>")) {
             return;
         }
@@ -82,10 +82,10 @@ public class RCCParser implements Parser {
 
     public void parseContest(String id, DescriptionReceiver receiver) {
         String url = "http://russiancodecup.ru/championship/round/" + id + "/problem/A/";
-        String page = FileUtilities.getWebPageContent(url, "UTF-8");
+        String page = FileUtils.getWebPageContent(url, "UTF-8");
         if (page == null || page.contains("<title>RCC | 404</title>")) {
             url = "http://www.russiancodecup.ru/tasks/round/" + id + "/A/";
-            page = FileUtilities.getWebPageContent(url, "UTF-8");
+            page = FileUtils.getWebPageContent(url, "UTF-8");
         }
         List<Description> descriptions = new ArrayList<Description>();
         char taskID = 'A';
@@ -111,7 +111,7 @@ public class RCCParser implements Parser {
                 descriptions.add(new Description(url, letter + " - " + name.substring(4)));
                 taskID = ((char) (url.charAt(url.length() - 2) + 1));
                 url = url.substring(0, url.length() - 2) + ((char) (url.charAt(url.length() - 2) + 1)) + "/";
-                page = FileUtilities.getWebPageContent(url, "UTF-8");
+                page = FileUtils.getWebPageContent(url, "UTF-8");
             } catch (ParseException e) {
                 receiver.receiveDescriptions(descriptions);
                 return;
@@ -120,7 +120,7 @@ public class RCCParser implements Parser {
     }
 
     public Task parseTask(Description description) {
-        String page = FileUtilities.getWebPageContent(description.id, "UTF-8");
+        String page = FileUtils.getWebPageContent(description.id, "UTF-8");
         if (page == null)
             return null;
         StringParser parser = new StringParser(page);

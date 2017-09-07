@@ -10,13 +10,13 @@ import com.intellij.openapi.vfs.*;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
-import net.egork.chelper.codegeneration.CodeGenerationUtilities;
+import net.egork.chelper.codegeneration.CodeGenerationUtils;
 import net.egork.chelper.task.TopCoderTask;
 import net.egork.chelper.topcoder.CHelperArenaPlugin;
 import net.egork.chelper.topcoder.Message;
-import net.egork.chelper.util.FileUtilities;
+import net.egork.chelper.util.FileUtils;
 import net.egork.chelper.util.InputReader;
-import net.egork.chelper.util.Utilities;
+import net.egork.chelper.util.ProjectUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -34,9 +34,9 @@ public class TopCoderAction extends AnAction {
     private static VirtualFileListener listener = null;
 
     public void actionPerformed(AnActionEvent e) {
-        if (!Utilities.isEligible(e.getDataContext()))
+        if (!ProjectUtils.isEligible(e.getDataContext()))
             return;
-        Project project = Utilities.getProject(e.getDataContext());
+        Project project = ProjectUtils.getProject(e.getDataContext());
         fixTopCoderSettings();
         startServer(project);
         String arenaFileName = createArenaJar();
@@ -89,11 +89,11 @@ public class TopCoderAction extends AnAction {
                                 String type = message.in.readString();
                                 if (Message.GET_SOURCE.equals(type)) {
                                     String taskName = message.in.readString();
-                                    VirtualFile directory = FileUtilities.getFile(project, Utilities.getData(project).outputDirectory);
+                                    VirtualFile directory = FileUtils.getFile(project, ProjectUtils.getData(project).outputDirectory);
                                     VirtualFile file = directory.findChild(taskName + ".java");
                                     if (file != null) {
                                         message.out.printString(Message.OK);
-                                        message.out.printString(FileUtilities.readTextFile(file));
+                                        message.out.printString(FileUtils.readTextFile(file));
                                     } else
                                         message.out.printString(Message.OTHER_ERROR);
                                 } else if (Message.NEW_TASK.equals(type)) {
@@ -101,7 +101,7 @@ public class TopCoderAction extends AnAction {
                                     if (task == null)
                                         message.out.printString(Message.OTHER_ERROR);
                                     else {
-                                        final VirtualFile directory = FileUtilities.getFile(project, Utilities.getData(project).defaultDirectory);
+                                        final VirtualFile directory = FileUtils.getFile(project, ProjectUtils.getData(project).defaultDirectory);
                                         VirtualFile taskFile = null;
                                         if (directory != null)
                                             taskFile = directory.findChild(task.name + ".tctask");
@@ -113,7 +113,7 @@ public class TopCoderAction extends AnAction {
                                                 public void run() {
                                                     ApplicationManager.getApplication().runWriteAction(new Runnable() {
                                                         public void run() {
-                                                            FileUtilities.createDirectoryIfMissing(project, Utilities.getData(project).defaultDirectory);
+                                                            FileUtils.createDirectoryIfMissing(project, ProjectUtils.getData(project).defaultDirectory);
                                                             createConfiguration(project, task);
                                                         }
                                                     });
@@ -154,7 +154,7 @@ public class TopCoderAction extends AnAction {
                         TopCoderTask task = TopCoderTask.load(new InputReader(file.getInputStream()));
                         if (task == null)
                             return;
-                        VirtualFile taskFile = FileUtilities.getFile(project, Utilities.getData(project).defaultDirectory + "/" + task.name + ".tctask");
+                        VirtualFile taskFile = FileUtils.getFile(project, ProjectUtils.getData(project).defaultDirectory + "/" + task.name + ".tctask");
                         if (taskFile != null)
                             return;
                         createConfiguration(project, task);
@@ -171,27 +171,27 @@ public class TopCoderAction extends AnAction {
                 }
             }
         });
-        VirtualFile file = FileUtilities.writeTextFile(LocalFileSystem.getInstance().findFileByPath(System.getProperty("user.home")), ".chelper", project.getBasePath() + "\n");
+        VirtualFile file = FileUtils.writeTextFile(LocalFileSystem.getInstance().findFileByPath(System.getProperty("user.home")), ".chelper", project.getBasePath() + "\n");
         new File(file.getCanonicalPath()).deleteOnExit();
     }
 
     private static void createConfiguration(Project project, TopCoderTask task) {
-        String defaultDir = Utilities.getData(project).defaultDirectory;
-        FileUtilities.createDirectoryIfMissing(project, defaultDir);
-        String packageName = FileUtilities.getPackage(FileUtilities.getPsiDirectory(project, defaultDir));
+        String defaultDir = ProjectUtils.getData(project).defaultDirectory;
+        FileUtils.createDirectoryIfMissing(project, defaultDir);
+        String packageName = FileUtils.getPackage(FileUtils.getPsiDirectory(project, defaultDir));
         if (packageName == null || packageName.length() == 0) {
             JOptionPane.showMessageDialog(null, "defaultDirectory should be under source and in non-default package");
             return;
         }
         String fqn = (packageName.length() == 0 ? "" : packageName + ".") + task.name;
-        TopCoderTask taskToWrite = task.setFQN(fqn).setFailOnOverflow(Utilities.getData(project).failOnIntegerOverflowForNewTasks);
-        if (FileUtilities.getFile(project, defaultDir + "/" + task.name + ".java") == null) {
-            FileUtilities.writeTextFile(FileUtilities.getFile(project, defaultDir),
-                task.name + ".java", CodeGenerationUtilities.createTopCoderStub(task, project, packageName));
+        TopCoderTask taskToWrite = task.setFQN(fqn).setFailOnOverflow(ProjectUtils.getData(project).failOnIntegerOverflowForNewTasks);
+        if (FileUtils.getFile(project, defaultDir + "/" + task.name + ".java") == null) {
+            FileUtils.writeTextFile(FileUtils.getFile(project, defaultDir),
+                task.name + ".java", CodeGenerationUtils.createTopCoderStub(task, project, packageName));
         }
-        Utilities.createConfiguration(taskToWrite, true, project);
+        ProjectUtils.createConfiguration(taskToWrite, true, project);
         final PsiElement main = JavaPsiFacade.getInstance(project).findClass(fqn, GlobalSearchScope.allScope(project));
-        Utilities.openElement(project, main);
+        ProjectUtils.openElement(project, main);
     }
 
     private void fixTopCoderSettings() {
