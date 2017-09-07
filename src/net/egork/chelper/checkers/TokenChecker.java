@@ -14,16 +14,16 @@ public class TokenChecker implements Checker {
 
     public TokenChecker(String parameters) {
 		if (parameters.length() != 0) {
-			String[] tokens = parameters.split(" ");
-			if (tokens.length == 1) {
+            String[] tokens = parameters.split("\\s+");
+            if (tokens.length == 1) {
 				certainty = Double.parseDouble(tokens[0]);
 				allowAbsolute = allowRelative = true;
 			} else {
 				if (tokens[0].toLowerCase().indexOf('a') != -1)
 					allowAbsolute = true;
 				if (tokens[0].toLowerCase().indexOf('r') != -1)
-					allowAbsolute = true;
-				certainty = Double.parseDouble(tokens[1]);
+                    allowRelative = true;
+                certainty = Double.parseDouble(tokens[1]);
 			}
 		}
     }
