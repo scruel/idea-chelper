@@ -49,37 +49,11 @@ public class AutoSwitcher implements ProjectComponent {
 
     @Override
     public void projectOpened() {
-        RunManagerImpl.getInstanceImpl(project).addRunManagerListener(new RunManagerListener() {
-            @Override
-            public void runConfigurationSelected() {
-                RunnerAndConfigurationSettings selectedConfiguration =
-                    RunManagerImpl.getInstanceImpl(project).getSelectedConfiguration();
-                if (selectedConfiguration == null)
-                    return;
-                RunConfiguration configuration = selectedConfiguration.getConfiguration();
-                if (busy || !(configuration instanceof TopCoderConfiguration || configuration instanceof TaskConfiguration)) {
-                    return;
-                }
-                busy = true;
-                VirtualFile toOpen = null;
-                if (configuration instanceof TopCoderConfiguration)
-                    toOpen = TaskUtilities.getFile(Utilities.getData(project).defaultDirectory, ((TopCoderConfiguration) configuration).getConfiguration().name, project);
-                else if (configuration instanceof TaskConfiguration)
-                    toOpen = FileUtilities.getFileByFQN(((TaskConfiguration) configuration).getConfiguration().taskClass, configuration.getProject());
-                if (toOpen != null) {
-                    final VirtualFile finalToOpen = toOpen;
-                    TransactionGuard.getInstance().submitTransactionAndWait(new Runnable() {
-                        @Override
-                        public void run() {
-                            FileEditorManager.getInstance(project).openFile(finalToOpen, true);
-                        }
-                    });
-                }
-                busy = false;
-            }
-        });
+        addSelectedConfigurationListener();
+        addFileEditorListeners();
+    }
 
-
+    private void addFileEditorListeners() {
         MessageBus messageBus = project.getMessageBus();
         messageBus.connect().subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileEditorManagerListener() {
             @Override
@@ -116,7 +90,6 @@ public class AutoSwitcher implements ProjectComponent {
                                     runManager.setSelectedConfiguration(new RunnerAndConfigurationSettingsImpl(runManager,
                                         configuration, false));
                                     busy = false;
-                                    // return;
                                 }
                             } else if (configuration instanceof TaskConfiguration) {
                                 Task task = ((TaskConfiguration) configuration).getConfiguration();
@@ -125,7 +98,6 @@ public class AutoSwitcher implements ProjectComponent {
                                     runManager.setSelectedConfiguration(new RunnerAndConfigurationSettingsImpl(runManager,
                                         configuration, false));
                                     busy = false;
-                                    // return;
                                 }
                             }
                             return;
@@ -140,6 +112,39 @@ public class AutoSwitcher implements ProjectComponent {
 
         });
     }
+
+    private void addSelectedConfigurationListener() {
+        RunManagerImpl.getInstanceImpl(project).addRunManagerListener(new RunManagerListener() {
+            @Override
+            public void runConfigurationSelected() {
+                RunnerAndConfigurationSettings selectedConfiguration =
+                    RunManagerImpl.getInstanceImpl(project).getSelectedConfiguration();
+                if (selectedConfiguration == null)
+                    return;
+                RunConfiguration configuration = selectedConfiguration.getConfiguration();
+                if (busy || !(configuration instanceof TopCoderConfiguration || configuration instanceof TaskConfiguration)) {
+                    return;
+                }
+                busy = true;
+                VirtualFile toOpen = null;
+                if (configuration instanceof TopCoderConfiguration)
+                    toOpen = TaskUtilities.getFile(Utilities.getData(project).defaultDirectory, ((TopCoderConfiguration) configuration).getConfiguration().name, project);
+                else if (configuration instanceof TaskConfiguration)
+                    toOpen = FileUtilities.getFileByFQN(((TaskConfiguration) configuration).getConfiguration().taskClass, configuration.getProject());
+                if (toOpen != null) {
+                    final VirtualFile finalToOpen = toOpen;
+                    TransactionGuard.getInstance().submitTransactionAndWait(new Runnable() {
+                        @Override
+                        public void run() {
+                            FileEditorManager.getInstance(project).openFile(finalToOpen, true);
+                        }
+                    });
+                }
+                busy = false;
+            }
+        });
+    }
+
 
     @Override
     public void projectClosed() {
