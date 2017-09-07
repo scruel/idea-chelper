@@ -16,6 +16,7 @@ public class Template {
         }
         String result = template;
         for (int i = 0; i < replacement.length; i += 2) {
+//            if (replacement[i] == null || replacement[i + 1] == null) continue;
             result = result.replace("%" + replacement[i] + "%", replacement[i + 1]);
         }
         return result;

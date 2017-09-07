@@ -3,7 +3,6 @@ package net.egork.chelper.util;
 import com.intellij.ide.IdeView;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.LangDataKeys;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
@@ -74,7 +73,7 @@ public class FileUtils {
     }
 
     public static VirtualFile writeTextFile(final VirtualFile location, final String fileName, final String fileContent) {
-        ApplicationManager.getApplication().runWriteAction(new Runnable() {
+        ExecuteUtils.executeStrictWriteActionAndWait(new Runnable() {
             public void run() {
                 if (location == null) {
                     return;
@@ -95,9 +94,6 @@ public class FileUtils {
                 }
             }
         });
-        if (location == null) {
-            return null;
-        }
         return location.findChild(fileName);
     }
 
@@ -171,7 +167,7 @@ public class FileUtils {
     }
 
     public static VirtualFile createDirectoryIfMissing(final Project project, final String location) {
-        ApplicationManager.getApplication().runWriteAction(new Runnable() {
+        ExecuteUtils.executeStrictWriteActionAndWait(new Runnable() {
             public void run() {
                 VirtualFile baseDir = project.getBaseDir();
                 if (baseDir == null) {
@@ -221,11 +217,11 @@ public class FileUtils {
     }
 
     public static void saveConfiguration(final String locationName, final String fileName, final Task configuration, final Project project) {
-        ApplicationManager.getApplication().runWriteAction(new Runnable() {
+        if (locationName == null) {
+            return;
+        }
+        ExecuteUtils.executeStrictWriteAction(new Runnable() {
             public void run() {
-                if (locationName == null) {
-                    return;
-                }
                 VirtualFile location = FileUtils.getFile(project, locationName);
                 if (location == null) {
                     return;
@@ -249,7 +245,7 @@ public class FileUtils {
     }
 
     public static void saveConfiguration(final String locationName, final String fileName, final TopCoderTask configuration, final Project project) {
-        ApplicationManager.getApplication().runWriteAction(new Runnable() {
+        ExecuteUtils.executeStrictWriteAction(new Runnable() {
             public void run() {
                 if (locationName == null) {
                     return;
