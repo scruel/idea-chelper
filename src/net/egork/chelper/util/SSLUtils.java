@@ -1,13 +1,9 @@
 package net.egork.chelper.util;
 
+import javax.net.ssl.*;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 /**
  * This class provide various static methods that relax X509 certificate and
@@ -139,7 +135,7 @@ public final class SSLUtils {
 	public static void trustAllHostnames() {
 		// Is the deprecated protocol setted?
 		if (isDeprecatedSSLProtocol()) {
-			__trustAllHostnames();
+			_trustAllHostnames();
 		} else {
 			_trustAllHostnames();
 		} // else
@@ -152,7 +148,7 @@ public final class SSLUtils {
 	public static void trustAllHttpsCertificates() {
 		// Is the deprecated protocol setted?
 		if (isDeprecatedSSLProtocol()) {
-			__trustAllHttpsCertificates();
+			_trustAllHttpsCertificates();
 		} else {
 			_trustAllHttpsCertificates();
 		} // else
@@ -164,7 +160,7 @@ public final class SSLUtils {
 	 * ssl package.
 	 *
 	 * @author Francis Labrie
-	 * @deprecated see {@link SSLUtilities.FakeHostnameVerifier}.
+	 * @deprecated see {@link SSLUtils.FakeHostnameVerifier}.
 	 */
 	public static class _FakeHostnameVerifier
 		implements com.sun.net.ssl.HostnameVerifier {
@@ -192,7 +188,7 @@ public final class SSLUtils {
 	 * package.
 	 *
 	 * @author Francis Labrie
-	 * @deprecated see {@link SSLUtilities.FakeX509TrustManager}.
+	 * @deprecated see {@link SSLUtils.FakeX509TrustManager}.
 	 */
 	public static class _FakeX509TrustManager
 		implements com.sun.net.ssl.X509TrustManager {

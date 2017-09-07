@@ -14,11 +14,11 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
+import net.egork.chelper.codegeneration.CodeGenerationUtilities;
 import net.egork.chelper.configurations.TaskConfiguration;
 import net.egork.chelper.configurations.TopCoderConfiguration;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.task.TopCoderTask;
-import net.egork.chelper.codegeneration.CodeGenerationUtilities;
 import net.egork.chelper.util.FileUtilities;
 import net.egork.chelper.util.Messenger;
 import net.egork.chelper.util.Utilities;
@@ -169,13 +169,13 @@ public class ArchiveAction extends AnAction {
                 Task other = ((TaskConfiguration) configuration).getConfiguration();
                 if (!task.contestName.equals(other.contestName))
                     continue;
-                manager.setActiveConfiguration(new RunnerAndConfigurationSettingsImpl(manager, configuration, false));
-                return;
-            }
-        }
-        for (RunConfiguration configuration : allConfigurations) {
+				manager.setSelectedConfiguration(new RunnerAndConfigurationSettingsImpl(manager, configuration, false));
+				return;
+			}
+		}
+		for (RunConfiguration configuration : allConfigurations) {
 			if (configuration instanceof TaskConfiguration || configuration instanceof TopCoderConfiguration) {
-				manager.setActiveConfiguration(new RunnerAndConfigurationSettingsImpl(manager, configuration, false));
+				manager.setSelectedConfiguration(new RunnerAndConfigurationSettingsImpl(manager, configuration, false));
 				return;
 			}
 		}
@@ -188,13 +188,13 @@ public class ArchiveAction extends AnAction {
 				TopCoderTask other = ((TopCoderConfiguration) configuration).getConfiguration();
 				if (!task.contestName.equals(other.contestName))
 					continue;
-				manager.setActiveConfiguration(new RunnerAndConfigurationSettingsImpl(manager, configuration, false));
+				manager.setSelectedConfiguration(new RunnerAndConfigurationSettingsImpl(manager, configuration, false));
 				return;
 			}
 		}
 		for (RunConfiguration configuration : allConfigurations) {
 			if (configuration instanceof TaskConfiguration || configuration instanceof TopCoderConfiguration) {
-				manager.setActiveConfiguration(new RunnerAndConfigurationSettingsImpl(manager, configuration, false));
+				manager.setSelectedConfiguration(new RunnerAndConfigurationSettingsImpl(manager, configuration, false));
 				return;
 			}
 		}

@@ -165,7 +165,7 @@ public class Utilities {
 			TaskConfigurationType.INSTANCE.getConfigurationFactories()[0]), false);
 		manager.addConfiguration(configuration, false);
 		if (setActive)
-			manager.setActiveConfiguration(configuration);
+			manager.setSelectedConfiguration(configuration);
 		return configuration;
 	}
 
@@ -205,9 +205,9 @@ public class Utilities {
                         TopCoderConfigurationType.INSTANCE.getConfigurationFactories()[0]), false);
         manager.addConfiguration(configuration, false);
         if (setActive)
-            manager.setActiveConfiguration(configuration);
-        return configuration;
-    }
+			manager.setSelectedConfiguration(configuration);
+		return configuration;
+	}
 
 	public static String getSimpleName(String className) {
 		int position = className.lastIndexOf('.');
