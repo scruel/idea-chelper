@@ -1,7 +1,7 @@
 package net.egork.chelper.parser;
 
 import com.intellij.openapi.util.IconLoader;
-import net.egork.chelper.checkers.TokenChecker;
+import net.egork.chelper.checkers.PEStrictChecker;
 import net.egork.chelper.task.StreamConfiguration;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.task.Test;
@@ -178,7 +178,7 @@ public class CodeforcesParser implements Parser {
             String taskClass = "Task" + letter;
             String name = letter + " - " + taskName;
             return Collections.singleton(new Task(name, defaultTestType(), inputType, outputType, tests.toArray(new Test[tests.size()]), null,
-                "-Xmx" + heapMemory, "Main", taskClass, TokenChecker.class.getCanonicalName(), "", new String[0], null,
+                "-Xmx" + heapMemory, "Main", taskClass, PEStrictChecker.class.getCanonicalName(), "", new String[0], null,
                 contestName, true, null, null, false, false));
         } catch (ParseException e) {
             return Collections.emptyList();

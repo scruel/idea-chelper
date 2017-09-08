@@ -1,7 +1,7 @@
 package net.egork.chelper.parser;
 
 import com.intellij.openapi.util.IconLoader;
-import net.egork.chelper.checkers.TokenChecker;
+import net.egork.chelper.checkers.PEStrictChecker;
 import net.egork.chelper.task.StreamConfiguration;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.task.Test;
@@ -143,7 +143,7 @@ public class RCCParser implements Parser {
             }
             return new Task(description.description, null, StreamConfiguration.STANDARD, StreamConfiguration.STANDARD,
                 tests.toArray(new Test[tests.size()]), null, "-Xmx" + memoryLimit + "M -Xss64M", "Main", "Task" + letter,
-                TokenChecker.class.getCanonicalName(), "", new String[0], null, null, true, null, null, false, false);
+                PEStrictChecker.class.getCanonicalName(), "", new String[0], null, null, true, null, null, false, false);
         } catch (ParseException e) {
             return null;
         }

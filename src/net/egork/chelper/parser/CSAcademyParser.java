@@ -1,6 +1,6 @@
 package net.egork.chelper.parser;
 
-import net.egork.chelper.checkers.TokenChecker;
+import net.egork.chelper.checkers.PEStrictChecker;
 import net.egork.chelper.task.StreamConfiguration;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.task.Test;
@@ -63,7 +63,7 @@ public class CSAcademyParser implements Parser {
             parser.advance(true, "\"longName\":\"");
             contestName = parser.advance(false, "\"");
             return Collections.singleton(new Task(taskName, defaultTestType(), input, output, tests.toArray(new Test[tests.size()]), null,
-                "-Xmx" + memoryLimit, "Main", CodeChefParser.getTaskID(taskName), TokenChecker.class.getCanonicalName(), "",
+                "-Xmx" + memoryLimit, "Main", CodeChefParser.getTaskID(taskName), PEStrictChecker.class.getCanonicalName(), "",
                 new String[0], null, contestName, true, null, null, false, false));
         } catch (ParseException e) {
             return Collections.emptyList();

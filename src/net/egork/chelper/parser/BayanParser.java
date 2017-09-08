@@ -1,6 +1,6 @@
 package net.egork.chelper.parser;
 
-import net.egork.chelper.checkers.TokenChecker;
+import net.egork.chelper.checkers.PEStrictChecker;
 import net.egork.chelper.task.StreamConfiguration;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.task.Test;
@@ -66,7 +66,7 @@ public class BayanParser implements Parser {
             StreamConfiguration output = new StreamConfiguration(StreamConfiguration.StreamType.CUSTOM,
                 parser.advance(false, "/").toLowerCase() + ".out");
             return Collections.singleton(new Task(taskName, defaultTestType(), input, output, tests.toArray(new Test[tests.size()]), null,
-                "-Xmx1024M", "Main", taskClass, TokenChecker.class.getCanonicalName(), "",
+                "-Xmx1024M", "Main", taskClass, PEStrictChecker.class.getCanonicalName(), "",
                 new String[0], null, contestName, true, null, null, false, false));
         } catch (ParseException e) {
             return Collections.emptyList();

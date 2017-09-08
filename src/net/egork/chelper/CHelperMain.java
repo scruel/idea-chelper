@@ -12,12 +12,14 @@ public class CHelperMain implements ApplicationComponent {
     public CHelperMain() {
     }
 
+    @Override
     public void initComponent() {
         Utilities.addListeners();
         SSLUtils.trustAllHostnames();
         SSLUtils.trustAllHttpsCertificates();
     }
 
+    @Override
     public void disposeComponent() {
     }
 

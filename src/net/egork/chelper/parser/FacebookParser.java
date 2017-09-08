@@ -1,6 +1,6 @@
 package net.egork.chelper.parser;
 
-import net.egork.chelper.checkers.TokenChecker;
+import net.egork.chelper.checkers.PEStrictChecker;
 import net.egork.chelper.task.StreamConfiguration;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.task.Test;
@@ -71,7 +71,7 @@ public class FacebookParser implements Parser {
             parser.advance(true, ">");
             String testOutput = StringEscapeUtils.unescapeHtml(parser.advance(false, "</pre>"));
             return Collections.singleton(new Task(taskName, defaultTestType(), input, output, new Test[]{new Test(testInput, testOutput)},
-                null, "-Xmx1024M", "Main", taskClass, TokenChecker.class.getCanonicalName(), "",
+                null, "-Xmx1024M", "Main", taskClass, PEStrictChecker.class.getCanonicalName(), "",
                 new String[0], null, contestName, true, null, null, true, false));
         } catch (ParseException e) {
             return Collections.emptyList();

@@ -1,7 +1,7 @@
 package net.egork.chelper.parser;
 
 import com.intellij.openapi.util.IconLoader;
-import net.egork.chelper.checkers.TokenChecker;
+import net.egork.chelper.checkers.PEStrictChecker;
 import net.egork.chelper.task.StreamConfiguration;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.task.Test;
@@ -225,7 +225,7 @@ public class GCJParser implements Parser {
                 new StreamConfiguration(StreamConfiguration.StreamType.CUSTOM, letter.toLowerCase() + ".out"),
                 new Test[]{new Test(input, output, 0)}, null, "-Xmx512M", "Main",
                 "Task" + letter,
-                TokenChecker.class.getCanonicalName(), "", new String[0], null, null, true, null, null,
+                PEStrictChecker.class.getCanonicalName(), "", new String[0], null, null, true, null, null,
                 true, false);
         } catch (ParseException e) {
             return null;

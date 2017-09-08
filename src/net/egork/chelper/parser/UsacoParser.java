@@ -1,6 +1,6 @@
 package net.egork.chelper.parser;
 
-import net.egork.chelper.checkers.TokenChecker;
+import net.egork.chelper.checkers.PEStrictChecker;
 import net.egork.chelper.task.StreamConfiguration;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.task.Test;
@@ -58,7 +58,7 @@ public class UsacoParser implements Parser {
             parser.advance(true, "<pre class=\"out\">");
             String testOutput = parser.advance(false, "</pre>").trim() + "\n";
             return Collections.singleton(new Task(taskName, defaultTestType(), input, output, new Test[]{new Test(testInput, testOutput)},
-                null, "-Xmx1024M", "Main", taskClass, TokenChecker.class.getCanonicalName(), "",
+                null, "-Xmx1024M", "Main", taskClass, PEStrictChecker.class.getCanonicalName(), "",
                 new String[0], null, contestName, true, null, null, false, false));
         } catch (ParseException e) {
             return Collections.emptyList();

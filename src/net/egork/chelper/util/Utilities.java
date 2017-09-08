@@ -27,7 +27,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import net.egork.chelper.ChromeParser;
 import net.egork.chelper.ProjectData;
 import net.egork.chelper.actions.TopCoderAction;
-import net.egork.chelper.checkers.TokenChecker;
+import net.egork.chelper.checkers.PEStrictChecker;
 import net.egork.chelper.codegeneration.CodeGenerationUtilities;
 import net.egork.chelper.configurations.TaskConfiguration;
 import net.egork.chelper.configurations.TaskConfigurationType;
@@ -52,7 +52,7 @@ public class Utilities {
     // It would be natural for everything to be persistent.
     private static Task defaultConfiguration = new Task(null, TestType.SINGLE, StreamConfiguration.STANDARD,
         StreamConfiguration.STANDARD, new Test[0], null, "-Xmx256m -Xss64m", "Main", null,
-        TokenChecker.class.getCanonicalName(), "", new String[0], null, "", true, null, null, false, false,
+        PEStrictChecker.class.getCanonicalName(), "", new String[0], null, "", true, null, null, false, false,
         "TaskClass.template");
     private static Parser defaultParser = Parser.PARSERS[0];
 
@@ -120,7 +120,7 @@ public class Utilities {
     public static void updateDefaultTask(Task task) {
         if (task != null) {
             defaultConfiguration = new Task(null, task.testType, task.input, task.output, new Test[0], null,
-                task.vmArgs, task.mainClass, null, TokenChecker.class.getCanonicalName(), "", new String[0], null,
+                task.vmArgs, task.mainClass, null, PEStrictChecker.class.getCanonicalName(), "", new String[0], null,
                 task.contestName, task.truncate, null, null, task.includeLocale, task.failOnOverflow, task.template);
         }
     }

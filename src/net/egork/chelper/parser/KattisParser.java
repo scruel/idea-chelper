@@ -1,7 +1,7 @@
 package net.egork.chelper.parser;
 
 import com.intellij.openapi.util.IconLoader;
-import net.egork.chelper.checkers.TokenChecker;
+import net.egork.chelper.checkers.PEStrictChecker;
 import net.egork.chelper.task.StreamConfiguration;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.task.Test;
@@ -188,7 +188,7 @@ public class KattisParser implements Parser {
             String taskClass = CodeChefParser.getTaskID(taskName);
             return Collections.singleton(new Task(taskName, defaultTestType(), StreamConfiguration.STANDARD,
                 StreamConfiguration.STANDARD, tests.toArray(new Test[tests.size()]), null,
-                "-Xmx" + heapMemory + " -Xss8M", "Main", taskClass, TokenChecker.class.getCanonicalName(), "",
+                "-Xmx" + heapMemory + " -Xss8M", "Main", taskClass, PEStrictChecker.class.getCanonicalName(), "",
                 new String[0], null, contestName, true, null, null, false, false));
         } catch (ParseException e) {
             return Collections.emptyList();

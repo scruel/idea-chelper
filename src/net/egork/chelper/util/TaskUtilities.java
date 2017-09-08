@@ -4,7 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
 import net.egork.chelper.actions.ArchiveAction;
-import net.egork.chelper.checkers.TokenChecker;
+import net.egork.chelper.checkers.PEStrictChecker;
 import net.egork.chelper.codegeneration.MainFileTemplate;
 import net.egork.chelper.codegeneration.SolutionGenerator;
 import net.egork.chelper.configurations.TaskConfiguration;
@@ -82,7 +82,7 @@ public class TaskUtilities {
         if (task == null || taskDataFile == null) return null;
         PsiClass aClass = MainFileTemplate.getClass(project, task.checkerClass);
         if (aClass == null) {
-            task = task.setCheckerClass(TokenChecker.class.getCanonicalName());
+            task = task.setCheckerClass(PEStrictChecker.class.getCanonicalName());
         }
 //        aClass = MainFileTemplate.getClass(project, task.inputClass);
 //        if (aClass == null) {
