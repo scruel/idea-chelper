@@ -1,8 +1,8 @@
 package net.egork.chelper.tester;
 
 import net.egork.chelper.task.MethodSignature;
-import net.egork.chelper.task.NewTopCoderTest;
 import net.egork.chelper.task.TopCoderTask;
+import net.egork.chelper.task.test.NewTopCoderTest;
 import net.egork.chelper.util.InputReader;
 import net.egork.chelper.util.OutputWriter;
 

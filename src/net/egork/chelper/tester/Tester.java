@@ -1,7 +1,7 @@
 package net.egork.chelper.tester;
 
-import net.egork.chelper.task.Test;
-import net.egork.chelper.task.TestType;
+import net.egork.chelper.task.test.Test;
+import net.egork.chelper.task.test.TestType;
 import net.egork.chelper.util.EncodingUtils;
 
 import java.io.InputStream;

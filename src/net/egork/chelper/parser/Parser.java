@@ -1,7 +1,7 @@
 package net.egork.chelper.parser;
 
 import net.egork.chelper.task.Task;
-import net.egork.chelper.task.TestType;
+import net.egork.chelper.task.test.TestType;
 
 import javax.swing.*;
 import java.util.Collection;

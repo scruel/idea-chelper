@@ -8,10 +8,10 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import net.egork.chelper.actions.ArchiveAction;
-import net.egork.chelper.task.NewTopCoderTest;
 import net.egork.chelper.task.Task;
-import net.egork.chelper.task.Test;
+import net.egork.chelper.task.TaskBase;
 import net.egork.chelper.task.TopCoderTask;
+import net.egork.chelper.task.test.TestBase;
 import net.egork.chelper.util.FileUtils;
 import net.egork.chelper.util.OutputWriter;
 import net.egork.chelper.util.ProjectUtils;
@@ -107,7 +107,7 @@ public class CodeGenerationUtils {
             return FileUtils.readTextFile(file);
         String template = "package %package%;\n" +
             "\n" +
-            "import net.egork.chelper.task.Test;\n" +
+            "import net.egork.chelper.task.test.Test;\n" +
             "import net.egork.chelper.tester.TestCase;\n" +
             "\n" +
             "import java.util.Collection;\n" +
@@ -129,7 +129,7 @@ public class CodeGenerationUtils {
             return FileUtils.readTextFile(file);
         String template = "package %package%;\n" +
             "\n" +
-            "import net.egork.chelper.task.NewTopCoderTest;\n" +
+            "import net.egork.chelper.task.test.NewTopCoderTest;\n" +
             "import net.egork.chelper.tester.TestCase;\n" +
             "\n" +
             "import java.util.Collection;\n" +
@@ -160,10 +160,10 @@ public class CodeGenerationUtils {
         return template;
     }
 
-    public static void createUnitTest(Task task, final Project project) {
+    public static void createUnitTest(TaskBase task, final Project project) {
         if (!ProjectUtils.getData(project).enableUnitTests)
             return;
-        Test[] tests = task.tests;
+        TestBase[] tests = task.tests;
         for (int i = 0, testsLength = tests.length; i < testsLength; i++)
             tests[i] = tests[i].setActive(true);
         String path = ProjectUtils.getData(project).testDirectory + "/on" + canonize(firstPart(task.date), false) + "/on" + canonize(task.date, false) + "_" + canonize(task.contestName, false) + "/" +
@@ -179,22 +179,33 @@ public class CodeGenerationUtils {
             JOptionPane.showMessageDialog(null, "testDirectory should be under project source");
             return;
         }
-        PsiElement main = JavaPsiFacade.getInstance(project).findClass(task.taskClass, GlobalSearchScope.allScope(project));
-        VirtualFile mainFile = main == null ? null : main.getContainingFile() == null ? null : main.getContainingFile().getVirtualFile();
-        String mainContent = FileUtils.readTextFile(mainFile);
-        mainContent = changePackage(mainContent, packageName);
-        String taskClassSimple = getSimpleName(task.taskClass);
-        FileUtils.writeTextFile(directory, taskClassSimple + ".java", mainContent);
-        task = task.setTaskClass(packageName + "." + taskClassSimple);
-        PsiElement checker = JavaPsiFacade.getInstance(project).findClass(task.checkerClass, GlobalSearchScope.allScope(project));
-        VirtualFile checkerFile = checker == null ? null : checker.getContainingFile() == null ? null : checker.getContainingFile().getVirtualFile();
-        if (checkerFile != null && mainFile != null && checkerFile.getParent().equals(mainFile.getParent())) {
-            String checkerContent = FileUtils.readTextFile(checkerFile);
-            checkerContent = changePackage(checkerContent, packageName);
-            String checkerClassSimple = getSimpleName(task.checkerClass);
-            FileUtils.writeTextFile(directory, checkerClassSimple + ".java", checkerContent);
-            task = task.setCheckerClass(packageName + "." + checkerClassSimple);
+        if (task instanceof Task) {
+            PsiElement main = JavaPsiFacade.getInstance(project).findClass(((Task) task).taskClass, GlobalSearchScope.allScope(project));
+            VirtualFile mainFile = main == null ? null : main.getContainingFile() == null ? null : main.getContainingFile().getVirtualFile();
+            String mainContent = FileUtils.readTextFile(mainFile);
+            mainContent = changePackage(mainContent, packageName);
+            String taskClassSimple = getSimpleName(((Task) task).taskClass);
+            FileUtils.writeTextFile(directory, taskClassSimple + ".java", mainContent);
+            task = ((Task) task).setTaskClass(packageName + "." + taskClassSimple);
+            PsiElement checker = JavaPsiFacade.getInstance(project).findClass(((Task) task).checkerClass, GlobalSearchScope.allScope(project));
+            VirtualFile checkerFile = checker == null ? null : checker.getContainingFile() == null ? null : checker.getContainingFile().getVirtualFile();
+            if (checkerFile != null && mainFile != null && checkerFile.getParent().equals(mainFile.getParent())) {
+                String checkerContent = FileUtils.readTextFile(checkerFile);
+                checkerContent = changePackage(checkerContent, packageName);
+                String checkerClassSimple = getSimpleName(((Task) task).checkerClass);
+                FileUtils.writeTextFile(directory, checkerClassSimple + ".java", checkerContent);
+                task = ((Task) task).setCheckerClass(packageName + "." + checkerClassSimple);
+            }
+
+        } else if (task instanceof TopCoderTask) {
+            VirtualFile mainFile = FileUtils.getFile(project, ProjectUtils.getData(project).defaultDirectory + "/" + task.name + ".java");
+            String mainContent = FileUtils.readTextFile(mainFile);
+            mainContent = changePackage(mainContent, packageName);
+            String taskClassSimple = task.name;
+            FileUtils.writeTextFile(directory, taskClassSimple + ".java", mainContent);
+            task = ((TopCoderTask) task).setFQN(packageName + "." + taskClassSimple);
         }
+
         String[] testClasses = Arrays.copyOf(task.testClasses, task.testClasses.length);
         for (int i = 0; i < testClasses.length; i++) {
             PsiElement test = JavaPsiFacade.getInstance(project).findClass(task.testClasses[i], GlobalSearchScope.allScope(project));
@@ -206,12 +217,18 @@ public class CodeGenerationUtils {
             testClasses[i] = packageName + "." + testClassSimple;
         }
         task = task.setTestClasses(testClasses);
-        final Task finalTask = task;
+        final TaskBase finalTask = task;
+
         ApplicationManager.getApplication().runWriteAction(new Runnable() {
             public void run() {
                 String taskFilePath;
                 try {
-                    VirtualFile taskFile = directory.findOrCreateChildData(null, ArchiveAction.canonize(finalTask.name) + ".task");
+                    VirtualFile taskFile;
+                    if (finalTask instanceof Task) {
+                        taskFile = directory.findOrCreateChildData(null, ArchiveAction.canonize(finalTask.name) + ".task");
+                    } else {
+                        taskFile = directory.findOrCreateChildData(null, finalTask.name + ".tctask");
+                    }
                     OutputStream outputStream = taskFile.getOutputStream(null);
                     finalTask.saveTask(new OutputWriter(outputStream));
                     outputStream.close();
@@ -219,7 +236,12 @@ public class CodeGenerationUtils {
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-                String tester = generateTester(taskFilePath);
+                String tester;
+                if (finalTask instanceof Task) {
+                    tester = generateTester(taskFilePath);
+                } else {
+                    tester = generateTopCoderTester(taskFilePath);
+                }
                 tester = changePackage(tester, packageName);
                 FileUtils.writeTextFile(directory, "Main.java", tester);
             }
@@ -237,62 +259,6 @@ public class CodeGenerationUtils {
                 result.append('_');
         }
         return result.toString();
-    }
-
-    public static void createUnitTest(TopCoderTask task, final Project project) {
-        if (!ProjectUtils.getData(project).enableUnitTests)
-            return;
-        NewTopCoderTest[] tests = task.tests;
-        for (int i = 0, testsLength = tests.length; i < testsLength; i++)
-            tests[i] = tests[i].setActive(true);
-        String path = ProjectUtils.getData(project).testDirectory + "/on" + canonize(firstPart(task.date), false) + "/on" + canonize(task.date, false) + "_" + canonize(task.contestName, false) + "/" +
-            canonize(task.name, true);
-        task = task.setTests(tests);
-        String originalPath = path;
-        int index = 0;
-        while (FileUtils.getFile(project, path) != null)
-            path = originalPath + (index++);
-        final VirtualFile directory = FileUtils.createDirectoryIfMissing(project, path);
-        final String packageName = FileUtils.getPackage(FileUtils.getPsiDirectory(project, path));
-        if (packageName == null) {
-            JOptionPane.showMessageDialog(null, "testDirectory should be under project source");
-            return;
-        }
-        VirtualFile mainFile = FileUtils.getFile(project, ProjectUtils.getData(project).defaultDirectory + "/" + task.name + ".java");
-        String mainContent = FileUtils.readTextFile(mainFile);
-        mainContent = changePackage(mainContent, packageName);
-        String taskClassSimple = task.name;
-        FileUtils.writeTextFile(directory, taskClassSimple + ".java", mainContent);
-        task = task.setFQN(packageName + "." + taskClassSimple);
-        String[] testClasses = Arrays.copyOf(task.testClasses, task.testClasses.length);
-        for (int i = 0; i < testClasses.length; i++) {
-            PsiElement test = JavaPsiFacade.getInstance(project).findClass(task.testClasses[i], GlobalSearchScope.allScope(project));
-            VirtualFile testFile = test == null ? null : test.getContainingFile() == null ? null : test.getContainingFile().getVirtualFile();
-            String testContent = FileUtils.readTextFile(testFile);
-            testContent = changePackage(testContent, packageName);
-            String testClassSimple = getSimpleName(testClasses[i]);
-            FileUtils.writeTextFile(directory, testClassSimple + ".java", testContent);
-            testClasses[i] = packageName + "." + testClassSimple;
-        }
-        task = task.setTestClasses(testClasses);
-        final TopCoderTask finalTask = task;
-        ApplicationManager.getApplication().runWriteAction(new Runnable() {
-            public void run() {
-                String taskFilePath;
-                try {
-                    VirtualFile taskFile = directory.findOrCreateChildData(null, finalTask.name + ".tctask");
-                    OutputStream outputStream = taskFile.getOutputStream(null);
-                    finalTask.saveTask(new OutputWriter(outputStream));
-                    outputStream.close();
-                    taskFilePath = FileUtils.getRelativePath(project.getBaseDir(), taskFile);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                String tester = generateTopCoderTester(taskFilePath);
-                tester = changePackage(tester, packageName);
-                FileUtils.writeTextFile(directory, "Main.java", tester);
-            }
-        });
     }
 
     private static String firstPart(String date) {

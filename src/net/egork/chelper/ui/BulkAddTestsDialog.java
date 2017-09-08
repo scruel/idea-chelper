@@ -2,7 +2,7 @@ package net.egork.chelper.ui;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
-import net.egork.chelper.task.Test;
+import net.egork.chelper.task.test.Test;
 import net.egork.chelper.util.ProjectUtils;
 
 import javax.swing.*;

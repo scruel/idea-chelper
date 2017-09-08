@@ -4,7 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.VerticalFlowLayout;
 import net.egork.chelper.task.StreamConfiguration;
 import net.egork.chelper.task.Task;
-import net.egork.chelper.task.TestType;
+import net.egork.chelper.task.test.TestType;
 import net.egork.chelper.util.FileCreator;
 import net.egork.chelper.util.FileUtils;
 import net.egork.chelper.util.ProjectUtils;

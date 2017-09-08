@@ -1,7 +1,7 @@
 package net.egork.chelper.tester;
 
 import net.egork.chelper.task.MethodSignature;
-import net.egork.chelper.task.TopCoderTest;
+import net.egork.chelper.task.test.TopCoderTest;
 import net.egork.chelper.util.EncodingUtils;
 
 import java.lang.reflect.InvocationTargetException;

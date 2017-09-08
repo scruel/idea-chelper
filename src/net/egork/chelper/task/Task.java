@@ -1,5 +1,7 @@
 package net.egork.chelper.task;
 
+import net.egork.chelper.task.test.Test;
+import net.egork.chelper.task.test.TestType;
 import net.egork.chelper.util.InputReader;
 import net.egork.chelper.util.OutputWriter;
 
@@ -9,24 +11,24 @@ import java.util.InputMismatchException;
 /**
  * @author Egor Kulikov (kulikov@devexperts.com)
  */
-public class Task extends TaskBase {
-    //Basic
+public class Task extends TaskBase<Test> {
+
+    // Basic
     public final TestType testType;
     public final StreamConfiguration input;
     public final StreamConfiguration output;
-    public final Test[] tests;
+    public final Test[] tests; // hide
 
-    //Creation only
+    // Creation only
     public final String template;
 
-    //Advanced
+    // Advanced
     public final String location;
     public final String vmArgs;
     public final String mainClass;
     public final String taskClass;
     public final String checkerClass;
     public final String checkerParameters;
-    public final String[] testClasses;
     public final boolean truncate;
     public final String inputClass;
     public final String outputClass;
@@ -46,18 +48,17 @@ public class Task extends TaskBase {
                 String location, String vmArgs, String mainClass, String taskClass, String checkerClass,
                 String checkerParameters, String[] testClasses, String date, String contestName, boolean truncate,
                 String inputClass, String outputClass, boolean includeLocale, boolean failOnOverflow, String template) {
-        super(trim(name), trim(date), trim(contestName));
+        super(trim(name), tests, trim(date), trim(contestName), testClasses);
+        this.tests = tests;
         this.testType = testType;
         this.input = input;
         this.output = output;
-        this.tests = tests;
         this.location = trim(location);
         this.vmArgs = trim(vmArgs);
         this.mainClass = trim(mainClass);
         this.taskClass = trim(taskClass);
         this.checkerClass = trim(checkerClass);
         this.checkerParameters = trim(checkerParameters);
-        this.testClasses = testClasses;
         this.truncate = truncate;
         this.inputClass = trim(inputClass);
         this.outputClass = trim(outputClass);
@@ -95,6 +96,7 @@ public class Task extends TaskBase {
         return result.toString();
     }
 
+    @Override
     public void saveTask(OutputWriter out) {
         out.printString(name);
         out.printEnum(testType);
@@ -169,6 +171,7 @@ public class Task extends TaskBase {
         }
     }
 
+    @Override
     public Task setTests(Test[] tests) {
         return new Task(name, testType, input, output, tests, location, vmArgs, mainClass, taskClass, checkerClass,
             checkerParameters, testClasses, date, contestName, truncate, inputClass, outputClass, includeLocale,

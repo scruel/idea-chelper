@@ -1,7 +1,7 @@
 package net.egork.chelper.util;
 
-import net.egork.chelper.task.Test;
-import net.egork.chelper.task.TopCoderTest;
+import net.egork.chelper.task.test.Test;
+import net.egork.chelper.task.test.TopCoderTest;
 
 /**
  * @author Egor Kulikov (kulikov@devexperts.com)

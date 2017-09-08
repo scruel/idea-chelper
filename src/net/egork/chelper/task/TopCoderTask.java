@@ -4,6 +4,7 @@ import com.intellij.notification.NotificationType;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiMethod;
 import net.egork.chelper.codegeneration.MainFileTemplate;
+import net.egork.chelper.task.test.NewTopCoderTest;
 import net.egork.chelper.util.InputReader;
 import net.egork.chelper.util.Messenger;
 import net.egork.chelper.util.OutputWriter;
@@ -13,24 +14,23 @@ import java.util.InputMismatchException;
 /**
  * @author Egor Kulikov (kulikov@devexperts.com)
  */
-public class TopCoderTask extends TaskBase {
+public class TopCoderTask extends TaskBase<NewTopCoderTest> {
     public final MethodSignature signature;
-    public final NewTopCoderTest[] tests;
-    public final String[] testClasses;
     public final String fqn;
     public final boolean failOnOverflow;
     public final String memoryLimit;
+    public final NewTopCoderTest[] tests; // hide
 
     public TopCoderTask(String name, MethodSignature signature, NewTopCoderTest[] tests, String date, String contestName, String[] testClasses, String fqn, boolean failOnOverflow, String memoryLimit) {
-        super(name, date, contestName);
-        this.signature = signature;
+        super(name, tests, date, contestName, testClasses);
         this.tests = tests;
-        this.testClasses = testClasses;
+        this.signature = signature;
         this.fqn = fqn;
         this.failOnOverflow = failOnOverflow;
         this.memoryLimit = memoryLimit;
     }
 
+    @Override
     public void saveTask(OutputWriter out) {
         out.printString(name);
         out.printString(signature.name);
@@ -139,6 +139,8 @@ public class TopCoderTask extends TaskBase {
         return new TopCoderTask(name, signature, tests, date, contestName, testClasses, fqn, failOnOverflow, memoryLimit);
     }
 
+    //hiding
+    @Override
     public TopCoderTask setTests(NewTopCoderTest[] tests) {
         return new TopCoderTask(name, signature, tests, date, contestName, testClasses, fqn, failOnOverflow, memoryLimit);
     }

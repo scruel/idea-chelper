@@ -5,7 +5,7 @@ import com.intellij.openapi.ui.VerticalFlowLayout;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
-import net.egork.chelper.task.Test;
+import net.egork.chelper.task.test.Test;
 import net.egork.chelper.util.ProjectUtils;
 
 import javax.swing.*;

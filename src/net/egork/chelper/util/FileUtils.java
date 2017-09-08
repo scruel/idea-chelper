@@ -12,6 +12,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import net.egork.chelper.codegeneration.CodeGenerationUtils;
 import net.egork.chelper.codegeneration.MainFileTemplate;
 import net.egork.chelper.task.Task;
+import net.egork.chelper.task.TaskBase;
 import net.egork.chelper.task.TopCoderTask;
 
 import java.io.*;
@@ -245,40 +246,12 @@ public class FileUtils {
         return TopCoderTask.load(new InputReader(getInputStream(vFile)));
     }
 
-    public static void saveConfiguration(final String locationName, final String fileName, final Task configuration, final Project project) {
+    public static void saveConfiguration(final String locationName, final String fileName, final TaskBase configuration, final Project project) {
         if (locationName == null) {
             return;
         }
         ExecuteUtils.executeStrictWriteAction(new Runnable() {
             public void run() {
-                VirtualFile location = FileUtils.getFile(project, locationName);
-                if (location == null) {
-                    return;
-                }
-                OutputStream stream = null;
-                try {
-                    VirtualFile file = location.findOrCreateChildData(null, fileName);
-                    stream = file.getOutputStream(null);
-                    configuration.saveTask(new OutputWriter(stream));
-                } catch (IOException ignored) {
-                } finally {
-                    if (stream != null) {
-                        try {
-                            stream.close();
-                        } catch (IOException ignored) {
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    public static void saveConfiguration(final String locationName, final String fileName, final TopCoderTask configuration, final Project project) {
-        ExecuteUtils.executeStrictWriteAction(new Runnable() {
-            public void run() {
-                if (locationName == null) {
-                    return;
-                }
                 VirtualFile location = FileUtils.getFile(project, locationName);
                 if (location == null) {
                     return;

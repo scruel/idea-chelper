@@ -13,7 +13,7 @@ import net.egork.chelper.parser.DescriptionReceiver;
 import net.egork.chelper.parser.Parser;
 import net.egork.chelper.parser.ParserTask;
 import net.egork.chelper.task.Task;
-import net.egork.chelper.task.TestType;
+import net.egork.chelper.task.test.TestType;
 import net.egork.chelper.util.ExecuteUtils;
 import net.egork.chelper.util.FileUtils;
 import net.egork.chelper.util.Messenger;

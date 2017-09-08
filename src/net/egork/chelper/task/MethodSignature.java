@@ -1,5 +1,7 @@
 package net.egork.chelper.task;
 
+import net.egork.chelper.task.test.TopCoderTest;
+
 import java.util.ArrayList;
 import java.util.List;
 

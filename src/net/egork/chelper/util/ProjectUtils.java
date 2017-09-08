@@ -34,7 +34,12 @@ import net.egork.chelper.configurations.TaskConfigurationType;
 import net.egork.chelper.configurations.TopCoderConfiguration;
 import net.egork.chelper.configurations.TopCoderConfigurationType;
 import net.egork.chelper.parser.Parser;
-import net.egork.chelper.task.*;
+import net.egork.chelper.task.StreamConfiguration;
+import net.egork.chelper.task.Task;
+import net.egork.chelper.task.TaskBase;
+import net.egork.chelper.task.TopCoderTask;
+import net.egork.chelper.task.test.Test;
+import net.egork.chelper.task.test.TestType;
 import net.egork.chelper.tester.NewTester;
 
 import javax.swing.*;
@@ -168,11 +173,11 @@ public class ProjectUtils {
         RunnerAndConfigurationSettings configuration = null;
         if (task instanceof Task) {
             configuration = new RunnerAndConfigurationSettingsImpl(manager,
-                new TaskConfiguration(((Task) task).name, project, (Task) task,
+                new TaskConfiguration(task.name, project, (Task) task,
                     TaskConfigurationType.INSTANCE.getConfigurationFactories()[0]), false);
         } else if (task instanceof TopCoderTask) {
             configuration = new RunnerAndConfigurationSettingsImpl(manager,
-                new TopCoderConfiguration(((TopCoderTask) task).name, project, (TopCoderTask) task,
+                new TopCoderConfiguration(task.name, project, (TopCoderTask) task,
                     TopCoderConfigurationType.INSTANCE.getConfigurationFactories()[0]), false);
         }
         manager.addConfiguration(configuration, false);

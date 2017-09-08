@@ -61,7 +61,7 @@ public class TopCoderConfiguration extends ModuleBasedConfiguration<JavaRunConfi
 
     public RunProfileState getState(@NotNull Executor executor, @NotNull ExecutionEnvironment env)
         throws ExecutionException {
-        SolutionGenerator.createSourceFile(getProject(), configuration);
+        SolutionGenerator.createSourceFile(configuration, getProject());
         JavaCommandLineState state = new JavaCommandLineState(env) {
             @Override
             protected JavaParameters createJavaParameters() throws ExecutionException {

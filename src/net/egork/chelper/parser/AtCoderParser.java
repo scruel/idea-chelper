@@ -3,8 +3,8 @@ package net.egork.chelper.parser;
 import net.egork.chelper.checkers.PEStrictChecker;
 import net.egork.chelper.task.StreamConfiguration;
 import net.egork.chelper.task.Task;
-import net.egork.chelper.task.Test;
-import net.egork.chelper.task.TestType;
+import net.egork.chelper.task.test.Test;
+import net.egork.chelper.task.test.TestType;
 
 import javax.swing.*;
 import java.text.ParseException;

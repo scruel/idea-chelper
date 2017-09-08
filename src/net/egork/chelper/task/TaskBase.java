@@ -1,27 +1,43 @@
 package net.egork.chelper.task;
 
+import net.egork.chelper.task.test.TestBase;
+import net.egork.chelper.util.OutputWriter;
+
 /**
  * Created by Scruel on 2017/9/8.
  * Github : https://github.com/scruel
  */
-public class TaskBase {
+public abstract class TaskBase<E extends TestBase> {
     //for task map
     public static final String TASK_KEY = "TASK_KEY";
     public static final String TASK_SOURCE_KEY = "TASK_SOURCE_KEY";
     public static final String TASK_DATA_KEY = "TASK_DATA_KEY";
 
+
     //Basic
     public final String name;
+    public final TestBase[] tests;
 
     //Advanced
     public final String date;
     public final String contestName;
+    public final String[] testClasses;
 
-    public TaskBase(String name, String date, String contestName) {
+    public TaskBase(String name, E[] tests, String date, String contestName, String[] testClasses) {
         this.name = name;
+        this.tests = tests;
         this.date = date;
         this.contestName = contestName;
+        this.testClasses = testClasses;
     }
+
+
+    public abstract TaskBase setTests(E[] tests);
+
+    public abstract void saveTask(OutputWriter out);
+
+    public abstract TaskBase setTestClasses(String[] testClasses);
+
 
     @Override
     public String toString() {

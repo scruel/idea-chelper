@@ -4,7 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.VerticalFlowLayout;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import net.egork.chelper.task.Test;
+import net.egork.chelper.task.test.Test;
 import net.egork.chelper.util.FileUtils;
 
 import javax.swing.*;

@@ -9,8 +9,9 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import net.egork.chelper.task.StreamConfiguration;
 import net.egork.chelper.task.Task;
-import net.egork.chelper.task.TestType;
+import net.egork.chelper.task.TaskBase;
 import net.egork.chelper.task.TopCoderTask;
+import net.egork.chelper.task.test.TestType;
 import net.egork.chelper.util.FileUtils;
 import net.egork.chelper.util.Messenger;
 import net.egork.chelper.util.ProjectUtils;
@@ -535,7 +536,7 @@ public class SolutionGenerator {
         return new MainFileTemplate(builder.toString(), entryPoints, toImport);
     }
 
-    public static void createSourceFile(final Task task, final Project project) {
+    public static void createSourceFile(final TaskBase task, final Project project) {
         ApplicationManager.getApplication().runWriteAction(new Runnable() {
             public void run() {
                 String outputDirectory = ProjectUtils.getData(project).outputDirectory;
@@ -551,48 +552,34 @@ public class SolutionGenerator {
                         }
                     }
                 }
-                SolutionGenerator generator = new SolutionGenerator(new HashSet<String>(Arrays.asList(ProjectUtils.getData(project).excludedPackages)),
-                    createMainClassTemplate(task, project), true, MainFileTemplate.getMethod(project, task.taskClass, "solve", "void", "int", task.inputClass, task.outputClass));
-                String source = generator.createInlinedSource();
-                final VirtualFile file = FileUtils.writeTextFile(directory, task.mainClass + ".java", source);
-                FileUtils.synchronizeFile(file);
-                ReformatCodeProcessor processor = new ReformatCodeProcessor(PsiManager.getInstance(project).findFile(file), false);
-                processor.run();
-                FileUtils.synchronizeFile(file);
-            }
-        });
-    }
-
-    public static void createSourceFile(final Project project, final TopCoderTask task) {
-        ApplicationManager.getApplication().runWriteAction(new Runnable() {
-            public void run() {
-                SolutionGenerator generator = new SolutionGenerator(
-                    new HashSet<String>(Arrays.asList(ProjectUtils.getData(project).excludedPackages)),
-                    new MainFileTemplate("%IMPORTS%\npublic %INLINED_SOURCE%", Collections.<PsiElement>emptySet(),
-                        Collections.<String>emptySet()), false, task.getMethod(project));
-                String text = generator.createInlinedSource();
-                String outputDirectory = ProjectUtils.getData(project).outputDirectory;
-                VirtualFile directory = FileUtils.createDirectoryIfMissing(project, outputDirectory);
-                if (directory == null)
-                    return;
-                for (VirtualFile file : directory.getChildren()) {
-                    if ("java".equals(file.getExtension())) {
-                        try {
-                            file.delete(null);
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
+                VirtualFile file = null;
+                if (task instanceof Task) {
+                    SolutionGenerator generator = new SolutionGenerator(new HashSet<String>(Arrays.asList(ProjectUtils.getData(project).excludedPackages)),
+                        createMainClassTemplate((Task) task, project), true, MainFileTemplate.getMethod(project, ((Task) task).taskClass, "solve", "void", "int", ((Task) task).inputClass, ((Task) task).outputClass));
+                    String source = generator.createInlinedSource();
+                    file = FileUtils.writeTextFile(directory, ((Task) task).mainClass + ".java", source);
+                } else if (task instanceof TopCoderTask) {
+                    SolutionGenerator generator = new SolutionGenerator(
+                        new HashSet<String>(Arrays.asList(ProjectUtils.getData(project).excludedPackages)),
+                        new MainFileTemplate("%IMPORTS%\npublic %INLINED_SOURCE%", Collections.<PsiElement>emptySet(),
+                            Collections.<String>emptySet()), false, ((TopCoderTask) task).getMethod(project));
+                    String text = generator.createInlinedSource();
+                    file = FileUtils.writeTextFile(directory, task.name + ".java", text);
                 }
-                final VirtualFile file = FileUtils.writeTextFile(directory, task.name + ".java", text);
+
                 FileUtils.synchronizeFile(file);
                 ReformatCodeProcessor processor = new ReformatCodeProcessor(PsiManager.getInstance(project).findFile(file), false);
                 processor.run();
-                String source = FileUtils.readTextFile(file);
-                VirtualFile virtualFile = FileUtils.writeTextFile(LocalFileSystem.getInstance().findFileByPath(System.getProperty("user.home")), ".java", source);
-                new File(virtualFile.getCanonicalPath()).deleteOnExit();
+
+
+                if (task instanceof Task) {
+                    FileUtils.synchronizeFile(file);
+                } else {
+                    String source = FileUtils.readTextFile(file);
+                    VirtualFile virtualFile = FileUtils.writeTextFile(LocalFileSystem.getInstance().findFileByPath(System.getProperty("user.home")), ".java", source);
+                    new File(virtualFile.getCanonicalPath()).deleteOnExit();
+                }
             }
         });
     }
-
 }

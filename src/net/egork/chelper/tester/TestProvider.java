@@ -1,6 +1,6 @@
 package net.egork.chelper.tester;
 
-import net.egork.chelper.task.Test;
+import net.egork.chelper.task.test.Test;
 
 import java.util.Collection;
 

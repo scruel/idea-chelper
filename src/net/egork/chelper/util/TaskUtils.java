@@ -141,10 +141,10 @@ public class TaskUtils {
         if (fixed == null) return null;
         if (fixed != task) {
             if (task instanceof Task) {
-                new TaskConfiguration(((Task) task).name, project, (Task) task,
+                new TaskConfiguration(task.name, project, (Task) task,
                     TaskConfigurationType.INSTANCE.getConfigurationFactories()[0]);
             } else if (task instanceof TopCoderTask) {
-                new TopCoderConfiguration(((TopCoderTask) task).name, project, (TopCoderTask) task,
+                new TopCoderConfiguration(task.name, project, (TopCoderTask) task,
                     TaskConfigurationType.INSTANCE.getConfigurationFactories()[0]);
             }
         }

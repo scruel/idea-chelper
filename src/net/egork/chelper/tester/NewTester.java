@@ -2,8 +2,8 @@ package net.egork.chelper.tester;
 
 import net.egork.chelper.checkers.Checker;
 import net.egork.chelper.task.Task;
-import net.egork.chelper.task.Test;
-import net.egork.chelper.task.TestType;
+import net.egork.chelper.task.test.Test;
+import net.egork.chelper.task.test.TestType;
 import net.egork.chelper.util.EncodingUtils;
 import net.egork.chelper.util.InputReader;
 import net.egork.chelper.util.OutputWriter;

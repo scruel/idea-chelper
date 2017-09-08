@@ -7,9 +7,9 @@ import com.topcoder.shared.problem.DataType;
 import com.topcoder.shared.problem.Renderer;
 import com.topcoder.shared.problem.TestCase;
 import net.egork.chelper.task.MethodSignature;
-import net.egork.chelper.task.NewTopCoderTest;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.task.TopCoderTask;
+import net.egork.chelper.task.test.NewTopCoderTest;
 import net.egork.chelper.util.OutputWriter;
 
 import javax.swing.*;

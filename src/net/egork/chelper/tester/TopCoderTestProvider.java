@@ -1,6 +1,6 @@
 package net.egork.chelper.tester;
 
-import net.egork.chelper.task.NewTopCoderTest;
+import net.egork.chelper.task.test.NewTopCoderTest;
 
 import java.util.Collection;
 
