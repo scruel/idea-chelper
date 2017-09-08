@@ -33,7 +33,7 @@ public class ProjectDataDialog extends JDialog {
     private final JLabel testDirectoryLabel;
     private final int width = new JTextField(20).getPreferredSize().width;
 
-    public ProjectDataDialog(Project project, ProjectData data) {
+    public ProjectDataDialog(final Project project, ProjectData data) {
         super(null, "Project settings", Dialog.ModalityType.APPLICATION_MODAL);
         setAlwaysOnTop(true);
         setResizable(false);

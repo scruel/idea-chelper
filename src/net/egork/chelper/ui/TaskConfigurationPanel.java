@@ -1,6 +1,7 @@
 package net.egork.chelper.ui;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.VerticalFlowLayout;
 import net.egork.chelper.task.StreamConfiguration;
 import net.egork.chelper.task.Task;
@@ -93,11 +94,11 @@ public class TaskConfigurationPanel extends JPanel {
         contestName = new JTextField(task.contestName);
         basic.add(contestName);
         basic.add(new JLabel("Test type:"));
-        testType = new JComboBox(TestType.values());
+        testType = new ComboBox(TestType.values());
         testType.setSelectedItem(task.testType);
         basic.add(testType);
         basic.add(new JLabel("Input:"));
-        inputType = new JComboBox(StreamConfiguration.StreamType.values());
+        inputType = new ComboBox(StreamConfiguration.StreamType.values());
         inputType.setSelectedItem(task.input.type);
         inputType.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -112,7 +113,7 @@ public class TaskConfigurationPanel extends JPanel {
         inputFileName.setVisible(task.input.type.hasStringParameter);
         basic.add(inputFileName);
         basic.add(new JLabel("Output:"));
-        outputType = new JComboBox(StreamConfiguration.OUTPUT_TYPES);
+        outputType = new ComboBox(StreamConfiguration.OUTPUT_TYPES);
         outputType.setSelectedItem(task.output.type);
         outputType.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {

@@ -1,6 +1,6 @@
 package net.egork.chelper;
 
-import com.intellij.execution.RunManagerListener;
+import com.intellij.execution.RunManagerAdapter;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.impl.RunManagerImpl;
@@ -50,15 +50,13 @@ public class AutoSwitcher implements ProjectComponent {
         return "AutoSwitcher";
     }
 
-    @Override
     public void projectOpened() {
         addSelectedConfigurationListener();
         addFileEditorListeners();
     }
 
     private void addSelectedConfigurationListener() {
-        RunManagerImpl.getInstanceImpl(project).addRunManagerListener(new RunManagerListener() {
-            @Override
+        RunManagerImpl.getInstanceImpl(project).addRunManagerListener(new RunManagerAdapter() {
             public void runConfigurationSelected() {
                 RunnerAndConfigurationSettings selectedConfiguration =
                     RunManagerImpl.getInstanceImpl(project).getSelectedConfiguration();
@@ -73,7 +71,7 @@ public class AutoSwitcher implements ProjectComponent {
                 VirtualFile toOpen = null;
                 if (configuration instanceof TopCoderConfiguration)
                     toOpen = TaskUtils.getFile(ProjectUtils.getData(project).defaultDirectory, ((TopCoderConfiguration) configuration).getConfiguration().name, project);
-                else
+                else if (configuration instanceof TaskConfiguration)
                     toOpen = FileUtils.getFileByFQN(((TaskConfiguration) configuration).getConfiguration().taskClass, configuration.getProject());
 
                 if (toOpen != null) {
@@ -128,9 +126,9 @@ public class AutoSwitcher implements ProjectComponent {
                     private void repairAndConfigureTask(Map<String, Object> taskMap) {
                         TaskBase task = (TaskBase) taskMap.get(TaskBase.TASK_KEY);
                         VirtualFile taskFile = (VirtualFile) taskMap.get(TaskBase.TASK_SOURCE_KEY);
-                        task = TaskUtils.taskOfFixedPath(task, project, taskFile);
+                        task = TaskUtils.fixedTaskByPath(task, project, taskFile);
                         busy = true;
-                        ProjectUtils.createConfiguration((Task) task, true, project);
+                        ProjectUtils.createConfiguration(task, true, project);
                         busy = false;
                     }
 

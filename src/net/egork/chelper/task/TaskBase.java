@@ -13,10 +13,9 @@ public abstract class TaskBase<E extends TestBase> {
     public static final String TASK_SOURCE_KEY = "TASK_SOURCE_KEY";
     public static final String TASK_DATA_KEY = "TASK_DATA_KEY";
 
-
     //Basic
     public final String name;
-    public final TestBase[] tests;
+    public final E[] tests;
 
     //Advanced
     public final String date;
@@ -37,7 +36,6 @@ public abstract class TaskBase<E extends TestBase> {
     public abstract void saveTask(OutputWriter out);
 
     public abstract TaskBase setTestClasses(String[] testClasses);
-
 
     @Override
     public String toString() {

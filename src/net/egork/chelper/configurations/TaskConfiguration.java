@@ -14,6 +14,7 @@ import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiDocumentManager;
+import com.intellij.psi.search.GlobalSearchScope;
 import net.egork.chelper.actions.ArchiveAction;
 import net.egork.chelper.actions.TopCoderAction;
 import net.egork.chelper.task.Task;
@@ -24,6 +25,7 @@ import net.egork.chelper.util.ProjectUtils;
 import net.egork.chelper.util.TaskUtils;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -122,6 +124,22 @@ public class TaskConfiguration extends ModuleBasedConfiguration<JavaRunConfigura
     private void saveConfiguration(Task configuration) {
         if (configuration != null && configuration.location != null && configuration.name != null && configuration.name.length() != 0)
             FileUtils.saveConfiguration(configuration.location, ArchiveAction.canonize(configuration.name) + ".task", configuration, getProject());
+    }
+
+    // Used to support previous versions of JDK6.0
+    @Nullable
+    public GlobalSearchScope getSearchScope() {
+        Module[] modules = getModules();
+        if (modules.length == 0) {
+            return null;
+        } else {
+            GlobalSearchScope scope = GlobalSearchScope.moduleRuntimeScope(modules[0], true);
+            for (int idx = 1; idx < modules.length; idx++) {
+                Module module = modules[idx];
+                scope = scope.uniteWith(GlobalSearchScope.moduleRuntimeScope(module, true));
+            }
+            return scope;
+        }
     }
 
     @Override

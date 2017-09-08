@@ -12,7 +12,6 @@ import java.util.InputMismatchException;
  * @author Egor Kulikov (kulikov@devexperts.com)
  */
 public class Task extends TaskBase<Test> {
-
     // Basic
     public final TestType testType;
     public final StreamConfiguration input;

@@ -24,6 +24,7 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.util.ui.UIUtil;
 import net.egork.chelper.ChromeParser;
 import net.egork.chelper.ProjectData;
 import net.egork.chelper.actions.TopCoderAction;
@@ -98,6 +99,7 @@ public class ProjectUtils {
         if (data.libraryMigrated)
             return;
         ApplicationManager.getApplication().runWriteAction(new Runnable() {
+            @Override
             public void run() {
                 LibraryTable table = ProjectLibraryTable.getInstance(project);
                 String path = TopCoderAction.getJarPathForClass(NewTester.class);
@@ -204,7 +206,7 @@ public class ProjectUtils {
         } else {
             int w = icon.getIconWidth();
             int h = icon.getIconHeight();
-            BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+            BufferedImage image = UIUtil.createImage(w, h, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = image.createGraphics();
             icon.paintIcon(null, g, 0, 0);
             g.dispose();

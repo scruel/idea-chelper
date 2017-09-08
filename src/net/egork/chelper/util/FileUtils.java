@@ -3,6 +3,7 @@ package net.egork.chelper.util;
 import com.intellij.ide.IdeView;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.LangDataKeys;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
@@ -76,6 +77,7 @@ public class FileUtils {
 
     public static VirtualFile writeTextFile(final VirtualFile location, final String fileName, final String fileContent) {
         ExecuteUtils.executeStrictWriteActionAndWait(new Runnable() {
+            @Override
             public void run() {
                 if (location == null) {
                     return;
@@ -99,19 +101,16 @@ public class FileUtils {
         return location.findChild(fileName);
     }
 
-
     public static boolean isValiDirectory(String location, Project project) {
         PsiDirectory directory = FileUtils.getPsiDirectory(project, location);
-        if (directory == null || !directory.isValid()) {
-            return false;
-        }
-        return true;
+        return !(directory == null || !directory.isValid());
     }
 
     public static boolean isValidClass(String clazz, Project project) {
         try {
             Class.forName(clazz).newInstance();
-        } catch (IllegalAccessException | InstantiationException ignore) {
+        } catch (IllegalAccessException ignore) {
+        } catch (InstantiationException ignore) {
         } catch (ClassNotFoundException igonre) {
             if (MainFileTemplate.getClass(project, clazz) == null)
                 return false;
@@ -190,6 +189,7 @@ public class FileUtils {
 
     public static VirtualFile createDirectoryIfMissing(final Project project, final String location) {
         ExecuteUtils.executeStrictWriteActionAndWait(new Runnable() {
+            @Override
             public void run() {
                 VirtualFile baseDir = project.getBaseDir();
                 if (baseDir == null) {
@@ -205,7 +205,9 @@ public class FileUtils {
     }
 
     public static void synchronizeFile(VirtualFile file) {
-        FileDocumentManager.getInstance().saveDocument(FileDocumentManager.getInstance().getDocument(file));
+        Document doc = FileDocumentManager.getInstance().getDocument(file);
+        if (doc == null) return;
+        FileDocumentManager.getInstance().saveDocument(doc);
     }
 
     public static String getWebPageContent(String address) {
@@ -251,6 +253,7 @@ public class FileUtils {
             return;
         }
         ExecuteUtils.executeStrictWriteAction(new Runnable() {
+            @Override
             public void run() {
                 VirtualFile location = FileUtils.getFile(project, locationName);
                 if (location == null) {

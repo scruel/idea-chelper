@@ -29,19 +29,19 @@ public class UnarchiveTaskAction extends AnAction {
         if (!ProjectUtils.isEligible(e.getDataContext()))
             return;
         final Project project = ProjectUtils.getProject(e.getDataContext());
-        FileChooserDialog dialog = FileChooserFactory.getInstance().createFileChooser(new
-                                                                                          FileChooserDescriptor(true, false, false, false, false, true) {
-                                                                                              @Override
-                                                                                              public boolean isFileSelectable(VirtualFile file) {
-                                                                                                  return super.isFileSelectable(file) && ("task".equals(file.getExtension()) || "tctask".equals(file.getExtension()));
-                                                                                              }
+        FileChooserDialog dialog = FileChooserFactory.getInstance().createFileChooser(
+            new FileChooserDescriptor(true, false, false, false, false, true) {
+                @Override
+                public boolean isFileSelectable(VirtualFile file) {
+                    return super.isFileSelectable(file) && ("task".equals(file.getExtension()) || "tctask".equals(file.getExtension()));
+                }
 
-                                                                                              @Override
-                                                                                              public boolean isFileVisible(VirtualFile file, boolean showHiddenFiles) {
-                                                                                                  return super.isFileVisible(file, showHiddenFiles) &&
-                                                                                                      (file.isDirectory() || "task".equals(file.getExtension()) || "tctask".equals(file.getExtension()));
-                                                                                              }
-                                                                                          }, project, null);
+                @Override
+                public boolean isFileVisible(VirtualFile file, boolean showHiddenFiles) {
+                    return super.isFileVisible(file, showHiddenFiles) &&
+                        (file.isDirectory() || "task".equals(file.getExtension()) || "tctask".equals(file.getExtension()));
+                }
+            }, project, null);
         final VirtualFile[] files = dialog.choose(FileUtils.getFile(project, ProjectUtils.getData(project).archiveDirectory), project);
         ApplicationManager.getApplication().runWriteAction(new Runnable() {
             public void run() {

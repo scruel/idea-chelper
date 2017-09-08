@@ -538,6 +538,7 @@ public class SolutionGenerator {
 
     public static void createSourceFile(final TaskBase task, final Project project) {
         ApplicationManager.getApplication().runWriteAction(new Runnable() {
+            @Override
             public void run() {
                 String outputDirectory = ProjectUtils.getData(project).outputDirectory;
                 VirtualFile directory = FileUtils.createDirectoryIfMissing(project, outputDirectory);
@@ -568,9 +569,9 @@ public class SolutionGenerator {
                 }
 
                 FileUtils.synchronizeFile(file);
-                ReformatCodeProcessor processor = new ReformatCodeProcessor(PsiManager.getInstance(project).findFile(file), false);
-                processor.run();
+                ReformatCodeProcessor processor = new ReformatCodeProcessor(project, PsiManager.getInstance(project).findFile(file), null, false);
 
+                processor.run();
 
                 if (task instanceof Task) {
                     FileUtils.synchronizeFile(file);

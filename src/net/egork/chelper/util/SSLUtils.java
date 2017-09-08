@@ -137,7 +137,7 @@ public final class SSLUtils {
     public static void trustAllHostnames() {
         // Is the deprecated protocol setted?
         if (isDeprecatedSSLProtocol()) {
-            _trustAllHostnames();
+            __trustAllHostnames();
         } else {
             _trustAllHostnames();
         } // else
@@ -150,7 +150,7 @@ public final class SSLUtils {
     public static void trustAllHttpsCertificates() {
         // Is the deprecated protocol setted?
         if (isDeprecatedSSLProtocol()) {
-            _trustAllHttpsCertificates();
+            __trustAllHttpsCertificates();
         } else {
             _trustAllHttpsCertificates();
         } // else
@@ -311,4 +311,4 @@ public final class SSLUtils {
             return (_AcceptedIssuers);
         } // getAcceptedIssuers
     } // FakeX509TrustManager
-}
+} // SSLUtilities

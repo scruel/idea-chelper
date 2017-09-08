@@ -131,12 +131,12 @@ public class TaskUtils {
      * @param taskDataFile
      * @return
      */
-    public static TaskBase taskOfFixedPath(TaskBase task, Project project, VirtualFile taskDataFile) {
+    public static TaskBase fixedTaskByPath(TaskBase task, Project project, VirtualFile taskDataFile) {
         TaskBase fixed = null;
         if (task instanceof Task) {
-            fixed = fixedTask(project, (Task) task, taskDataFile);
+            fixed = _fixedTaskByPath(project, (Task) task, taskDataFile);
         } else if (task instanceof TopCoderTask) {
-            fixed = fixedTopCoderTask(project, (TopCoderTask) task, taskDataFile);
+            fixed = _fixedTopCoderTaskByPath(project, (TopCoderTask) task, taskDataFile);
         }
         if (fixed == null) return null;
         if (fixed != task) {
@@ -151,7 +151,7 @@ public class TaskUtils {
         return fixed;
     }
 
-    private static Task fixedTask(Project project, Task task, VirtualFile taskDataFile) {
+    private static Task _fixedTaskByPath(Project project, Task task, VirtualFile taskDataFile) {
         if (task == null || taskDataFile == null) return null;
         PsiClass aClass = MainFileTemplate.getClass(project, task.checkerClass);
         if (aClass == null) {
@@ -176,7 +176,7 @@ public class TaskUtils {
         return task;
     }
 
-    private static TopCoderTask fixedTopCoderTask(Project project, TopCoderTask task, VirtualFile taskDataFile) {
+    private static TopCoderTask _fixedTopCoderTaskByPath(Project project, TopCoderTask task, VirtualFile taskDataFile) {
         //TODO haven't try topcoder.
         if (task == null || taskDataFile == null) return null;
         return task;

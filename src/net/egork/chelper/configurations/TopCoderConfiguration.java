@@ -13,6 +13,7 @@ import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.search.GlobalSearchScope;
 import net.egork.chelper.actions.TopCoderAction;
 import net.egork.chelper.codegeneration.SolutionGenerator;
 import net.egork.chelper.task.TopCoderTask;
@@ -23,6 +24,7 @@ import net.egork.chelper.util.ProjectUtils;
 import net.egork.chelper.util.TaskUtils;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -111,6 +113,22 @@ public class TopCoderConfiguration extends ModuleBasedConfiguration<JavaRunConfi
     public void setConfiguration(TopCoderTask configuration) {
         this.configuration = configuration;
         saveConfiguration(configuration);
+    }
+
+    // Used to support previous versions of JDK6.0
+    @Nullable
+    public GlobalSearchScope getSearchScope() {
+        Module[] modules = getModules();
+        if (modules.length == 0) {
+            return null;
+        } else {
+            GlobalSearchScope scope = GlobalSearchScope.moduleRuntimeScope(modules[0], true);
+            for (int idx = 1; idx < modules.length; idx++) {
+                Module module = modules[idx];
+                scope = scope.uniteWith(GlobalSearchScope.moduleRuntimeScope(module, true));
+            }
+            return scope;
+        }
     }
 
     @Override

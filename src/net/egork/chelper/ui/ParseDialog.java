@@ -2,11 +2,14 @@ package net.egork.chelper.ui;
 
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.VerticalFlowLayout;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.ui.ListCellRendererWrapper;
 import com.intellij.ui.components.JBList;
+import com.intellij.ui.components.JBScrollPane;
 import net.egork.chelper.ProjectData;
 import net.egork.chelper.parser.Description;
 import net.egork.chelper.parser.DescriptionReceiver;
@@ -94,16 +97,14 @@ public class ParseDialog extends JDialog {
             }
         };
         JPanel upperPanel = new JPanel(new BorderLayout(5, 5));
-        parserCombo = new JComboBox(Parser.PARSERS);
-        parserCombo.setRenderer(new ListCellRenderer() {
-            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
-                                                          boolean cellHasFocus) {
+        parserCombo = new ComboBox(Parser.PARSERS);
+        parserCombo.setRenderer(new ListCellRendererWrapper() {
+            public void customize(JList list, Object value, int index, boolean selected, boolean hasFocus) {
                 Parser parser = (Parser) value;
                 JLabel label = new JLabel(parser.getName(), parser.getIcon(), JLabel.LEFT);
                 label.setOpaque(true);
-                if (isSelected)
+                if (selected)
                     label.setBackground(UIManager.getColor("textHighlight"));
-                return label;
             }
         });
         parserCombo.setSelectedItem(ProjectUtils.getDefaultParser());
@@ -135,7 +136,6 @@ public class ParseDialog extends JDialog {
         contestList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         contestList.setLayoutOrientation(JList.VERTICAL);
         contestList.addListSelectionListener(new ListSelectionListener() {
-            @Override
             public void valueChanged(ListSelectionEvent e) {
                 if (taskReceiver != null) {
                     taskReceiver.stop();
@@ -153,6 +153,7 @@ public class ParseDialog extends JDialog {
                         final Receiver receiver = this;
                         final boolean shouldMark = firstTime;
                         ExecuteUtils.executeStrictWriteAction(new Runnable() {
+                            @Override
                             public void run() {
                                 if (taskReceiver != receiver)
                                     return;
@@ -172,13 +173,13 @@ public class ParseDialog extends JDialog {
                 contestName.setText(contest.description);
             }
         });
-        JScrollPane contestScroll = new JScrollPane(contestList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        JScrollPane contestScroll = new JBScrollPane(contestList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         middlePanel.add(contestScroll);
         taskModel = new ParseListModel();
         taskList = new JBList(taskModel);
         taskList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         taskList.setLayoutOrientation(JList.VERTICAL);
-        JScrollPane taskScroll = new JScrollPane(taskList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        JScrollPane taskScroll = new JBScrollPane(taskList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         middlePanel.add(taskScroll);
         contentPanel.add(middlePanel, BorderLayout.CENTER);
         JPanel bottomPanel = new JPanel(new GridLayout(1, 2, 5, 5));
@@ -192,7 +193,7 @@ public class ParseDialog extends JDialog {
         };
         Task defaultTask = ProjectUtils.getDefaultTask();
         leftPanel.add(new JLabel("Test type:"));
-        testType = new JComboBox(TestType.values());
+        testType = new ComboBox(TestType.values());
         testType.setSelectedItem(ProjectUtils.getDefaultParser().defaultTestType());
         leftPanel.add(testType);
         leftPanel.add(new JLabel("Location:"));
