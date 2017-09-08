@@ -1,8 +1,7 @@
 <!--suppress ALL -->
 <idea-plugin>
   <name>CHelper</name>
-  <description>Inlines library code and provides testing framework</description>
-  <version>4.1.14</version>
+  <version>4.2.0</version>
   <vendor>Egor Kulikov</vendor>
   <idea-version since-build="162"/>
 
@@ -66,6 +65,7 @@
     <action id="editProjectProperties" class="net.egork.chelper.actions.EditProjectProperties"
             icon="/icons/settings.png"
             text="Edit CHelper Settings">
+      <add-to-group group-id="ToolsMenu" anchor="last"/>
     </action>
     <action id="unarchiveTask" class="net.egork.chelper.actions.UnarchiveTaskAction" text="Restore Task"
             icon="/icons/unarchive.png"
@@ -77,6 +77,26 @@
             description="Edit current task"/>
     <action id="bulkAdd" class="net.egork.chelper.actions.BulkAddTests" text="Bulk Add Tests"
             icon="/icons/editTests.png"/>
+
+    <group id="CHelper.Group" text="CHelper"
+           class="com.intellij.openapi.actionSystem.DefaultActionGroup">
+      <separator/>
+      <reference ref="editProjectProperties"/>
+      <reference ref="newTaskCustom"/>
+      <reference ref="deleteTask"/>
+      <reference ref="editTask"/>
+      <reference ref="editTests"/>
+      <reference ref="copySource"/>
+      <reference ref="archiveTask"/>
+      <reference ref="unarchiveTask"/>
+      <reference ref="parseContest"/>
+      <reference ref="launchArena"/>
+
+      <!--<reference ref="bulkAdd"/>-->
+      <!--<reference ref="newTask"/>-->
+      <add-to-group group-id="MainToolBar" anchor="after" relative-to-action="ToolbarRunGroup"/>
+
+    </group>
   </actions>
 
   <extensions defaultExtensionNs="com.intellij">
