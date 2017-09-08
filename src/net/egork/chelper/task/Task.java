@@ -9,9 +9,8 @@ import java.util.InputMismatchException;
 /**
  * @author Egor Kulikov (kulikov@devexperts.com)
  */
-public class Task {
+public class Task extends TaskBase {
     //Basic
-    public final String name;
     public final TestType testType;
     public final StreamConfiguration input;
     public final StreamConfiguration output;
@@ -28,8 +27,6 @@ public class Task {
     public final String checkerClass;
     public final String checkerParameters;
     public final String[] testClasses;
-    public final String date;
-    public final String contestName;
     public final boolean truncate;
     public final String inputClass;
     public final String outputClass;
@@ -49,7 +46,7 @@ public class Task {
                 String location, String vmArgs, String mainClass, String taskClass, String checkerClass,
                 String checkerParameters, String[] testClasses, String date, String contestName, boolean truncate,
                 String inputClass, String outputClass, boolean includeLocale, boolean failOnOverflow, String template) {
-        this.name = trim(name);
+        super(trim(name), trim(date), trim(contestName));
         this.testType = testType;
         this.input = input;
         this.output = output;
@@ -61,8 +58,6 @@ public class Task {
         this.checkerClass = trim(checkerClass);
         this.checkerParameters = trim(checkerParameters);
         this.testClasses = testClasses;
-        this.date = trim(date);
-        this.contestName = trim(contestName);
         this.truncate = truncate;
         this.inputClass = trim(inputClass);
         this.outputClass = trim(outputClass);
@@ -130,43 +125,48 @@ public class Task {
     }
 
     public static Task loadTask(InputReader in) {
-        String name = in.readString();
-        TestType testType = in.readEnum(TestType.class);
-        StreamConfiguration.StreamType inputStreamType = in.readEnum(StreamConfiguration.StreamType.class);
-        String inputFileName = in.readString();
-        StreamConfiguration.StreamType outputStreamType = in.readEnum(StreamConfiguration.StreamType.class);
-        String outputFileName = in.readString();
-        int testCount = in.readInt();
-        Test[] tests = new Test[testCount];
-        for (int i = 0; i < testCount; i++)
-            tests[i] = Test.loadTest(in);
-
-        String location = in.readString();
-        String vmArgs = in.readString();
-        String mainClass = in.readString();
-        String taskClass = in.readString();
-        String checkerClass = in.readString();
-        String checkerParameters = in.readString();
-        int testClassesCount = in.readInt();
-        String[] testClasses = new String[testClassesCount];
-        for (int i = 0; i < testClassesCount; i++)
-            testClasses[i] = in.readString();
-        String date = in.readString();
-        String contestName = in.readString();
-        boolean truncate = in.readBoolean();
-        String inputClass = in.readString();
-        String outputClass = in.readString();
-        boolean includeLocale = false;
-        boolean failOnOverflow = false;
         try {
-            includeLocale = in.readBoolean();
-            failOnOverflow = in.readBoolean();
-        } catch (InputMismatchException ignored) {
+            String name = in.readString();
+            TestType testType = in.readEnum(TestType.class);
+            StreamConfiguration.StreamType inputStreamType = in.readEnum(StreamConfiguration.StreamType.class);
+            String inputFileName = in.readString();
+            StreamConfiguration.StreamType outputStreamType = in.readEnum(StreamConfiguration.StreamType.class);
+            String outputFileName = in.readString();
+            int testCount = in.readInt();
+            Test[] tests = new Test[testCount];
+            for (int i = 0; i < testCount; i++)
+                tests[i] = Test.loadTest(in);
+
+            String location = in.readString();
+            String vmArgs = in.readString();
+            String mainClass = in.readString();
+            String taskClass = in.readString();
+            String checkerClass = in.readString();
+            String checkerParameters = in.readString();
+            int testClassesCount = in.readInt();
+            String[] testClasses = new String[testClassesCount];
+            for (int i = 0; i < testClassesCount; i++)
+                testClasses[i] = in.readString();
+            String date = in.readString();
+            String contestName = in.readString();
+            boolean truncate = in.readBoolean();
+            String inputClass = in.readString();
+            String outputClass = in.readString();
+            boolean includeLocale = false;
+            boolean failOnOverflow = false;
+            try {
+                includeLocale = in.readBoolean();
+                failOnOverflow = in.readBoolean();
+            } catch (InputMismatchException ignored) {
+            }
+            return new Task(name, testType, new StreamConfiguration(inputStreamType, inputFileName),
+                new StreamConfiguration(outputStreamType, outputFileName), tests, location, vmArgs, mainClass,
+                taskClass, checkerClass, checkerParameters, testClasses, date, contestName, truncate, inputClass,
+                outputClass, includeLocale, failOnOverflow);
+        } catch (InputMismatchException e) {
+//            throw new RuntimeException("CHelper could not continue because the associated data file is missing or corrupt");
+            return null;
         }
-        return new Task(name, testType, new StreamConfiguration(inputStreamType, inputFileName),
-            new StreamConfiguration(outputStreamType, outputFileName), tests, location, vmArgs, mainClass,
-            taskClass, checkerClass, checkerParameters, testClasses, date, contestName, truncate, inputClass,
-            outputClass, includeLocale, failOnOverflow);
     }
 
     public Task setTests(Test[] tests) {

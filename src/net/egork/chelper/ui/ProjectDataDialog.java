@@ -112,16 +112,16 @@ public class ProjectDataDialog extends JDialog {
     }
 
     private boolean isValidData(Project project) {
-        if (!FileUtils.isValidClass(project, ProjectDataDialog.this.inputClass.getText())) {
+        if (!FileUtils.isValidClass(ProjectDataDialog.this.inputClass.getText(), project)) {
             Messenger.publishMessageWithBalloon(project, inputClass, "invalid inputClass!", MessageType.ERROR);
             return false;
         }
-        if (!FileUtils.isValidClass(project, ProjectDataDialog.this.outputClass.getText())) {
+        if (!FileUtils.isValidClass(ProjectDataDialog.this.outputClass.getText(), project)) {
             Messenger.publishMessageWithBalloon(project, outputClass, "invalid outputClass!", MessageType.ERROR);
             return false;
         }
 
-        if (!FileUtils.isValiDirectory(project, ProjectDataDialog.this.defaultDirectory.getText())) {
+        if (!FileUtils.isValiDirectory(ProjectDataDialog.this.defaultDirectory.getText(), project)) {
             Messenger.publishMessageWithBalloon(project, defaultDirectory.getTextField(), "invalid defaultDirectory!", MessageType.ERROR);
             return false;
         }

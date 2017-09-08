@@ -99,15 +99,15 @@ public class FileUtils {
     }
 
 
-    public static boolean isValiDirectory(Project project, String dir) {
-        PsiDirectory directory = FileUtils.getPsiDirectory(project, dir);
+    public static boolean isValiDirectory(String location, Project project) {
+        PsiDirectory directory = FileUtils.getPsiDirectory(project, location);
         if (directory == null || !directory.isValid()) {
             return false;
         }
         return true;
     }
 
-    public static boolean isValidClass(Project project, String clazz) {
+    public static boolean isValidClass(String clazz, Project project) {
         try {
             Class.forName(clazz).newInstance();
         } catch (IllegalAccessException | InstantiationException ignore) {
@@ -230,11 +230,19 @@ public class FileUtils {
     }
 
     public static Task readTask(String fileName, Project project) {
-        return Task.loadTask(new InputReader(getInputStream(getFile(project, fileName))));
+        VirtualFile vFile = getFile(project, fileName);
+        if (vFile == null) {
+            return null;
+        }
+        return Task.loadTask(new InputReader(getInputStream(vFile)));
     }
 
     public static TopCoderTask readTopCoderTask(String fileName, Project project) {
-        return TopCoderTask.load(new InputReader(getInputStream(getFile(project, fileName))));
+        VirtualFile vFile = getFile(project, fileName);
+        if (vFile == null) {
+            return null;
+        }
+        return TopCoderTask.load(new InputReader(getInputStream(vFile)));
     }
 
     public static void saveConfiguration(final String locationName, final String fileName, final Task configuration, final Project project) {
@@ -312,42 +320,42 @@ public class FileUtils {
         return name.matches("[a-zA-Z_$][a-zA-Z\\d_$]*");
     }
 
-    public static String createTaskClass(Task task, Project project, String path, String name) {
-        VirtualFile directory = FileUtils.createDirectoryIfMissing(project, path);
-        String mainClass = CodeGenerationUtils.createStub(task, path, name, project);
+    public static String createTaskClass(Task task, Project project, String location, String name) {
+        VirtualFile directory = FileUtils.createDirectoryIfMissing(project, location);
+        String mainClass = CodeGenerationUtils.createStub(task, location, name, project);
         if (directory.findChild(name + ".java") == null) {
             writeTextFile(directory, name + ".java", mainClass);
         }
-        PsiDirectory psiDirectory = getPsiDirectory(project, path);
+        PsiDirectory psiDirectory = getPsiDirectory(project, location);
         String aPackage = getPackage(psiDirectory);
         return aPackage + "." + name;
     }
 
-    public static String createCheckerClass(Project project, String path, String name, Task task) {
-        String mainClass = CodeGenerationUtils.createCheckerStub(path, name, project, task);
-        VirtualFile directory = FileUtils.createDirectoryIfMissing(project, path);
+    public static String createCheckerClass(Project project, String location, String name, Task task) {
+        String mainClass = CodeGenerationUtils.createCheckerStub(location, name, project, task);
+        VirtualFile directory = FileUtils.createDirectoryIfMissing(project, location);
         writeTextFile(directory, name + ".java", mainClass);
-        PsiDirectory psiDirectory = getPsiDirectory(project, path);
+        PsiDirectory psiDirectory = getPsiDirectory(project, location);
         String aPackage = getPackage(psiDirectory);
         String fqn = aPackage + "." + name;
         ProjectUtils.openElement(project, ProjectUtils.getPsiElement(project, fqn));
         return fqn;
     }
 
-    public static String createTestClass(Project project, String path, String name, Task task) {
-        String mainClass = CodeGenerationUtils.createTestStub(path, name, project, task);
-        VirtualFile directory = FileUtils.createDirectoryIfMissing(project, path);
+    public static String createTestClass(Project project, String location, String name, Task task) {
+        String mainClass = CodeGenerationUtils.createTestStub(location, name, project, task);
+        VirtualFile directory = FileUtils.createDirectoryIfMissing(project, location);
         writeTextFile(directory, name + ".java", mainClass);
-        PsiDirectory psiDirectory = getPsiDirectory(project, path);
+        PsiDirectory psiDirectory = getPsiDirectory(project, location);
         String aPackage = getPackage(psiDirectory);
         String fqn = aPackage + "." + name;
         ProjectUtils.openElement(project, ProjectUtils.getPsiElement(project, fqn));
         return fqn;
     }
 
-    public static String createTopCoderTestClass(Project project, String path, String name) {
-        VirtualFile directory = FileUtils.createDirectoryIfMissing(project, path);
-        PsiDirectory psiDirectory = getPsiDirectory(project, path);
+    public static String createTopCoderTestClass(Project project, String location, String name) {
+        VirtualFile directory = FileUtils.createDirectoryIfMissing(project, location);
+        PsiDirectory psiDirectory = getPsiDirectory(project, location);
         String aPackage = getPackage(psiDirectory);
         String mainClass = CodeGenerationUtils.createTopCoderTestStub(project, aPackage, name);
         writeTextFile(directory, name + ".java", mainClass);
@@ -363,6 +371,11 @@ public class FileUtils {
         return taskClass;
     }
 
+    /**
+     * @param fqn     className
+     * @param project
+     * @return
+     */
     public static VirtualFile getFileByFQN(String fqn, Project project) {
         if (fqn == null)
             return null;

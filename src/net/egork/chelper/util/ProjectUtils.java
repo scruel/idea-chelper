@@ -143,8 +143,8 @@ public class ProjectUtils {
                 return;
             FileEditorManager.getInstance(project).openFile(virtualFile, true);
         } else if (element instanceof PsiClass) {
-            FileEditorManager.getInstance(project).openFile(FileUtils.getFile(project,
-                getData(project).defaultDirectory + "/" + ((PsiClass) element).getName() + ".java"), true);
+            FileEditorManager.getInstance(project).openFile(FileUtils.getFile(project, getData(project).defaultDirectory + "/" + ((PsiClass) element).getName() + ".java"
+            ), true);
         }
     }
 
@@ -158,14 +158,23 @@ public class ProjectUtils {
         return center;
     }
 
-    public static RunnerAndConfigurationSettings createConfiguration(Task task, boolean setActive, Project project) {
+
+    public static RunnerAndConfigurationSettings createConfiguration(TaskBase task, boolean setActive, Project project) {
         RunManagerImpl manager = RunManagerImpl.getInstanceImpl(project);
         RunnerAndConfigurationSettings old = manager.findConfigurationByName(task.name);
-        if (old != null)
+        if (old != null) {
             manager.removeConfiguration(old);
-        RunnerAndConfigurationSettingsImpl configuration = new RunnerAndConfigurationSettingsImpl(manager,
-            new TaskConfiguration(task.name, project, task,
-                TaskConfigurationType.INSTANCE.getConfigurationFactories()[0]), false);
+        }
+        RunnerAndConfigurationSettings configuration = null;
+        if (task instanceof Task) {
+            configuration = new RunnerAndConfigurationSettingsImpl(manager,
+                new TaskConfiguration(((Task) task).name, project, (Task) task,
+                    TaskConfigurationType.INSTANCE.getConfigurationFactories()[0]), false);
+        } else if (task instanceof TopCoderTask) {
+            configuration = new RunnerAndConfigurationSettingsImpl(manager,
+                new TopCoderConfiguration(((TopCoderTask) task).name, project, (TopCoderTask) task,
+                    TopCoderConfigurationType.INSTANCE.getConfigurationFactories()[0]), false);
+        }
         manager.addConfiguration(configuration, false);
         if (setActive)
             manager.setSelectedConfiguration(configuration);
@@ -198,19 +207,6 @@ public class ProjectUtils {
         }
     }
 
-    public static RunnerAndConfigurationSettings createConfiguration(TopCoderTask task, boolean setActive, Project project) {
-        RunManagerImpl manager = RunManagerImpl.getInstanceImpl(project);
-        RunnerAndConfigurationSettings old = manager.findConfigurationByName(task.name);
-        if (old != null)
-            manager.removeConfiguration(old);
-        RunnerAndConfigurationSettingsImpl configuration = new RunnerAndConfigurationSettingsImpl(manager,
-            new TopCoderConfiguration(task.name, project, task,
-                TopCoderConfigurationType.INSTANCE.getConfigurationFactories()[0]), false);
-        manager.addConfiguration(configuration, false);
-        if (setActive)
-            manager.setSelectedConfiguration(configuration);
-        return configuration;
-    }
 
     public static String getSimpleName(String className) {
         int position = className.lastIndexOf('.');

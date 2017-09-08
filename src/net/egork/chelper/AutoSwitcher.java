@@ -16,12 +16,15 @@ import com.intellij.util.messages.MessageBus;
 import net.egork.chelper.configurations.TaskConfiguration;
 import net.egork.chelper.configurations.TopCoderConfiguration;
 import net.egork.chelper.task.Task;
+import net.egork.chelper.task.TaskBase;
 import net.egork.chelper.task.TopCoderTask;
 import net.egork.chelper.util.ExecuteUtils;
 import net.egork.chelper.util.FileUtils;
 import net.egork.chelper.util.ProjectUtils;
 import net.egork.chelper.util.TaskUtils;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Map;
 
 /**
  * @author Egor Kulikov (egor@egork.net)
@@ -62,15 +65,17 @@ public class AutoSwitcher implements ProjectComponent {
                 if (selectedConfiguration == null)
                     return;
                 RunConfiguration configuration = selectedConfiguration.getConfiguration();
-                if (busy || !(configuration instanceof TopCoderConfiguration || configuration instanceof TaskConfiguration)) {
+                if (busy
+                    || !(configuration instanceof TopCoderConfiguration || configuration instanceof TaskConfiguration)) {
                     return;
                 }
                 busy = true;
                 VirtualFile toOpen = null;
                 if (configuration instanceof TopCoderConfiguration)
                     toOpen = TaskUtils.getFile(ProjectUtils.getData(project).defaultDirectory, ((TopCoderConfiguration) configuration).getConfiguration().name, project);
-                else if (configuration instanceof TaskConfiguration)
+                else
                     toOpen = FileUtils.getFileByFQN(((TaskConfiguration) configuration).getConfiguration().taskClass, configuration.getProject());
+
                 if (toOpen != null) {
                     final VirtualFile finalToOpen = toOpen;
                     ExecuteUtils.executeStrictWriteActionAndWait(new Runnable() {
@@ -110,35 +115,46 @@ public class AutoSwitcher implements ProjectComponent {
                             return;
                         RunManagerImpl runManager = RunManagerImpl.getInstanceImpl(project);
 
-                        VirtualFile taskFile;
-                        if (null == (taskFile = TaskUtils.getTaskFile(file))) return;
-                        RunnerAndConfigurationSettings old = runManager.findConfigurationByName(taskFile.getNameWithoutExtension());
-                        if (old != null) {
-                            RunConfiguration configuration = old.getConfiguration();
-                            if (configuration instanceof TopCoderConfiguration) {
-                                TopCoderTask task = ((TopCoderConfiguration) configuration).getConfiguration();
-                                if (file.equals(TaskUtils.getFile(ProjectUtils.getData(project).defaultDirectory, task.name, project))) {
-                                    busy = true;
-                                    runManager.setSelectedConfiguration(new RunnerAndConfigurationSettingsImpl(runManager,
-                                        configuration, false));
-                                    busy = false;
-                                }
-                            } else if (configuration instanceof TaskConfiguration) {
-                                Task task = ((TaskConfiguration) configuration).getConfiguration();
-                                task = TaskUtils.taskOfFixedPath(project, task, taskFile);
-                                if (file.equals(FileUtils.getFileByFQN(task.taskClass, configuration.getProject()))) {
-                                    busy = true;
-                                    runManager.setSelectedConfiguration(new RunnerAndConfigurationSettingsImpl(runManager,
-                                        configuration, false));
-                                    busy = false;
-                                }
-                            }
+                        Map<String, Object> taskMap;
+                        if (null == (taskMap = TaskUtils.getTaskMapWitFile(file, project))) return;
+                        if (checkAllRunnerAndConfigurationSettings(runManager,
+                            (VirtualFile) taskMap.get(TaskBase.TASK_SOURCE_KEY))) {
                             return;
                         }
 
-                        Task task = FileUtils.readTask(FileUtils.getRelativePath(project.getBaseDir(), taskFile), project);
-                        task = TaskUtils.taskOfFixedPath(project, task, taskFile);
-                        ProjectUtils.createConfiguration(task, true, project);
+                        repairAndConfigureTask(taskMap);
+                    }
+
+                    private void repairAndConfigureTask(Map<String, Object> taskMap) {
+                        TaskBase task = (TaskBase) taskMap.get(TaskBase.TASK_KEY);
+                        VirtualFile taskFile = (VirtualFile) taskMap.get(TaskBase.TASK_SOURCE_KEY);
+                        task = TaskUtils.taskOfFixedPath(task, project, taskFile);
+                        ProjectUtils.createConfiguration((Task) task, true, project);
+                    }
+
+                    private boolean checkAllRunnerAndConfigurationSettings(RunManagerImpl runManager, VirtualFile taskFile) {
+                        for (RunConfiguration configuration : runManager.getAllConfigurationsList()) {
+                            if (configuration instanceof TopCoderConfiguration) {
+                                TopCoderTask task = ((TopCoderConfiguration) configuration).getConfiguration();
+                                if (taskFile.equals(TaskUtils.getFile(ProjectUtils.getData(project).defaultDirectory, task.name, project))) {
+                                    busy = true;
+                                    runManager.setSelectedConfiguration(new RunnerAndConfigurationSettingsImpl(runManager,
+                                        configuration, false));
+                                    busy = false;
+                                    return true;
+                                }
+                            } else if (configuration instanceof TaskConfiguration) {
+                                Task task = ((TaskConfiguration) configuration).getConfiguration();
+                                if (taskFile.equals(FileUtils.getFileByFQN(task.taskClass, configuration.getProject()))) {
+                                    busy = true;
+                                    runManager.setSelectedConfiguration(new RunnerAndConfigurationSettingsImpl(runManager,
+                                        configuration, false));
+                                    busy = false;
+                                    return true;
+                                }
+                            }
+                        }
+                        return false;
                     }
                 };
                 DumbService.getInstance(project).smartInvokeLater(selectTaskRunnable);
