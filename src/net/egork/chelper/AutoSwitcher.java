@@ -129,7 +129,9 @@ public class AutoSwitcher implements ProjectComponent {
                         TaskBase task = (TaskBase) taskMap.get(TaskBase.TASK_KEY);
                         VirtualFile taskFile = (VirtualFile) taskMap.get(TaskBase.TASK_SOURCE_KEY);
                         task = TaskUtils.taskOfFixedPath(task, project, taskFile);
+                        busy = true;
                         ProjectUtils.createConfiguration((Task) task, true, project);
+                        busy = false;
                     }
 
                     private boolean checkAllRunnerAndConfigurationSettings(RunManagerImpl runManager, VirtualFile taskFile) {
