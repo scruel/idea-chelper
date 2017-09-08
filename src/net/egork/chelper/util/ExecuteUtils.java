@@ -35,7 +35,7 @@ public class ExecuteUtils {
     }
 
     public static void executeStrictWriteActionAndWait(final Runnable action) {
-        executeStrictWriteAction(action, null);
+        executeStrictWriteActionAndWait(action, null);
     }
 
     public static void executeStrictWriteActionAndWait(final Runnable runnable, final Project project) {
@@ -52,12 +52,12 @@ public class ExecuteUtils {
         );
     }
 
-
-    public static void executeStrictReadActionAndWait(final Runnable action) {
-        executeStrictReadAction(action, null);
-    }
-
-    private static void executeStrictReadAction(Runnable action, Object o) {
-
-    }
+//    TODO
+//    public static void executeStrictReadActionAndWait(final Runnable action) {
+//        executeStrictReadAction(action, null);
+//    }
+//
+//    private static void executeStrictReadAction(Runnable action, Object o) {
+//
+//    }
 }

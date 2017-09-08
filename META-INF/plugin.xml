@@ -92,16 +92,8 @@
       <reference ref="parseContest"/>
       <reference ref="launchArena"/>
 
-<<<<<<< HEAD
       <!--<reference ref="bulkAdd"/>-->
       <!--<reference ref="newTask"/>-->
-=======
-      <reference ref="bulkAdd"/>
-      <reference ref="launchArena"/>
-      <reference ref="unarchiveTask"/>
-      <reference ref="newTask"/>
-      <reference ref="archiveTask"/>
->>>>>>> bd75433... fix: RunAndWrite method called the wrong overload method by careless mistake.
       <add-to-group group-id="MainToolBar" anchor="after" relative-to-action="ToolbarRunGroup"/>
 
     </group>
