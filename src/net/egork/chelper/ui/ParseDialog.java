@@ -2,8 +2,10 @@ package net.egork.chelper.ui;
 
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.VerticalFlowLayout;
 import com.intellij.openapi.util.IconLoader;
+import com.intellij.psi.PsiDirectory;
 import com.intellij.ui.components.JBList;
 import net.egork.chelper.ProjectData;
 import net.egork.chelper.parser.Description;
@@ -55,6 +57,7 @@ public class ParseDialog extends JDialog {
         OkCancelPanel contentPanel = new OkCancelPanel(new BorderLayout(5, 5)) {
             @Override
             public void onOk() {
+                if (!ParseDialog.this.isValidData(project)) return;
                 List<Task> list = new ArrayList<Task>();
                 Object[] tasks = taskList.getSelectedValues();
                 Parser parser = (Parser) parserCombo.getSelectedItem();
@@ -229,6 +232,15 @@ public class ParseDialog extends JDialog {
         Point center = ProjectUtils.getLocation(project, contentPanel.getSize());
         setLocation(center);
         setVisible(true);
+    }
+
+    private boolean isValidData(Project project) {
+        PsiDirectory directory = FileUtils.getPsiDirectory(project, ParseDialog.this.location.getText());
+        if (directory == null || !directory.isValid()) {
+            Messenger.publishMessageWithBalloon(project, location.getTextField(), "invalid defaultDirectory!", MessageType.ERROR);
+            return false;
+        }
+        return true;
     }
 
     private void refresh() {

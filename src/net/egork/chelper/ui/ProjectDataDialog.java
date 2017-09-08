@@ -1,8 +1,11 @@
 package net.egork.chelper.ui;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.VerticalFlowLayout;
 import net.egork.chelper.ProjectData;
+import net.egork.chelper.util.FileUtils;
+import net.egork.chelper.util.Messenger;
 import net.egork.chelper.util.ProjectUtils;
 
 import javax.swing.*;
@@ -49,6 +52,7 @@ public class ProjectDataDialog extends JDialog {
         OkCancelPanel main = new OkCancelPanel(new VerticalFlowLayout()) {
             @Override
             public void onOk() {
+                if (!ProjectDataDialog.this.isValidData(project)) return;
                 onChange();
                 isOk = true;
                 ProjectDataDialog.this.setVisible(false);
@@ -105,6 +109,23 @@ public class ProjectDataDialog extends JDialog {
         pack();
         Point center = ProjectUtils.getLocation(project, main.getSize());
         setLocation(center);
+    }
+
+    private boolean isValidData(Project project) {
+        if (!FileUtils.isValidClass(project, ProjectDataDialog.this.inputClass.getText())) {
+            Messenger.publishMessageWithBalloon(project, inputClass, "invalid inputClass!", MessageType.ERROR);
+            return false;
+        }
+        if (!FileUtils.isValidClass(project, ProjectDataDialog.this.outputClass.getText())) {
+            Messenger.publishMessageWithBalloon(project, outputClass, "invalid outputClass!", MessageType.ERROR);
+            return false;
+        }
+
+        if (!FileUtils.isValiDirectory(project, ProjectDataDialog.this.defaultDirectory.getText())) {
+            Messenger.publishMessageWithBalloon(project, defaultDirectory.getTextField(), "invalid defaultDirectory!", MessageType.ERROR);
+            return false;
+        }
+        return true;
     }
 
     private void onChange() {

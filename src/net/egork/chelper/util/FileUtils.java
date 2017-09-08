@@ -10,6 +10,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import net.egork.chelper.codegeneration.CodeGenerationUtils;
+import net.egork.chelper.codegeneration.MainFileTemplate;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.task.TopCoderTask;
 
@@ -95,6 +96,26 @@ public class FileUtils {
             }
         });
         return location.findChild(fileName);
+    }
+
+
+    public static boolean isValiDirectory(Project project, String dir) {
+        PsiDirectory directory = FileUtils.getPsiDirectory(project, dir);
+        if (directory == null || !directory.isValid()) {
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean isValidClass(Project project, String clazz) {
+        try {
+            Class.forName(clazz).newInstance();
+        } catch (IllegalAccessException | InstantiationException ignore) {
+        } catch (ClassNotFoundException igonre) {
+            if (MainFileTemplate.getClass(project, clazz) == null)
+                return false;
+        }
+        return true;
     }
 
     public static String readTextFile(VirtualFile file) {

@@ -77,6 +77,10 @@ public class DirectorySelector extends JPanel {
         button.setEnabled(enabled);
     }
 
+    public JTextField getTextField() {
+        return textField;
+    }
+
     public String getText() {
         return textField.getText();
     }
