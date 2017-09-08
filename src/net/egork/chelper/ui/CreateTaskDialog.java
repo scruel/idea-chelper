@@ -17,17 +17,17 @@ import java.awt.event.ActionListener;
  * @author Egor Kulikov (kulikov@devexperts.com)
  */
 public class CreateTaskDialog extends JDialog {
-	private Task task;
-	private boolean isOk = false;
+    private Task task;
+    private boolean isOk = false;
     private JButton basicAdvanced;
     private TaskConfigurationPanel panel;
 
     public CreateTaskDialog(Task task, boolean canEditName, Project project) {
-		super(null, "Task", ModalityType.APPLICATION_MODAL);
+        super(null, "Task", ModalityType.APPLICATION_MODAL);
         setIconImage(Utilities.iconToImage(IconLoader.getIcon("/icons/newTask.png")));
-		setAlwaysOnTop(true);
-		setResizable(false);
-		this.task = task;
+        setAlwaysOnTop(true);
+        setResizable(false);
+        this.task = task;
         JPanel buttonPanel = new JPanel(new GridLayout(1, 3));
         basicAdvanced = new JButton("Advanced");
         OkCancelPanel main = new OkCancelPanel(new BorderLayout()) {
@@ -61,41 +61,41 @@ public class CreateTaskDialog extends JDialog {
         }, buttonPanel);
         panel.setAdvancedVisibility(false);
         main.add(panel, BorderLayout.CENTER);
-		setContentPane(main);
-		pack();
-		Point center = Utilities.getLocation(project, main.getSize());
-		setLocation(center);
-	}
+        setContentPane(main);
+        pack();
+        Point center = Utilities.getLocation(project, main.getSize());
+        setLocation(center);
+    }
 
-	public static Task showDialog(PsiDirectory directory, String defaultName, Task template, boolean allowNameChange) {
+    public static Task showDialog(PsiDirectory directory, String defaultName, Task template, boolean allowNameChange) {
         Task defaultTask = template == null ? Utilities.getDefaultTask() : template;
         String name = defaultName == null ? "Task" : defaultName;
         Project project = directory.getProject();
         String location = FileUtilities.getRelativePath(project.getBaseDir(), directory.getVirtualFile());
         ProjectData data = Utilities.getData(project);
         Task task = new Task(name, defaultTask.testType, defaultTask.input, defaultTask.output, defaultTask.tests, location,
-                defaultTask.vmArgs, defaultTask.mainClass, defaultTask.taskClass == null ? name : defaultTask.taskClass,
-                defaultTask.checkerClass, defaultTask.checkerParameters, defaultTask.testClasses,
-                Task.getDateString(), defaultTask.contestName, defaultTask.truncate, data.inputClass, data.outputClass,
-                defaultTask.includeLocale,
-                data.failOnIntegerOverflowForNewTasks, defaultTask.template);
-		CreateTaskDialog dialog = new CreateTaskDialog(task, allowNameChange, project);
-		dialog.setVisible(true);
-		Utilities.updateDefaultTask(dialog.task);
+            defaultTask.vmArgs, defaultTask.mainClass, defaultTask.taskClass == null ? name : defaultTask.taskClass,
+            defaultTask.checkerClass, defaultTask.checkerParameters, defaultTask.testClasses,
+            Task.getDateString(), defaultTask.contestName, defaultTask.truncate, data.inputClass, data.outputClass,
+            defaultTask.includeLocale,
+            data.failOnIntegerOverflowForNewTasks, defaultTask.template);
+        CreateTaskDialog dialog = new CreateTaskDialog(task, allowNameChange, project);
+        dialog.setVisible(true);
+        Utilities.updateDefaultTask(dialog.task);
         if (dialog.task != null)
             dialog.task = dialog.task.setTaskClass(FileUtilities.createIfNeeded(dialog.task, dialog.task.taskClass, project, dialog.task.location));
-		return dialog.task;
-	}
+        return dialog.task;
+    }
 
     @Override
-	public void setVisible(boolean b) {
-		if (b) {
+    public void setVisible(boolean b) {
+        if (b) {
             JTextField taskName = panel.getNameField();
-			taskName.requestFocusInWindow();
-			taskName.setSelectionStart(0);
-			taskName.setSelectionEnd(taskName.getText().length());
-		} else if (!isOk)
-			task = null;
-		super.setVisible(b);
-	}
+            taskName.requestFocusInWindow();
+            taskName.setSelectionStart(0);
+            taskName.setSelectionEnd(taskName.getText().length());
+        } else if (!isOk)
+            task = null;
+        super.setVisible(b);
+    }
 }

@@ -3,14 +3,13 @@ package net.egork.chelper.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
 import java.util.InputMismatchException;
 
 /**
  * @author Egor Kulikov (kulikov@devexperts.com)
  */
 public class InputReader {
-	private InputStream stream;
+    private InputStream stream;
     private byte[] buf = new byte[1024];
     private int curChar;
     private int numChars;
@@ -95,19 +94,19 @@ public class InputReader {
         int length = readInt();
         if (length < 0)
             return null;
-		byte[] bytes = new byte[length];
-		for (int i = 0; i < length; i++)
-			bytes[i] = (byte) read();
-		try {
-			return new String(bytes, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			return new String(bytes);
-		}
-	}
+        byte[] bytes = new byte[length];
+        for (int i = 0; i < length; i++)
+            bytes[i] = (byte) read();
+        try {
+            return new String(bytes, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            return new String(bytes);
+        }
+    }
 
     public String readToken() {
         int c;
-        while (isSpaceChar(c = read()));
+        while (isSpaceChar(c = read())) ;
         StringBuilder result = new StringBuilder();
         result.appendCodePoint(c);
         while (!isSpaceChar(c = read()))
@@ -119,7 +118,7 @@ public class InputReader {
         return c == ' ' || c == '\n' || c == '\r' || c == '\t' || c == -1;
     }
 
-	public char readCharacter() {
+    public char readCharacter() {
         int c = read();
         while (isSpaceChar(c))
             c = read();
@@ -168,11 +167,11 @@ public class InputReader {
         return value == -1;
     }
 
-	public boolean readBoolean() {
+    public boolean readBoolean() {
         return readInt() == 1;
     }
 
-    public<E extends Enum<E>> E readEnum(Class<E> c) {
+    public <E extends Enum<E>> E readEnum(Class<E> c) {
         String name = readString();
         if (name == null)
             return null;

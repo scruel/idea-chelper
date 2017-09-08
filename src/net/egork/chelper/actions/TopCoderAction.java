@@ -40,8 +40,8 @@ public class TopCoderAction extends AnAction {
         fixTopCoderSettings();
         startServer(project);
         String arenaFileName = createArenaJar();
-		if (arenaFileName == null)
-			return;
+        if (arenaFileName == null)
+            return;
         String javaExecutable = System.getProperty("java.home") + File.separator + "bin" + File.separator + "javaws";
         try {
             new ProcessBuilder(javaExecutable, arenaFileName).start();
@@ -65,7 +65,7 @@ public class TopCoderAction extends AnAction {
             return tempFile.getAbsolutePath();
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, "Arena is not accessible, check Internet connection", "Connection error", JOptionPane.ERROR_MESSAGE);
-			return null;
+            return null;
         }
     }
 
@@ -103,8 +103,8 @@ public class TopCoderAction extends AnAction {
                                     else {
                                         final VirtualFile directory = FileUtilities.getFile(project, Utilities.getData(project).defaultDirectory);
                                         VirtualFile taskFile = null;
-										if (directory != null)
-											taskFile = directory.findChild(task.name + ".tctask");
+                                        if (directory != null)
+                                            taskFile = directory.findChild(task.name + ".tctask");
                                         if (taskFile != null)
                                             message.out.printString(Message.ALREADY_DEFINED);
                                         else {
@@ -113,7 +113,7 @@ public class TopCoderAction extends AnAction {
                                                 public void run() {
                                                     ApplicationManager.getApplication().runWriteAction(new Runnable() {
                                                         public void run() {
-															FileUtilities.createDirectoryIfMissing(project, Utilities.getData(project).defaultDirectory);
+                                                            FileUtilities.createDirectoryIfMissing(project, Utilities.getData(project).defaultDirectory);
                                                             createConfiguration(project, task);
                                                         }
                                                     });
@@ -126,11 +126,12 @@ public class TopCoderAction extends AnAction {
                             } finally {
                                 socket.close();
                             }
-                        } catch (IOException ignored) {}
+                        } catch (IOException ignored) {
+                        }
                     }
                 }
             }).start();
-		} catch (IOException e) {
+        } catch (IOException e) {
             serverSocket = null;
         }
         if (listener != null)
@@ -161,10 +162,12 @@ public class TopCoderAction extends AnAction {
                             public void run() {
                                 try {
                                     file.delete(null);
-                                } catch (IOException ignored) {}
+                                } catch (IOException ignored) {
+                                }
                             }
                         });
-                    } catch (IOException ignored) {}
+                    } catch (IOException ignored) {
+                    }
                 }
             }
         });
@@ -172,26 +175,26 @@ public class TopCoderAction extends AnAction {
         new File(file.getCanonicalPath()).deleteOnExit();
     }
 
-	private static void createConfiguration(Project project, TopCoderTask task) {
-		String defaultDir = Utilities.getData(project).defaultDirectory;
-		FileUtilities.createDirectoryIfMissing(project, defaultDir);
-		String packageName = FileUtilities.getPackage(FileUtilities.getPsiDirectory(project, defaultDir));
-		if (packageName == null || packageName.length() == 0) {
-			JOptionPane.showMessageDialog(null, "defaultDirectory should be under source and in non-default package");
-			return;
-		}
-		String fqn = (packageName.length() == 0 ? "" : packageName + ".") + task.name;
-		TopCoderTask taskToWrite = task.setFQN(fqn).setFailOnOverflow(Utilities.getData(project).failOnIntegerOverflowForNewTasks);
-		if (FileUtilities.getFile(project, defaultDir + "/" + task.name + ".java") == null) {
-			FileUtilities.writeTextFile(FileUtilities.getFile(project, defaultDir),
-				task.name + ".java", CodeGenerationUtilities.createTopCoderStub(task, project, packageName));
-		}
-		Utilities.createConfiguration(taskToWrite, true, project);
-		final PsiElement main = JavaPsiFacade.getInstance(project).findClass(fqn, GlobalSearchScope.allScope(project));
-		Utilities.openElement(project, main);
-	}
+    private static void createConfiguration(Project project, TopCoderTask task) {
+        String defaultDir = Utilities.getData(project).defaultDirectory;
+        FileUtilities.createDirectoryIfMissing(project, defaultDir);
+        String packageName = FileUtilities.getPackage(FileUtilities.getPsiDirectory(project, defaultDir));
+        if (packageName == null || packageName.length() == 0) {
+            JOptionPane.showMessageDialog(null, "defaultDirectory should be under source and in non-default package");
+            return;
+        }
+        String fqn = (packageName.length() == 0 ? "" : packageName + ".") + task.name;
+        TopCoderTask taskToWrite = task.setFQN(fqn).setFailOnOverflow(Utilities.getData(project).failOnIntegerOverflowForNewTasks);
+        if (FileUtilities.getFile(project, defaultDir + "/" + task.name + ".java") == null) {
+            FileUtilities.writeTextFile(FileUtilities.getFile(project, defaultDir),
+                task.name + ".java", CodeGenerationUtilities.createTopCoderStub(task, project, packageName));
+        }
+        Utilities.createConfiguration(taskToWrite, true, project);
+        final PsiElement main = JavaPsiFacade.getInstance(project).findClass(fqn, GlobalSearchScope.allScope(project));
+        Utilities.openElement(project, main);
+    }
 
-	private void fixTopCoderSettings() {
+    private void fixTopCoderSettings() {
         Properties properties = new Properties();
         try {
             properties.load(new FileInputStream(new File(System.getProperty("user.home") + File.separator + "contestapplet.conf")));

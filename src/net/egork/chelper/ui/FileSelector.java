@@ -23,22 +23,22 @@ public class FileSelector extends JPanel {
     private final JTextField textField;
     private JButton button;
 
-	public FileSelector(final Project project, String initialValue, String extension) {
-		this(project, initialValue, extension, false);
-	}
+    public FileSelector(final Project project, String initialValue, String extension) {
+        this(project, initialValue, extension, false);
+    }
 
     public FileSelector(final Project project, String initialValue, final String extension, final boolean allowAllFiles) {
         super(new BorderLayout());
         textField = new JTextField(initialValue);
         button = new JButton("...") {
-			@Override
-			public Dimension getPreferredSize() {
-				Dimension dimension = super.getPreferredSize();
-				//noinspection SuspiciousNameCombination
-				dimension.width = dimension.height;
-				return dimension;
-			}
-		};
+            @Override
+            public Dimension getPreferredSize() {
+                Dimension dimension = super.getPreferredSize();
+                //noinspection SuspiciousNameCombination
+                dimension.width = dimension.height;
+                return dimension;
+            }
+        };
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 PathChooserDialog dialog = FileChooserFactory.getInstance().createPathChooser(new FileChooserDescriptor(true, false, false, false, false, false) {
@@ -53,7 +53,7 @@ public class FileSelector extends JPanel {
                     public boolean isFileVisible(VirtualFile file, boolean showHiddenFiles) {
                         return super.isFileVisible(file, showHiddenFiles) &&
                             (allowAllFiles || (FileUtilities.isChild(project.getBaseDir(), file) ||
-                            FileUtilities.isChild(file, project.getBaseDir()))) &&
+                                FileUtilities.isChild(file, project.getBaseDir()))) &&
                             (file.isDirectory() || hasCorrectExtension(file));
                     }
 

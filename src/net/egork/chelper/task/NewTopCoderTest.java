@@ -121,27 +121,27 @@ public class NewTopCoderTest {
     }
 
     public String toString() {
-		StringBuilder builder = new StringBuilder();
-		for (Object argument : arguments) {
-			if (builder.length() != 0)
-				builder.append(" ");
-			if (argument instanceof String)
-				builder.append(toString(argument, String.class));
-			else if (argument instanceof Integer)
-				builder.append(toString(argument, int.class));
-			else if (argument instanceof Long)
-				builder.append(toString(argument, long.class));
-			else if (argument instanceof Double)
-				builder.append(toString(argument, double.class));
-			else if (argument instanceof String[])
-				builder.append(toString(argument, String[].class));
-			else if (argument instanceof int[])
-				builder.append(toString(argument, int[].class));
-			else if (argument instanceof long[])
-				builder.append(toString(argument, long[].class));
-			else
-				builder.append(toString(argument, double[].class));
-		}
+        StringBuilder builder = new StringBuilder();
+        for (Object argument : arguments) {
+            if (builder.length() != 0)
+                builder.append(" ");
+            if (argument instanceof String)
+                builder.append(toString(argument, String.class));
+            else if (argument instanceof Integer)
+                builder.append(toString(argument, int.class));
+            else if (argument instanceof Long)
+                builder.append(toString(argument, long.class));
+            else if (argument instanceof Double)
+                builder.append(toString(argument, double.class));
+            else if (argument instanceof String[])
+                builder.append(toString(argument, String[].class));
+            else if (argument instanceof int[])
+                builder.append(toString(argument, int[].class));
+            else if (argument instanceof long[])
+                builder.append(toString(argument, long[].class));
+            else
+                builder.append(toString(argument, double[].class));
+        }
         String representation = builder.toString();
         if (representation.length() > 15)
             representation = representation.substring(0, 12) + "...";
@@ -177,14 +177,14 @@ public class NewTopCoderTest {
     }
 
     public static String toString(Object value, Class aClass) {
-		if (value == null)
-			return "null";
+        if (value == null)
+            return "null";
         if (String.class.equals(aClass))
             return '"' + value.toString() + '"';
         if (!aClass.isArray())
             return value.toString();
         if (int[].class.equals(aClass)) {
-            int[] array = (int[])value;
+            int[] array = (int[]) value;
             StringBuilder result = new StringBuilder();
             result.append('{');
             for (int i : array) {
@@ -196,7 +196,7 @@ public class NewTopCoderTest {
             return result.toString();
         }
         if (long[].class.equals(aClass)) {
-            long[] array = (long[])value;
+            long[] array = (long[]) value;
             StringBuilder result = new StringBuilder();
             result.append('{');
             for (long i : array) {
@@ -208,7 +208,7 @@ public class NewTopCoderTest {
             return result.toString();
         }
         if (double[].class.equals(aClass)) {
-            double[] array = (double[])value;
+            double[] array = (double[]) value;
             StringBuilder result = new StringBuilder();
             result.append('{');
             for (double i : array) {
@@ -220,7 +220,7 @@ public class NewTopCoderTest {
             return result.toString();
         }
         if (String[].class.equals(aClass)) {
-            String[] array = (String[])value;
+            String[] array = (String[]) value;
             StringBuilder result = new StringBuilder();
             result.append('{');
             for (String i : array) {

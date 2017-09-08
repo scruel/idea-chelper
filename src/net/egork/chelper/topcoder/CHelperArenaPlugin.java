@@ -43,19 +43,19 @@ public class CHelperArenaPlugin implements ArenaPlugin {
             return message.in.readString();
         } catch (IOException e) {
             messagePanel.showInfoMessage("Probably socket was not opened, trying file method");
-			StringBuilder source = new StringBuilder();
-			try {
-				File file = new File(System.getProperty("user.home") + File.separator + ".java");
-				Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-				int next;
-				while ((next = reader.read()) != -1)
-					source.append((char)next);
-				reader.close();
-				return source.toString();
-			} catch (IOException e1) {
-				messagePanel.showErrorMessage("Both socket and file methods failed to retrieve source");
-				return "";
-			}
+            StringBuilder source = new StringBuilder();
+            try {
+                File file = new File(System.getProperty("user.home") + File.separator + ".java");
+                Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+                int next;
+                while ((next = reader.read()) != -1)
+                    source.append((char) next);
+                reader.close();
+                return source.toString();
+            } catch (IOException e1) {
+                messagePanel.showErrorMessage("Both socket and file methods failed to retrieve source");
+                return "";
+            }
         }
     }
 
@@ -95,7 +95,7 @@ public class CHelperArenaPlugin implements ArenaPlugin {
         }
         // NOTE: we set failOnOverflow to false here, but it will be overridden on the receiving end.
         TopCoderTask task = new TopCoderTask(name, signature, tests, date, contestName, new String[0], null, false,
-			componentModel.getComponent().getMemLimitMB() + "M");
+            componentModel.getComponent().getMemLimitMB() + "M");
         try {
             Message message = new Message(PORT);
             message.out.printString(Message.NEW_TASK);
@@ -110,28 +110,28 @@ public class CHelperArenaPlugin implements ArenaPlugin {
             }
         } catch (IOException e) {
             messagePanel.showInfoMessage("Probably socket was not opened, trying file method");
-			try {
-				String path = new BufferedReader(new InputStreamReader(new FileInputStream(System.getProperty("user.home") + File.separator + ".chelper"))).readLine();
-				File file = new File(path + File.separator + ".tctask");
-				file.deleteOnExit();
-				FileOutputStream outputStream = new FileOutputStream(file);
-				task.saveTask(new OutputWriter(outputStream));
-				outputStream.close();
-			} catch (IOException e1) {
-				messagePanel.showErrorMessage("File method also failed");
-			}
-		}
+            try {
+                String path = new BufferedReader(new InputStreamReader(new FileInputStream(System.getProperty("user.home") + File.separator + ".chelper"))).readLine();
+                File file = new File(path + File.separator + ".tctask");
+                file.deleteOnExit();
+                FileOutputStream outputStream = new FileOutputStream(file);
+                task.saveTask(new OutputWriter(outputStream));
+                outputStream.close();
+            } catch (IOException e1) {
+                messagePanel.showErrorMessage("File method also failed");
+            }
+        }
     }
 
-	private String getFullContestName(String contestName) {
-		if (contestName.startsWith("SRM") && contestName.split(" ").length >= 2)
-			return "TopCoder SRM #" + contestName.split(" ")[1];
-		if (contestName.startsWith("TCO") && contestName.split(" ").length >= 4)
-			return "TopCoder Open Round #" + contestName.split(" ")[3];
-		return contestName.replace("TCO", "TopCoder Open");
-	}
+    private String getFullContestName(String contestName) {
+        if (contestName.startsWith("SRM") && contestName.split(" ").length >= 2)
+            return "TopCoder SRM #" + contestName.split(" ")[1];
+        if (contestName.startsWith("TCO") && contestName.split(" ").length >= 4)
+            return "TopCoder Open Round #" + contestName.split(" ")[3];
+        return contestName.replace("TCO", "TopCoder Open");
+    }
 
-	private Class getClass(DataType type) {
+    private Class getClass(DataType type) {
         String description = type.getDescriptor(JavaLanguage.JAVA_LANGUAGE);
         if ("int".equals(description))
             return int.class;

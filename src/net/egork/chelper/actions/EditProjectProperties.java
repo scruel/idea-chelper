@@ -31,28 +31,28 @@ public class EditProjectProperties extends AnAction {
         if (result != null) {
             result.save(project);
             Utilities.addProjectData(project, result);
-			ApplicationManager.getApplication().runWriteAction(new Runnable() {
-				public void run() {
-					LibraryTable table = ProjectLibraryTable.getInstance(project);
-					String path = TopCoderAction.getJarPathForClass(NewTester.class);
-					VirtualFile jar = VirtualFileManager.getInstance().findFileByUrl(VirtualFileManager.constructUrl(JarFileSystem.PROTOCOL, path) + JarFileSystem.JAR_SEPARATOR);
-					Library library = table.getLibraryByName("CHelper");
-					if (library == null) {
-						library = table.createLibrary("CHelper");
-						Library.ModifiableModel libraryModel = library.getModifiableModel();
-						libraryModel.addRoot(jar, OrderRootType.CLASSES);
-						libraryModel.commit();
-					} else
-						return;
-					for (Module module : ModuleManager.getInstance(project).getModules()) {
-						ModifiableRootModel model = ModuleRootManager.getInstance(module).getModifiableModel();
-						if (model.getModuleLibraryTable().getLibraryByName("CHelper") == null) {
-							model.addLibraryEntry(library);
-							model.commit();
-						}
-					}
-				}
-			});
+            ApplicationManager.getApplication().runWriteAction(new Runnable() {
+                public void run() {
+                    LibraryTable table = ProjectLibraryTable.getInstance(project);
+                    String path = TopCoderAction.getJarPathForClass(NewTester.class);
+                    VirtualFile jar = VirtualFileManager.getInstance().findFileByUrl(VirtualFileManager.constructUrl(JarFileSystem.PROTOCOL, path) + JarFileSystem.JAR_SEPARATOR);
+                    Library library = table.getLibraryByName("CHelper");
+                    if (library == null) {
+                        library = table.createLibrary("CHelper");
+                        Library.ModifiableModel libraryModel = library.getModifiableModel();
+                        libraryModel.addRoot(jar, OrderRootType.CLASSES);
+                        libraryModel.commit();
+                    } else
+                        return;
+                    for (Module module : ModuleManager.getInstance(project).getModules()) {
+                        ModifiableRootModel model = ModuleRootManager.getInstance(module).getModifiableModel();
+                        if (model.getModuleLibraryTable().getLibraryByName("CHelper") == null) {
+                            model.addLibraryEntry(library);
+                            model.commit();
+                        }
+                    }
+                }
+            });
         }
     }
 }

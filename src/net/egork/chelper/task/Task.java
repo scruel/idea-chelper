@@ -11,7 +11,7 @@ import java.util.InputMismatchException;
  */
 public class Task {
     //Basic
-	public final String name;
+    public final String name;
     public final TestType testType;
     public final StreamConfiguration input;
     public final StreamConfiguration output;
@@ -30,27 +30,25 @@ public class Task {
     public final String[] testClasses;
     public final String date;
     public final String contestName;
-	public final boolean truncate;
+    public final boolean truncate;
     public final String inputClass;
     public final String outputClass;
-	public final boolean includeLocale;
+    public final boolean includeLocale;
     public final boolean failOnOverflow;
 
     public Task(String name, TestType testType, StreamConfiguration input, StreamConfiguration output, Test[] tests,
-        String location, String vmArgs, String mainClass, String taskClass, String checkerClass,
-        String checkerParameters, String[] testClasses, String date, String contestName, boolean truncate,
-        String inputClass, String outputClass, boolean includeLocale, boolean failOnOverflow)
-    {
+                String location, String vmArgs, String mainClass, String taskClass, String checkerClass,
+                String checkerParameters, String[] testClasses, String date, String contestName, boolean truncate,
+                String inputClass, String outputClass, boolean includeLocale, boolean failOnOverflow) {
         this(name, testType, input, output, tests, location, vmArgs, mainClass, taskClass, checkerClass,
             checkerParameters, testClasses, date, contestName, truncate, inputClass, outputClass, includeLocale,
             failOnOverflow, null);
     }
 
     public Task(String name, TestType testType, StreamConfiguration input, StreamConfiguration output, Test[] tests,
-        String location, String vmArgs, String mainClass, String taskClass, String checkerClass,
-        String checkerParameters, String[] testClasses, String date, String contestName, boolean truncate,
-        String inputClass, String outputClass, boolean includeLocale, boolean failOnOverflow, String template)
-    {
+                String location, String vmArgs, String mainClass, String taskClass, String checkerClass,
+                String checkerParameters, String[] testClasses, String date, String contestName, boolean truncate,
+                String inputClass, String outputClass, boolean includeLocale, boolean failOnOverflow, String template) {
         this.name = trim(name);
         this.testType = testType;
         this.input = input;
@@ -68,25 +66,25 @@ public class Task {
         this.truncate = truncate;
         this.inputClass = trim(inputClass);
         this.outputClass = trim(outputClass);
-		this.includeLocale = includeLocale;
+        this.includeLocale = includeLocale;
         this.failOnOverflow = failOnOverflow;
         this.template = template;
-		if (tests != null) {
-			for (int i = 0; i < tests.length; i++) {
-				if (tests[i].index != i)
-					tests[i] = new Test(tests[i].input, tests[i].output, i, tests[i].active);
-			}
-		}
+        if (tests != null) {
+            for (int i = 0; i < tests.length; i++) {
+                if (tests[i].index != i)
+                    tests[i] = new Test(tests[i].input, tests[i].output, i, tests[i].active);
+            }
+        }
     }
 
-	private static String trim(String s) {
-		if (s == null) {
+    private static String trim(String s) {
+        if (s == null) {
             return null;
         }
-		return s.trim();
-	}
+        return s.trim();
+    }
 
-	public static String getDateString() {
+    public static String getDateString() {
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH) + 1;
@@ -103,19 +101,19 @@ public class Task {
     }
 
     public void saveTask(OutputWriter out) {
-		out.printString(name);
-		out.printEnum(testType);
-		out.printEnum(input.type);
-		out.printString(input.fileName);
-		out.printEnum(output.type);
-		out.printString(output.fileName);
+        out.printString(name);
+        out.printEnum(testType);
+        out.printEnum(input.type);
+        out.printString(input.fileName);
+        out.printEnum(output.type);
+        out.printString(output.fileName);
         out.printLine(tests.length);
         for (Test test : tests)
             test.saveTest(out);
 
         out.printString(location);
         out.printString(vmArgs);
-		out.printString(mainClass);
+        out.printString(mainClass);
         out.printString(taskClass);
         out.printString(checkerClass);
         out.printString(checkerParameters);
@@ -127,7 +125,7 @@ public class Task {
         out.printBoolean(truncate);
         out.printString(inputClass);
         out.printString(outputClass);
-		out.printBoolean(includeLocale);
+        out.printBoolean(includeLocale);
         out.printBoolean(failOnOverflow);
     }
 
@@ -158,16 +156,17 @@ public class Task {
         boolean truncate = in.readBoolean();
         String inputClass = in.readString();
         String outputClass = in.readString();
-		boolean includeLocale = false;
+        boolean includeLocale = false;
         boolean failOnOverflow = false;
-		try {
-			includeLocale = in.readBoolean();
+        try {
+            includeLocale = in.readBoolean();
             failOnOverflow = in.readBoolean();
-		} catch (InputMismatchException ignored) {}
+        } catch (InputMismatchException ignored) {
+        }
         return new Task(name, testType, new StreamConfiguration(inputStreamType, inputFileName),
-                new StreamConfiguration(outputStreamType, outputFileName), tests, location, vmArgs, mainClass,
-                taskClass, checkerClass, checkerParameters, testClasses, date, contestName, truncate, inputClass,
-                outputClass, includeLocale, failOnOverflow);
+            new StreamConfiguration(outputStreamType, outputFileName), tests, location, vmArgs, mainClass,
+            taskClass, checkerClass, checkerParameters, testClasses, date, contestName, truncate, inputClass,
+            outputClass, includeLocale, failOnOverflow);
     }
 
     public Task setTests(Test[] tests) {
@@ -194,39 +193,39 @@ public class Task {
             failOnOverflow, template);
     }
 
-	public Task setLocation(String location) {
-		return new Task(name, testType, input, output, tests, location, vmArgs, mainClass, taskClass, checkerClass,
-			checkerParameters, testClasses, date, contestName, truncate, inputClass, outputClass, includeLocale,
+    public Task setLocation(String location) {
+        return new Task(name, testType, input, output, tests, location, vmArgs, mainClass, taskClass, checkerClass,
+            checkerParameters, testClasses, date, contestName, truncate, inputClass, outputClass, includeLocale,
             failOnOverflow, template);
-	}
+    }
 
-	public Task setTestType(TestType testType) {
-		return new Task(name, testType, input, output, tests, location, vmArgs, mainClass, taskClass, checkerClass,
-			checkerParameters, testClasses, date, contestName, truncate, inputClass, outputClass, includeLocale,
+    public Task setTestType(TestType testType) {
+        return new Task(name, testType, input, output, tests, location, vmArgs, mainClass, taskClass, checkerClass,
+            checkerParameters, testClasses, date, contestName, truncate, inputClass, outputClass, includeLocale,
             failOnOverflow, template);
-	}
+    }
 
-	public Task setContestName(String contestName) {
-		return new Task(name, testType, input, output, tests, location, vmArgs, mainClass, taskClass, checkerClass,
-			checkerParameters, testClasses, date, contestName, truncate, inputClass, outputClass, includeLocale,
+    public Task setContestName(String contestName) {
+        return new Task(name, testType, input, output, tests, location, vmArgs, mainClass, taskClass, checkerClass,
+            checkerParameters, testClasses, date, contestName, truncate, inputClass, outputClass, includeLocale,
             failOnOverflow, template);
-	}
+    }
 
     public Task setName(String name) {
-   		return new Task(name, testType, input, output, tests, location, vmArgs, mainClass, taskClass, checkerClass,
-   			checkerParameters, testClasses, date, contestName, truncate, inputClass, outputClass, includeLocale,
-               failOnOverflow, template);
-   	}
-
-	public Task setInputOutputClasses(String inputClass, String outputClass) {
-		return new Task(name, testType, input, output, tests, location, vmArgs, mainClass, taskClass, checkerClass,
-			checkerParameters, testClasses, date, contestName, truncate, inputClass, outputClass, includeLocale,
+        return new Task(name, testType, input, output, tests, location, vmArgs, mainClass, taskClass, checkerClass,
+            checkerParameters, testClasses, date, contestName, truncate, inputClass, outputClass, includeLocale,
             failOnOverflow, template);
-	}
+    }
+
+    public Task setInputOutputClasses(String inputClass, String outputClass) {
+        return new Task(name, testType, input, output, tests, location, vmArgs, mainClass, taskClass, checkerClass,
+            checkerParameters, testClasses, date, contestName, truncate, inputClass, outputClass, includeLocale,
+            failOnOverflow, template);
+    }
 
     public Task setTemplate(String template) {
-   		return new Task(name, testType, input, output, tests, location, vmArgs, mainClass, taskClass, checkerClass,
-   			checkerParameters, testClasses, date, contestName, truncate, inputClass, outputClass, includeLocale,
-               failOnOverflow, template);
-   	}
+        return new Task(name, testType, input, output, tests, location, vmArgs, mainClass, taskClass, checkerClass,
+            checkerParameters, testClasses, date, contestName, truncate, inputClass, outputClass, includeLocale,
+            failOnOverflow, template);
+    }
 }

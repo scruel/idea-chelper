@@ -20,7 +20,7 @@ public class ProjectDataDialog extends JDialog {
     private final DirectorySelector archiveDirectory;
     private final DirectorySelector outputDirectory;
     private final JCheckBox enableUnitTests;
-	private final JCheckBox smartTesting;
+    private final JCheckBox smartTesting;
     private final JCheckBox failOnIntegerOverflowForNewTasks;
     private final DirectorySelector testDirectory;
     private final ClassSelector inputClass;
@@ -28,7 +28,7 @@ public class ProjectDataDialog extends JDialog {
     private final JTextField excludePackages;
     private final JTextField author;
     private final JLabel testDirectoryLabel;
-	private final int width = new JTextField(20).getPreferredSize().width;
+    private final int width = new JTextField(20).getPreferredSize().width;
 
     public ProjectDataDialog(Project project, ProjectData data) {
         super(null, "Project settings", Dialog.ModalityType.APPLICATION_MODAL);
@@ -45,7 +45,7 @@ public class ProjectDataDialog extends JDialog {
         outputClass = new ClassSelector(data.outputClass, project);
         excludePackages = new JTextField(ProjectData.join(data.excludedPackages));
         author = new JTextField(data.author);
-		smartTesting = new JCheckBox("Use smart testing", data.smartTesting);
+        smartTesting = new JCheckBox("Use smart testing", data.smartTesting);
         OkCancelPanel main = new OkCancelPanel(new VerticalFlowLayout()) {
             @Override
             public void onOk() {
@@ -60,13 +60,13 @@ public class ProjectDataDialog extends JDialog {
                 ProjectDataDialog.this.setVisible(false);
             }
 
-			@Override
-			public Dimension getPreferredSize() {
-				Dimension dimension = super.getPreferredSize();
-				dimension.width = width;
-				return dimension;
-			}
-		};
+            @Override
+            public Dimension getPreferredSize() {
+                Dimension dimension = super.getPreferredSize();
+                dimension.width = width;
+                return dimension;
+            }
+        };
         JPanel okCancelPanel = new JPanel(new GridLayout(1, 2));
         okCancelPanel.add(main.getOkButton());
         okCancelPanel.add(main.getCancelButton());
@@ -89,7 +89,7 @@ public class ProjectDataDialog extends JDialog {
         main.add(new JLabel("Author:"));
         main.add(author);
         main.add(failOnIntegerOverflowForNewTasks);
-		main.add(smartTesting);
+        main.add(smartTesting);
         main.add(okCancelPanel);
         testDirectory.setVisible(enableUnitTests.isSelected());
         testDirectoryLabel.setVisible(enableUnitTests.isSelected());

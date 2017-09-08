@@ -23,22 +23,22 @@ public class DirectorySelector extends JPanel {
     private final JTextField textField;
     private JButton button;
 
-	public DirectorySelector(final Project project, String initialValue) {
-		this(project, initialValue, false);
-	}
+    public DirectorySelector(final Project project, String initialValue) {
+        this(project, initialValue, false);
+    }
 
     public DirectorySelector(final Project project, String initialValue, final boolean allowAllDirectories) {
         super(new BorderLayout());
         textField = new JTextField(initialValue);
         button = new JButton("...") {
-			@Override
-			public Dimension getPreferredSize() {
-				Dimension dimension = super.getPreferredSize();
-				//noinspection SuspiciousNameCombination
-				dimension.width = dimension.height;
-				return dimension;
-			}
-		};
+            @Override
+            public Dimension getPreferredSize() {
+                Dimension dimension = super.getPreferredSize();
+                //noinspection SuspiciousNameCombination
+                dimension.width = dimension.height;
+                return dimension;
+            }
+        };
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 PathChooserDialog dialog = FileChooserFactory.getInstance().createPathChooser(new FileChooserDescriptor(false, true, false, false, false, false) {
