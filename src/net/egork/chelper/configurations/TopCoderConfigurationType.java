@@ -26,6 +26,11 @@ public class TopCoderConfigurationType implements ConfigurationType {
                 return new TopCoderConfiguration("TopCoderTask", project,
                     new TopCoderTask("TopCoderTask", null, null, "", "", new String[0], null, false, "256M"), factory);
             }
+
+            @Override
+            public RunConfiguration createConfiguration(String name, RunConfiguration template) {
+                return super.createConfiguration(name, template);
+            }
         };
     }
 

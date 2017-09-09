@@ -3,6 +3,7 @@ package net.egork.chelper.ui;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
 import net.egork.chelper.configurations.TaskConfiguration;
+import net.egork.chelper.util.ProjectUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -22,9 +23,13 @@ public class TaskConfigurationEditor extends SettingsEditor<TaskConfiguration> {
     }
 
     private void applyTask() {
-        taskConfigurationPanel = new TaskConfigurationPanel(taskConfiguration.getConfiguration(), false, taskConfiguration.getProject(), null, null);
         if (wrapper == null)
             wrapper = new JPanel(new BorderLayout());
+        if (taskConfiguration.getConfiguration() == null) {
+            ProjectUtils.removeConfiguration(taskConfiguration);
+            return;
+        }
+        taskConfigurationPanel = new TaskConfigurationPanel(taskConfiguration.getConfiguration(), false, taskConfiguration.getProject(), null, null);
         wrapper.add(taskConfigurationPanel, BorderLayout.CENTER);
     }
 

@@ -32,6 +32,7 @@ import com.intellij.util.Processor;
 import com.intellij.util.ui.UIUtil;
 import net.egork.chelper.ChromeParser;
 import net.egork.chelper.ProjectData;
+import net.egork.chelper.actions.ArchiveAction;
 import net.egork.chelper.actions.TopCoderAction;
 import net.egork.chelper.checkers.PEStrictChecker;
 import net.egork.chelper.codegeneration.CodeGenerationUtils;
@@ -226,6 +227,17 @@ public class ProjectUtils {
         if (setActive)
             manager.setSelectedConfiguration(configuration);
         return configuration;
+    }
+
+    public static boolean removeConfiguration(TaskConfiguration taskConfiguration) {
+        RunManagerImpl manager = RunManagerImpl.getInstanceImpl(taskConfiguration.getProject());
+        RunnerAndConfigurationSettings old = manager.findConfigurationByName(taskConfiguration.getName());
+        if (old != null) {
+            //TODO auto refresh Run/Debug Configuration panel when remove configuration.
+            manager.removeConfiguration(old);
+            ArchiveAction.setOtherConfiguration(manager, (Task) null);
+        }
+        return true;
     }
 
     public static Parser getDefaultParser() {

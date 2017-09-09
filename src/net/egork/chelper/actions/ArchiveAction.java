@@ -44,8 +44,6 @@ public class ArchiveAction extends AnAction {
             return;
         }
         final RunConfiguration configuration = selectedConfiguration.getConfiguration();
-
-
         final TaskBase taskBase;
         if (configuration instanceof TaskConfiguration) {
             taskBase = ((TaskConfiguration) configuration).getConfiguration();
@@ -88,8 +86,6 @@ public class ArchiveAction extends AnAction {
                             checkerFile.delete(this);
                         }
                     }
-
-
                     for (String testClass : taskBase.testClasses) {
                         VirtualFile testFile = FileUtils.getFileByFQN(testClass, project);
                         if (testFile != null) {
@@ -97,7 +93,6 @@ public class ArchiveAction extends AnAction {
                             testFile.delete(this);
                         }
                     }
-
 
                     VirtualFile taskFile;
                     if (configuration instanceof TaskConfiguration) {
@@ -148,13 +143,13 @@ public class ArchiveAction extends AnAction {
         for (RunConfiguration configuration : allConfigurations) {
             if (configuration instanceof TopCoderConfiguration) {
                 TopCoderTask other = ((TopCoderConfiguration) configuration).getConfiguration();
-                if (!task.contestName.equals(other.contestName))
+                if (task != null && !task.contestName.equals(other.contestName))
                     continue;
                 manager.setSelectedConfiguration(new RunnerAndConfigurationSettingsImpl(manager, configuration, false));
                 return;
             } else if (configuration instanceof TaskConfiguration) {
                 Task other = ((TaskConfiguration) configuration).getConfiguration();
-                if (!task.contestName.equals(other.contestName))
+                if (task != null && !task.contestName.equals(other.contestName))
                     continue;
                 manager.setSelectedConfiguration(new RunnerAndConfigurationSettingsImpl(manager, configuration, false));
                 return;
