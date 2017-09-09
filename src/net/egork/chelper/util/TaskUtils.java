@@ -1,5 +1,7 @@
 package net.egork.chelper.util;
 
+import com.intellij.execution.configurations.RunConfiguration;
+import com.intellij.execution.impl.RunManagerImpl;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
@@ -149,6 +151,33 @@ public class TaskUtils {
             }
         }
         return fixed;
+    }
+
+    /**
+     * @param runManager
+     * @param sourceFile .java(source)
+     * @return
+     */
+    public static RunConfiguration GetConfigurationSettingsByDataFile(Project project, RunManagerImpl runManager, VirtualFile sourceFile) {
+        for (RunConfiguration configuration : runManager.getAllConfigurationsList()) {
+            if (configuration instanceof TopCoderConfiguration) {
+                TopCoderTask task = ((TopCoderConfiguration) configuration).getConfiguration();
+                if (sourceFile.equals(TaskUtils.getFile(ProjectUtils.getData(project).defaultDirectory, task.name, project))) {
+                    return configuration;
+                }
+            } else if (configuration instanceof TaskConfiguration) {
+                Task task = ((TaskConfiguration) configuration).getConfiguration();
+                if (sourceFile.equals(FileUtils.getFileByFQN(task.taskClass, configuration.getProject()))) {
+                    return configuration;
+                }
+            }
+        }
+        return null;
+    }
+
+    public static RunConfiguration GetConfigurationSettingsByDataFile(Project project, VirtualFile sourceFile) {
+        RunManagerImpl runManager = RunManagerImpl.getInstanceImpl(project);
+        return GetConfigurationSettingsByDataFile(project, runManager, sourceFile);
     }
 
     private static Task _fixedTaskByPath(Project project, Task task, VirtualFile taskDataFile) {

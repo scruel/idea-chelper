@@ -155,11 +155,5 @@ public class ArchiveAction extends AnAction {
                 return;
             }
         }
-        for (RunConfiguration configuration : allConfigurations) {
-            if (configuration instanceof TaskConfiguration || configuration instanceof TopCoderConfiguration) {
-                manager.setSelectedConfiguration(new RunnerAndConfigurationSettingsImpl(manager, configuration, false));
-                return;
-            }
-        }
     }
 }

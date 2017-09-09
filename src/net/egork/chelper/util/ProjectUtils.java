@@ -18,10 +18,7 @@ import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.roots.impl.libraries.ProjectLibraryTable;
 import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.roots.libraries.LibraryTable;
-import com.intellij.openapi.vfs.JarFileSystem;
-import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.openapi.vfs.*;
 import com.intellij.openapi.wm.WindowManager;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
@@ -48,6 +45,7 @@ import net.egork.chelper.task.TopCoderTask;
 import net.egork.chelper.task.test.Test;
 import net.egork.chelper.task.test.TestType;
 import net.egork.chelper.tester.NewTester;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
@@ -76,7 +74,7 @@ public class ProjectUtils {
     public static void addListeners() {
         ProjectManager.getInstance().addProjectManagerListener(new ProjectManagerAdapter() {
             @Override
-            public void projectOpened(Project project) {
+            public void projectOpened(final Project project) {
                 ProjectData configuration = ProjectData.load(project);
                 if (configuration != null) {
                     eligibleProjects.put(project, configuration);
@@ -88,6 +86,19 @@ public class ProjectUtils {
                     CodeGenerationUtils.createTopCoderTaskTemplateIfNeeded(project);
                     CodeGenerationUtils.createTopCoderTestCaseClassTemplateIfNeeded(project);
                     ChromeParser.checkInstalled(project, configuration);
+
+                    VirtualFileManager.getInstance().addVirtualFileListener(new VirtualFileListener() {
+                        @Override
+                        public void fileDeleted(@NotNull final VirtualFileEvent event) {
+                            ExecuteUtils.executeStrictWriteAction(new Runnable() {
+                                @Override
+                                public void run() {
+                                    ProjectUtils.removeConfiguration(TaskUtils.GetConfigurationSettingsByDataFile(project, event.getFile()));
+                                }
+                            });
+
+                        }
+                    });
                 }
             }
 
@@ -229,13 +240,14 @@ public class ProjectUtils {
         return configuration;
     }
 
-    public static boolean removeConfiguration(TaskConfiguration taskConfiguration) {
+    public static boolean removeConfiguration(RunConfiguration taskConfiguration) {
+        if (taskConfiguration == null) return true;
         RunManagerImpl manager = RunManagerImpl.getInstanceImpl(taskConfiguration.getProject());
         RunnerAndConfigurationSettings old = manager.findConfigurationByName(taskConfiguration.getName());
         if (old != null) {
             //TODO auto refresh Run/Debug Configuration panel when remove configuration.
             manager.removeConfiguration(old);
-            ArchiveAction.setOtherConfiguration(manager, (Task) null);
+            ArchiveAction.setOtherConfiguration(manager, null);
         }
         return true;
     }

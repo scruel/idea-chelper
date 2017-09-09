@@ -45,6 +45,7 @@ public class FileUtils {
                 if (parentFile != null) {
                     _psiFile = parentFile.findFile(nameWithOutExtension + ".java");
                     if (_psiFile != null) {
+                        ProjectUtils.removeConfiguration(TaskUtils.GetConfigurationSettingsByDataFile(psiFile.getProject(), _psiFile.getVirtualFile()));
                         _psiFile.delete();
                     }
                     _psiFile = parentFile.findFile(nameWithOutExtension + ".task");

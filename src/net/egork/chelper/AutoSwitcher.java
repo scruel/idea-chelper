@@ -15,9 +15,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.messages.MessageBus;
 import net.egork.chelper.configurations.TaskConfiguration;
 import net.egork.chelper.configurations.TopCoderConfiguration;
-import net.egork.chelper.task.Task;
 import net.egork.chelper.task.TaskBase;
-import net.egork.chelper.task.TopCoderTask;
 import net.egork.chelper.util.ExecuteUtils;
 import net.egork.chelper.util.FileUtils;
 import net.egork.chelper.util.ProjectUtils;
@@ -115,8 +113,19 @@ public class AutoSwitcher implements ProjectComponent {
 
                         Map<String, Object> taskMap;
                         if (null == (taskMap = TaskUtils.getTaskMapWitFile(file, project))) return;
-                        if (checkAllRunnerAndConfigurationSettings(runManager,
-                            (VirtualFile) taskMap.get(TaskBase.TASK_SOURCE_KEY))) {
+
+                        RunConfiguration configuration = TaskUtils.GetConfigurationSettingsByDataFile(project, runManager,
+                            (VirtualFile) taskMap.get(TaskBase.TASK_SOURCE_KEY));
+                        if (configuration != null) {
+                            busy = true;
+                            if (configuration instanceof TopCoderConfiguration) {
+                                runManager.setSelectedConfiguration(new RunnerAndConfigurationSettingsImpl(runManager,
+                                    configuration, false));
+                            } else if (configuration instanceof TaskConfiguration) {
+                                runManager.setSelectedConfiguration(new RunnerAndConfigurationSettingsImpl(runManager,
+                                    configuration, false));
+                            }
+                            busy = false;
                             return;
                         }
 
@@ -130,31 +139,6 @@ public class AutoSwitcher implements ProjectComponent {
                         busy = true;
                         ProjectUtils.createConfiguration(task, true, project);
                         busy = false;
-                    }
-
-                    private boolean checkAllRunnerAndConfigurationSettings(RunManagerImpl runManager, VirtualFile taskFile) {
-                        for (RunConfiguration configuration : runManager.getAllConfigurationsList()) {
-                            if (configuration instanceof TopCoderConfiguration) {
-                                TopCoderTask task = ((TopCoderConfiguration) configuration).getConfiguration();
-                                if (taskFile.equals(TaskUtils.getFile(ProjectUtils.getData(project).defaultDirectory, task.name, project))) {
-                                    busy = true;
-                                    runManager.setSelectedConfiguration(new RunnerAndConfigurationSettingsImpl(runManager,
-                                        configuration, false));
-                                    busy = false;
-                                    return true;
-                                }
-                            } else if (configuration instanceof TaskConfiguration) {
-                                Task task = ((TaskConfiguration) configuration).getConfiguration();
-                                if (taskFile.equals(FileUtils.getFileByFQN(task.taskClass, configuration.getProject()))) {
-                                    busy = true;
-                                    runManager.setSelectedConfiguration(new RunnerAndConfigurationSettingsImpl(runManager,
-                                        configuration, false));
-                                    busy = false;
-                                    return true;
-                                }
-                            }
-                        }
-                        return false;
                     }
                 };
                 DumbService.getInstance(project).smartInvokeLater(selectTaskRunnable);
