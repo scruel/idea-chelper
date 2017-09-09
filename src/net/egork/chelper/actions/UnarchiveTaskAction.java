@@ -10,6 +10,7 @@ import com.intellij.openapi.fileChooser.FileChooserFactory;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiManager;
 import net.egork.chelper.codegeneration.CodeGenerationUtils;
 import net.egork.chelper.exception.TaskCorruptException;
 import net.egork.chelper.task.Task;
@@ -132,6 +133,7 @@ public class UnarchiveTaskAction extends AnAction {
                             }
                             ProjectUtils.createConfiguration(project, task, true);
                         }
+                        FileUtils.deleteTaskIfExists(PsiManager.getInstance(project).findFile(taskFile));
                     }
                 } catch (IOException e) {
                     throw new RuntimeException(e);

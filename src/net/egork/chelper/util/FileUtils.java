@@ -54,8 +54,6 @@ public class FileUtils {
                     }
                 }
 //                Messenger.publishMessage("Unable to delete file " + _psiFile.getVirtualFile().getPath(),NotificationType.ERROR);
-
-
             }
         });
         return true;
