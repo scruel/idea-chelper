@@ -106,6 +106,14 @@ public class FileUtils {
         return !(directory == null || !directory.isValid());
     }
 
+    public static String readTextFile(VirtualFile file) {
+        try {
+            return VfsUtil.loadText(file);
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
     public static boolean isValidClass(String clazz, Project project) {
         try {
             Class.forName(clazz).newInstance();
@@ -116,14 +124,6 @@ public class FileUtils {
                 return false;
         }
         return true;
-    }
-
-    public static String readTextFile(VirtualFile file) {
-        try {
-            return VfsUtil.loadText(file);
-        } catch (IOException e) {
-            return null;
-        }
     }
 
     public static PsiDirectory getPsiDirectory(Project project, String location) {

@@ -6,16 +6,20 @@ import com.intellij.execution.impl.RunManagerImpl;
 import com.intellij.execution.impl.RunnerAndConfigurationSettingsImpl;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.ProjectManagerAdapter;
+import com.intellij.openapi.roots.ModifiableRootModel;
+import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.roots.impl.libraries.ProjectLibraryTable;
 import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.roots.libraries.LibraryTable;
 import com.intellij.openapi.vfs.JarFileSystem;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.wm.WindowManager;
@@ -24,6 +28,7 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.util.Processor;
 import com.intellij.util.ui.UIUtil;
 import net.egork.chelper.ChromeParser;
 import net.egork.chelper.ProjectData;
@@ -56,6 +61,8 @@ public class ProjectUtils {
     private ProjectUtils() {
     }
 
+    public static final String PROJECT_NAME = "CHelper";
+
     private static Map<Project, ProjectData> eligibleProjects = new HashMap<Project, ProjectData>();
     // TODO: The existence of non-persistent defaultConfiguration together with persistent ProjectData is a bit weird.
     // It would be natural for everything to be persistent.
@@ -73,7 +80,7 @@ public class ProjectUtils {
                 if (configuration != null) {
                     eligibleProjects.put(project, configuration);
                     TopCoderAction.start(project);
-                    ensureLibrary(project);
+                    ensureLibraryAndData(project);
                     CodeGenerationUtils.createTaskClassTemplateIfNeeded(project, null);
                     CodeGenerationUtils.createCheckerClassTemplateIfNeeded(project);
                     CodeGenerationUtils.createTestCaseClassTemplateIfNeeded(project);
@@ -94,25 +101,59 @@ public class ProjectUtils {
         return JavaPsiFacade.getInstance(project).findClass(classFQN, GlobalSearchScope.allScope(project));
     }
 
-    private static void ensureLibrary(final Project project) {
-        final ProjectData data = ProjectUtils.getData(project);
-        if (data.libraryMigrated)
-            return;
-        ApplicationManager.getApplication().runWriteAction(new Runnable() {
+    public static void ensureLibraryAndData(final Project project) {
+        ExecuteUtils.executeStrictWriteActionAndWait(new Runnable() {
             @Override
             public void run() {
-                LibraryTable table = ProjectLibraryTable.getInstance(project);
-                String path = TopCoderAction.getJarPathForClass(NewTester.class);
-                VirtualFile jar = VirtualFileManager.getInstance().findFileByUrl(VirtualFileManager.constructUrl(JarFileSystem.PROTOCOL, path) + JarFileSystem.JAR_SEPARATOR);
-                Library library = table.getLibraryByName("CHelper");
-                if (library != null) {
-                    Library.ModifiableModel libraryModel = library.getModifiableModel();
-                    libraryModel.addRoot(jar, OrderRootType.CLASSES);
-                    libraryModel.commit();
-                }
-                data.completeMigration(project);
+                ProjectUtils.ensureLibrary(project);
             }
         });
+    }
+
+    public static void ensureLibrary(Project project) {
+        LibraryTable table = ProjectLibraryTable.getInstance(project);
+        String path = TopCoderAction.getJarPathForClass(NewTester.class);
+        if (path == null) {
+            throw new RuntimeException("Could not find CHelper jar!");
+        }
+        VirtualFile jar;
+        jar = VirtualFileManager.getInstance().findFileByUrl(VirtualFileManager.constructUrl(JarFileSystem.PROTOCOL, path) + JarFileSystem.JAR_SEPARATOR);
+
+        if (jar == null) {
+            jar = LocalFileSystem.getInstance().refreshAndFindFileByPath(path);
+        }
+        if (jar == null) {
+            throw new RuntimeException("Could not find CHelper jar!");
+        }
+        Library library = table.getLibraryByName(PROJECT_NAME);
+        if (library != null) {
+            table.removeLibrary(library);
+        }
+        library = table.createLibrary(PROJECT_NAME);
+        Library.ModifiableModel libraryModel = library.getModifiableModel();
+        libraryModel.addRoot(jar, OrderRootType.CLASSES);
+        libraryModel.commit();
+        // check module CHelper dependency.
+        addLibray(project, library);
+    }
+
+    private static void addLibray(Project project, Library library) {
+        final boolean[] res = new boolean[1];
+        for (Module module : ModuleManager.getInstance(project).getModules()) {
+            ModuleRootManager.getInstance(module).orderEntries().forEachLibrary(new Processor<Library>() {
+                @Override
+                public boolean process(Library library) {
+                    if (PROJECT_NAME.equals(library.getName()))
+                        res[0] = true;
+                    return true;
+                }
+            });
+            if (!res[0]) {
+                ModifiableRootModel model = ModuleRootManager.getInstance(module).getModifiableModel();
+                model.addLibraryEntry(library);
+                model.commit();
+            }
+        }
     }
 
     public static boolean isEligible(DataContext dataContext) {
@@ -196,7 +237,7 @@ public class ProjectUtils {
         ProjectUtils.defaultParser = defaultParser;
     }
 
-    public static void addProjectData(Project project, ProjectData data) {
+    public static void putProjectData(Project project, ProjectData data) {
         eligibleProjects.put(project, data);
     }
 
