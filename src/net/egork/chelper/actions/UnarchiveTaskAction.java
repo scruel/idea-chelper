@@ -3,7 +3,6 @@ package net.egork.chelper.actions;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDialog;
 import com.intellij.openapi.fileChooser.FileChooserFactory;
@@ -44,8 +43,8 @@ public class UnarchiveTaskAction extends AnAction {
                         (file.isDirectory() || "task".equals(file.getExtension()) || "tctask".equals(file.getExtension()));
                 }
             }, project, null);
-        final VirtualFile[] files = dialog.choose(FileUtils.getFile(project, ProjectUtils.getData(project).archiveDirectory), project);
-        ApplicationManager.getApplication().runWriteAction(new Runnable() {
+        final VirtualFile[] files = dialog.choose(project, FileUtils.getFile(project, ProjectUtils.getData(project).archiveDirectory));
+        ExecuteUtils.executeStrictWriteActionAndWait(new Runnable() {
             public void run() {
                 try {
                     for (VirtualFile taskFile : files) {

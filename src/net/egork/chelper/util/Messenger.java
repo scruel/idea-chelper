@@ -21,7 +21,8 @@ public class Messenger {
     }
 
     public static void publishMessage(String message, NotificationType type) {
-        Notifications.Bus.notify(new Notification("chelper", ProjectUtils.PROJECT_NAME, message, type));
+        Notifications.Bus.notify(new Notification(ProjectUtils.PROJECT_NAME, ProjectUtils.PROJECT_NAME, message, type));
+//        Messages.showInfoMessage( ... );
     }
 
     public static void publishMessageWithBalloon(Project project, String message, MessageType type) {

@@ -18,12 +18,13 @@ import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.roots.impl.libraries.ProjectLibraryTable;
 import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.roots.libraries.LibraryTable;
-import com.intellij.openapi.vfs.*;
+import com.intellij.openapi.vfs.JarFileSystem;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.wm.WindowManager;
-import com.intellij.psi.JavaPsiFacade;
-import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
+import com.intellij.psi.*;
+import com.intellij.psi.impl.PsiManagerImpl;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.Processor;
 import com.intellij.util.ui.UIUtil;
@@ -87,18 +88,14 @@ public class ProjectUtils {
                     CodeGenerationUtils.createTopCoderTestCaseClassTemplateIfNeeded(project);
                     ChromeParser.checkInstalled(project, configuration);
 
-                    VirtualFileManager.getInstance().addVirtualFileListener(new VirtualFileListener() {
-                        @Override
-                        public void fileDeleted(@NotNull final VirtualFileEvent event) {
-                            ExecuteUtils.executeStrictWriteAction(new Runnable() {
-                                @Override
-                                public void run() {
-                                    ProjectUtils.removeConfiguration(TaskUtils.GetConfSettingsBySourceFile(project, event.getFile()));
-                                }
-                            });
-
+                    PsiManagerImpl.getInstance(project).addPsiTreeChangeListener(
+                        new PsiTreeChangeAdapter() {
+                            @Override
+                            public void childRemoved(@NotNull final PsiTreeChangeEvent event) {
+                                ProjectUtils.removeConfiguration(TaskUtils.GetConfSettingsBySourceFile(project, event.getChild().getContainingFile().getVirtualFile()));
+                            }
                         }
-                    });
+                    );
                 }
             }
 

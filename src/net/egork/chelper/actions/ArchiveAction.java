@@ -7,7 +7,6 @@ import com.intellij.execution.impl.RunnerAndConfigurationSettingsImpl;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -20,6 +19,7 @@ import net.egork.chelper.configurations.TopCoderConfiguration;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.task.TaskBase;
 import net.egork.chelper.task.TopCoderTask;
+import net.egork.chelper.util.ExecuteUtils;
 import net.egork.chelper.util.FileUtils;
 import net.egork.chelper.util.Messenger;
 import net.egork.chelper.util.ProjectUtils;
@@ -61,7 +61,7 @@ public class ArchiveAction extends AnAction {
             return;
         }
         CodeGenerationUtils.createUnitTest(project, taskBase);
-        ApplicationManager.getApplication().runWriteAction(new Runnable() {
+        ExecuteUtils.executeStrictWriteActionAndWait(new Runnable() {
             @Override
             public void run() {
                 try {
