@@ -16,7 +16,7 @@ public class EditTCDialog extends JDialog {
     private boolean isOk = false;
     private TopCoderTaskPanel panel;
 
-    public EditTCDialog(TopCoderTask task, Project project) {
+    public EditTCDialog(Project project, TopCoderTask task) {
         super(null, task.name, ModalityType.APPLICATION_MODAL);
         setIconImage(ProjectUtils.iconToImage(IconLoader.getIcon("/icons/topcoder.png")));
         setAlwaysOnTop(true);
@@ -49,7 +49,7 @@ public class EditTCDialog extends JDialog {
     }
 
     public static TopCoderTask show(Project project, TopCoderTask task) {
-        EditTCDialog dialog = new EditTCDialog(task, project);
+        EditTCDialog dialog = new EditTCDialog(project, task);
         dialog.setVisible(true);
         if (dialog.isOk) {
             return dialog.task;

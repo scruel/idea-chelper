@@ -186,9 +186,9 @@ public class TopCoderAction extends AnAction {
         TopCoderTask taskToWrite = task.setFQN(fqn).setFailOnOverflow(ProjectUtils.getData(project).failOnIntegerOverflowForNewTasks);
         if (FileUtils.getFile(project, defaultDir + "/" + task.name + ".java") == null) {
             FileUtils.writeTextFile(FileUtils.getFile(project, defaultDir),
-                task.name + ".java", CodeGenerationUtils.createTopCoderStub(task, project, packageName));
+                task.name + ".java", CodeGenerationUtils.createTopCoderStub(project, task, packageName));
         }
-        ProjectUtils.createConfiguration(taskToWrite, true, project);
+        ProjectUtils.createConfiguration(project, taskToWrite, true);
         final PsiElement main = JavaPsiFacade.getInstance(project).findClass(fqn, GlobalSearchScope.allScope(project));
         ProjectUtils.openElement(project, main);
     }

@@ -39,7 +39,7 @@ public class TopCoderTaskPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 refresh();
                 TopCoderTaskPanel.this.task = TopCoderTaskPanel.this.task.setTests(TopCoderEditTestsDialog.editTests(
-                    TopCoderTaskPanel.this.task, project));
+                    project, TopCoderTaskPanel.this.task));
             }
         });
         add(editTests);

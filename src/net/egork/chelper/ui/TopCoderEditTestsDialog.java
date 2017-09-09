@@ -38,7 +38,7 @@ public class TopCoderEditTestsDialog extends JDialog {
     private JCheckBox knowAnswer;
     private boolean updating;
 
-    public TopCoderEditTestsDialog(TopCoderTask task, Project project) {
+    public TopCoderEditTestsDialog(Project project, TopCoderTask task) {
         super(null, "Tests", ModalityType.APPLICATION_MODAL);
         this.task = task;
         setAlwaysOnTop(true);
@@ -317,8 +317,8 @@ public class TopCoderEditTestsDialog extends JDialog {
             checkBoxes.get(currentTest).isSelected()));
     }
 
-    public static NewTopCoderTest[] editTests(TopCoderTask task, Project project) {
-        TopCoderEditTestsDialog dialog = new TopCoderEditTestsDialog(task, project);
+    public static NewTopCoderTest[] editTests(Project project, TopCoderTask task) {
+        TopCoderEditTestsDialog dialog = new TopCoderEditTestsDialog(project, task);
         dialog.setVisible(true);
         return dialog.tests.toArray(new NewTopCoderTest[dialog.tests.size()]);
     }

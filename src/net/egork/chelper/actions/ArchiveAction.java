@@ -60,14 +60,14 @@ public class ArchiveAction extends AnAction {
                 NotificationType.ERROR);
             return;
         }
-        CodeGenerationUtils.createUnitTest(taskBase, project);
+        CodeGenerationUtils.createUnitTest(project, taskBase);
         ApplicationManager.getApplication().runWriteAction(new Runnable() {
             @Override
             public void run() {
                 try {
                     VirtualFile mainFile;
                     if (configuration instanceof TaskConfiguration) {
-                        mainFile = FileUtils.getFileByFQN(((Task) taskBase).taskClass, project);
+                        mainFile = FileUtils.getFileByFQN(project, ((Task) taskBase).taskClass);
                     } else {
                         mainFile = FileUtils.getFile(project,
                             ProjectUtils.getData(project).defaultDirectory
@@ -87,7 +87,7 @@ public class ArchiveAction extends AnAction {
                         }
                     }
                     for (String testClass : taskBase.testClasses) {
-                        VirtualFile testFile = FileUtils.getFileByFQN(testClass, project);
+                        VirtualFile testFile = FileUtils.getFileByFQN(project, testClass);
                         if (testFile != null) {
                             VfsUtil.copyFile(this, testFile, directory);
                             testFile.delete(this);

@@ -45,7 +45,7 @@ public class FileUtils {
                 if (parentFile != null) {
                     _psiFile = parentFile.findFile(nameWithOutExtension + ".java");
                     if (_psiFile != null) {
-                        ProjectUtils.removeConfiguration(TaskUtils.GetConfigurationSettingsByDataFile(psiFile.getProject(), _psiFile.getVirtualFile()));
+                        ProjectUtils.removeConfiguration(TaskUtils.GetConfSettingsBySourceFile(psiFile.getProject(), _psiFile.getVirtualFile()));
                         _psiFile.delete();
                     }
                     _psiFile = parentFile.findFile(nameWithOutExtension + ".task");
@@ -135,7 +135,7 @@ public class FileUtils {
         return location.findChild(fileName);
     }
 
-    public static boolean isValiDirectory(String location, Project project) {
+    public static boolean isValiDirectory(Project project, String location) {
         PsiDirectory directory = FileUtils.getPsiDirectory(project, location);
         return !(directory == null || !directory.isValid());
     }
@@ -148,7 +148,7 @@ public class FileUtils {
         }
     }
 
-    public static boolean isValidClass(String clazz, Project project) {
+    public static boolean isValidClass(Project project, String clazz) {
         try {
             Class.forName(clazz).newInstance();
         } catch (IllegalAccessException ignore) {
@@ -267,7 +267,7 @@ public class FileUtils {
         return null;
     }
 
-    public static Task readTask(String fileName, Project project) {
+    public static Task readTask(Project project, String fileName) {
         VirtualFile vFile = getFile(project, fileName);
         if (vFile == null) {
             return null;
@@ -275,7 +275,7 @@ public class FileUtils {
         return Task.loadTask(new InputReader(getInputStream(vFile)));
     }
 
-    public static TopCoderTask readTopCoderTask(String fileName, Project project) {
+    public static TopCoderTask readTopCoderTask(Project project, String fileName) {
         VirtualFile vFile = getFile(project, fileName);
         if (vFile == null) {
             return null;
@@ -331,9 +331,9 @@ public class FileUtils {
         return name.matches("[a-zA-Z_$][a-zA-Z\\d_$]*");
     }
 
-    public static String createTaskClass(Task task, Project project, String location, String name) {
+    public static String createTaskClass(Project project, Task task, String location, String name) {
         VirtualFile directory = FileUtils.createDirectoryIfMissing(project, location);
-        String mainClass = CodeGenerationUtils.createStub(task, location, name, project);
+        String mainClass = CodeGenerationUtils.createStub(project, task, location, name);
         if (directory.findChild(name + ".java") == null) {
             writeTextFile(directory, name + ".java", mainClass);
         }
@@ -343,7 +343,7 @@ public class FileUtils {
     }
 
     public static String createCheckerClass(Project project, String location, String name, Task task) {
-        String mainClass = CodeGenerationUtils.createCheckerStub(location, name, project, task);
+        String mainClass = CodeGenerationUtils.createCheckerStub(project, task, location, name);
         VirtualFile directory = FileUtils.createDirectoryIfMissing(project, location);
         writeTextFile(directory, name + ".java", mainClass);
         PsiDirectory psiDirectory = getPsiDirectory(project, location);
@@ -354,7 +354,7 @@ public class FileUtils {
     }
 
     public static String createTestClass(Project project, String location, String name, Task task) {
-        String mainClass = CodeGenerationUtils.createTestStub(location, name, project, task);
+        String mainClass = CodeGenerationUtils.createTestStub(project, task, location, name);
         VirtualFile directory = FileUtils.createDirectoryIfMissing(project, location);
         writeTextFile(directory, name + ".java", mainClass);
         PsiDirectory psiDirectory = getPsiDirectory(project, location);
@@ -375,19 +375,19 @@ public class FileUtils {
         return fqn;
     }
 
-    public static String createIfNeeded(Task task, String taskClass, Project project, String location) {
+    public static String createIfNeeded(Project project, Task task, String taskClass, String location) {
         if (taskClass.indexOf('.') == -1) {
-            taskClass = createTaskClass(task, project, location, taskClass);
+            taskClass = createTaskClass(project, task, location, taskClass);
         }
         return taskClass;
     }
 
     /**
-     * @param fqn     className
      * @param project
+     * @param fqn     className
      * @return
      */
-    public static VirtualFile getFileByFQN(String fqn, Project project) {
+    public static VirtualFile getFileByFQN(Project project, String fqn) {
         if (fqn == null)
             return null;
         PsiElement main = JavaPsiFacade.getInstance(project).findClass(fqn, GlobalSearchScope.allScope(project));

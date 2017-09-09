@@ -21,7 +21,7 @@ public class SelectOrCreateClass extends JPanel {
     public SelectOrCreateClass(String initialValue, final Project project, final Provider<String> locationProvider,
                                final FileCreator fileCreator) {
         super(new BorderLayout());
-        classSelector = new ClassSelector(initialValue, project);
+        classSelector = new ClassSelector(project, initialValue);
         create = new JButton("Create");
         create.setEnabled(fileCreator.isValid(initialValue));
         classSelector.addDocumentListener(new DocumentListener() {

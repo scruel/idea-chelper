@@ -9,7 +9,7 @@ import com.intellij.ui.JavaReferenceEditorUtil;
  * @author Egor Kulikov (egorku@yandex-team.ru)
  */
 public class ClassSelector extends EditorTextField {
-    public ClassSelector(String text, Project project) {
+    public ClassSelector(Project project, String text) {
         super(JavaReferenceEditorUtil.createDocument(text, project, true), project, StdFileTypes.JAVA);
     }
 }

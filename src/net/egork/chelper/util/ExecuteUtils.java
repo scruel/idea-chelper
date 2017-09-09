@@ -14,10 +14,10 @@ public class ExecuteUtils {
     }
 
     public static void executeStrictWriteAction(final Runnable action) {
-        executeStrictWriteAction(action, null);
+        executeStrictWriteAction(null, action);
     }
 
-    public static void executeStrictWriteAction(final Runnable runnable, final Project project) {
+    public static void executeStrictWriteAction(final Project project, final Runnable runnable) {
         final Application application = ApplicationManager.getApplication();
 
         if (application.isDispatchThread() && application.isWriteAccessAllowed()) {
@@ -36,10 +36,10 @@ public class ExecuteUtils {
     }
 
     public static void executeStrictWriteActionAndWait(final Runnable action) {
-        executeStrictWriteActionAndWait(action, null);
+        executeStrictWriteActionAndWait(null, action);
     }
 
-    public static void executeStrictWriteActionAndWait(final Runnable runnable, final Project project) {
+    public static void executeStrictWriteActionAndWait(final Project project, final Runnable runnable) {
         final Application application = ApplicationManager.getApplication();
 
         application.invokeAndWait(

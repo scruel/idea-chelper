@@ -29,7 +29,7 @@ public class TaskConfigurationEditor extends SettingsEditor<TaskConfiguration> {
             ProjectUtils.removeConfiguration(taskConfiguration);
             return;
         }
-        taskConfigurationPanel = new TaskConfigurationPanel(taskConfiguration.getConfiguration(), false, taskConfiguration.getProject(), null, null);
+        taskConfigurationPanel = new TaskConfigurationPanel(taskConfiguration.getProject(), taskConfiguration.getConfiguration(), false, null, null);
         wrapper.add(taskConfigurationPanel, BorderLayout.CENTER);
     }
 

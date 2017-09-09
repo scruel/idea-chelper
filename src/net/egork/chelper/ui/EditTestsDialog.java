@@ -37,7 +37,7 @@ public class EditTestsDialog extends JDialog {
     private JPanel outputPanel;
     private boolean updating = false;
 
-    public EditTestsDialog(Test[] tests, Project project) {
+    public EditTestsDialog(Project project, Test[] tests) {
         super(null, "Tests", ModalityType.APPLICATION_MODAL);
         setIconImage(ProjectUtils.iconToImage(IconLoader.getIcon("/icons/editTests.png")));
         setAlwaysOnTop(true);
@@ -260,8 +260,8 @@ public class EditTestsDialog extends JDialog {
 //        output.repaint();
     }
 
-    public static Test[] editTests(Test[] tests, Project project) {
-        EditTestsDialog dialog = new EditTestsDialog(tests, project);
+    public static Test[] editTests(Project project, Test[] tests) {
+        EditTestsDialog dialog = new EditTestsDialog(project, tests);
         dialog.setVisible(true);
         return dialog.tests.toArray(new Test[dialog.tests.size()]);
     }

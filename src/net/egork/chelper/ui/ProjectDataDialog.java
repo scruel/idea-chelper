@@ -44,8 +44,8 @@ public class ProjectDataDialog extends JDialog {
         enableUnitTests = new JCheckBox("Enable unit tests", data.enableUnitTests);
         failOnIntegerOverflowForNewTasks = new JCheckBox("Fail on integer overflow for new tasks", data.failOnIntegerOverflowForNewTasks);
         testDirectory = new DirectorySelector(project, data.testDirectory);
-        inputClass = new ClassSelector(data.inputClass, project);
-        outputClass = new ClassSelector(data.outputClass, project);
+        inputClass = new ClassSelector(project, data.inputClass);
+        outputClass = new ClassSelector(project, data.outputClass);
         excludePackages = new JTextField(ProjectData.join(data.excludedPackages));
         author = new JTextField(data.author);
         smartTesting = new JCheckBox("Use smart testing", data.smartTesting);
@@ -112,16 +112,16 @@ public class ProjectDataDialog extends JDialog {
     }
 
     private boolean isValidData(Project project) {
-        if (!FileUtils.isValidClass(ProjectDataDialog.this.inputClass.getText(), project)) {
+        if (!FileUtils.isValidClass(project, ProjectDataDialog.this.inputClass.getText())) {
             Messenger.publishMessageWithBalloon(project, inputClass, "invalid inputClass!", MessageType.ERROR);
             return false;
         }
-        if (!FileUtils.isValidClass(ProjectDataDialog.this.outputClass.getText(), project)) {
+        if (!FileUtils.isValidClass(project, ProjectDataDialog.this.outputClass.getText())) {
             Messenger.publishMessageWithBalloon(project, outputClass, "invalid outputClass!", MessageType.ERROR);
             return false;
         }
 
-        if (!FileUtils.isValiDirectory(ProjectDataDialog.this.defaultDirectory.getText(), project)) {
+        if (!FileUtils.isValiDirectory(project, ProjectDataDialog.this.defaultDirectory.getText())) {
             Messenger.publishMessageWithBalloon(project, defaultDirectory.getTextField(), "invalid defaultDirectory!", MessageType.ERROR);
             return false;
         }

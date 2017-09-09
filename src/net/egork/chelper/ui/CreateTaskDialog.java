@@ -22,7 +22,7 @@ public class CreateTaskDialog extends JDialog {
     private JButton basicAdvanced;
     private TaskConfigurationPanel panel;
 
-    public CreateTaskDialog(Task task, boolean canEditName, Project project) {
+    public CreateTaskDialog(Project project, Task task, boolean canEditName) {
         super(null, "Task", ModalityType.APPLICATION_MODAL);
         setIconImage(ProjectUtils.iconToImage(IconLoader.getIcon("/icons/newTask.png")));
         setAlwaysOnTop(true);
@@ -54,7 +54,7 @@ public class CreateTaskDialog extends JDialog {
                 pack();
             }
         });
-        panel = new TaskConfigurationPanel(task, canEditName, project, new TaskConfigurationPanel.SizeChangeListener() {
+        panel = new TaskConfigurationPanel(project, task, canEditName, new TaskConfigurationPanel.SizeChangeListener() {
             public void onSizeChanged() {
                 pack();
             }
@@ -79,11 +79,11 @@ public class CreateTaskDialog extends JDialog {
             Task.getDateString(), defaultTask.contestName, defaultTask.truncate, data.inputClass, data.outputClass,
             defaultTask.includeLocale,
             data.failOnIntegerOverflowForNewTasks, defaultTask.template);
-        CreateTaskDialog dialog = new CreateTaskDialog(task, allowNameChange, project);
+        CreateTaskDialog dialog = new CreateTaskDialog(project, task, allowNameChange);
         dialog.setVisible(true);
         ProjectUtils.updateDefaultTask(dialog.task);
         if (dialog.task != null)
-            dialog.task = dialog.task.setTaskClass(FileUtils.createIfNeeded(dialog.task, dialog.task.taskClass, project, dialog.task.location));
+            dialog.task = dialog.task.setTaskClass(FileUtils.createIfNeeded(project, dialog.task, dialog.task.taskClass, dialog.task.location));
         return dialog.task;
     }
 

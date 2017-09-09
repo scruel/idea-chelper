@@ -37,7 +37,7 @@ import java.util.InputMismatchException;
 public class TaskConfiguration extends ModuleBasedConfiguration<JavaRunConfigurationModule> {
     private Task configuration;
 
-    public TaskConfiguration(String name, Project project, Task configuration, ConfigurationFactory factory) {
+    public TaskConfiguration(Project project, String name, Task configuration, ConfigurationFactory factory) {
         super(name, new JavaRunConfigurationModule(project, false), factory);
         this.configuration = configuration;
         saveConfiguration(configuration);
@@ -50,7 +50,7 @@ public class TaskConfiguration extends ModuleBasedConfiguration<JavaRunConfigura
 
     @Override
     protected ModuleBasedConfiguration createInstance() {
-        return new TaskConfiguration(getName(), getProject(), configuration, getFactory());
+        return new TaskConfiguration(getProject(), getName(), configuration, getFactory());
     }
 
     @Override
@@ -64,7 +64,7 @@ public class TaskConfiguration extends ModuleBasedConfiguration<JavaRunConfigura
 
     public RunProfileState getState(@NotNull Executor executor, @NotNull ExecutionEnvironment env)
         throws ExecutionException {
-        TaskUtils.createSourceFile(configuration, getProject());
+        TaskUtils.createSourceFile(getProject(), configuration);
         JavaCommandLineState state = new JavaCommandLineState(env) {
             @Override
             protected JavaParameters createJavaParameters() throws ExecutionException {
@@ -148,7 +148,7 @@ public class TaskConfiguration extends ModuleBasedConfiguration<JavaRunConfigura
         String fileName = element.getChildText("taskConf");
         if (fileName != null && fileName.trim().length() != 0) {
             try {
-                configuration = FileUtils.readTask(fileName, getProject());
+                configuration = FileUtils.readTask(getProject(), fileName);
             } catch (NullPointerException ignored) {
             }
         }

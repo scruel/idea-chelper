@@ -25,7 +25,7 @@ public class TestClassesDialog extends JDialog {
     private FileCreator fileCreator;
     private final int width = new JTextField(20).getPreferredSize().width;
 
-    public TestClassesDialog(String[] testClasses, final Project project, final String location, FileCreator fileCreator, final String baseName) {
+    public TestClassesDialog(final Project project, String[] testClasses, final String location, FileCreator fileCreator, final String baseName) {
         super(null, "Test classes", ModalityType.APPLICATION_MODAL);
         this.fileCreator = fileCreator;
         setIconImage(ProjectUtils.iconToImage(IconLoader.getIcon("/icons/check.png")));
@@ -57,12 +57,12 @@ public class TestClassesDialog extends JDialog {
         buttonPanel.add(main.getCancelButton());
         classesPanel = new JPanel(new VerticalFlowLayout());
         for (String testClass : testClasses)
-            panels.add(new TestClassPanel(testClass, project, location));
+            panels.add(new TestClassPanel(project, testClass, location));
         JButton add = new JButton("Add");
         buttonPanel.add(add, BorderLayout.WEST);
         add.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                panels.add(new TestClassPanel(baseName + "TestCase" + panels.size(), project, location));
+                panels.add(new TestClassPanel(project, baseName + "TestCase" + panels.size(), location));
                 rebuild();
             }
         });
@@ -81,8 +81,8 @@ public class TestClassesDialog extends JDialog {
         return testClasses;
     }
 
-    public static String[] showDialog(String[] testClasses, Project project, String location, FileCreator fileCreator, String baseName) {
-        TestClassesDialog dialog = new TestClassesDialog(testClasses, project, location, fileCreator, baseName);
+    public static String[] showDialog(Project project, String[] testClasses, String location, FileCreator fileCreator, String baseName) {
+        TestClassesDialog dialog = new TestClassesDialog(project, testClasses, location, fileCreator, baseName);
         dialog.setVisible(true);
         return dialog.testClasses;
     }
@@ -90,7 +90,7 @@ public class TestClassesDialog extends JDialog {
     private class TestClassPanel extends JPanel {
         private SelectOrCreateClass selector;
 
-        private TestClassPanel(String testClass, Project project, final String location) {
+        private TestClassPanel(Project project, String testClass, final String location) {
             super(new BorderLayout());
             selector = new SelectOrCreateClass(testClass, project, new Provider<String>() {
                 public String provide() {

@@ -49,11 +49,11 @@ public class AutoSwitcher implements ProjectComponent {
     }
 
     public void projectOpened() {
-        addSelectedConfigurationListener();
-        addFileEditorListeners();
+        addAutoSwitchFileListener();
+        addAutoSwitchConfListener();
     }
 
-    private void addSelectedConfigurationListener() {
+    private void addAutoSwitchFileListener() {
         RunManagerImpl.getInstanceImpl(project).addRunManagerListener(new RunManagerAdapter() {
             public void runConfigurationSelected() {
                 RunnerAndConfigurationSettings selectedConfiguration =
@@ -68,9 +68,9 @@ public class AutoSwitcher implements ProjectComponent {
                 busy = true;
                 VirtualFile toOpen = null;
                 if (configuration instanceof TopCoderConfiguration)
-                    toOpen = TaskUtils.getFile(ProjectUtils.getData(project).defaultDirectory, ((TopCoderConfiguration) configuration).getConfiguration().name, project);
+                    toOpen = TaskUtils.getFile(project, ((TopCoderConfiguration) configuration).getConfiguration().name, ProjectUtils.getData(project).defaultDirectory);
                 else if (configuration instanceof TaskConfiguration)
-                    toOpen = FileUtils.getFileByFQN(((TaskConfiguration) configuration).getConfiguration().taskClass, configuration.getProject());
+                    toOpen = FileUtils.getFileByFQN(configuration.getProject(), ((TaskConfiguration) configuration).getConfiguration().taskClass);
 
                 if (toOpen != null) {
                     final VirtualFile finalToOpen = toOpen;
@@ -86,7 +86,7 @@ public class AutoSwitcher implements ProjectComponent {
         });
     }
 
-    private void addFileEditorListeners() {
+    private void addAutoSwitchConfListener() {
         MessageBus messageBus = project.getMessageBus();
         messageBus.connect().subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileEditorManagerListener() {
             @Override
@@ -112,9 +112,9 @@ public class AutoSwitcher implements ProjectComponent {
                         RunManagerImpl runManager = RunManagerImpl.getInstanceImpl(project);
 
                         Map<String, Object> taskMap;
-                        if (null == (taskMap = TaskUtils.getTaskMapWitFile(file, project))) return;
+                        if (null == (taskMap = TaskUtils.getTaskMapWitFile(project, file))) return;
 
-                        RunConfiguration configuration = TaskUtils.GetConfigurationSettingsByDataFile(project, runManager,
+                        RunConfiguration configuration = TaskUtils.GetConfSettingsBySourceFile(project, runManager,
                             (VirtualFile) taskMap.get(TaskBase.TASK_SOURCE_KEY));
                         if (configuration != null) {
                             busy = true;
@@ -135,9 +135,9 @@ public class AutoSwitcher implements ProjectComponent {
                     private void repairAndConfigureTask(Map<String, Object> taskMap) {
                         TaskBase task = (TaskBase) taskMap.get(TaskBase.TASK_KEY);
                         VirtualFile taskFile = (VirtualFile) taskMap.get(TaskBase.TASK_SOURCE_KEY);
-                        task = TaskUtils.fixedTaskByPath(task, project, taskFile);
+                        task = TaskUtils.fixedTaskByPath(project, task, taskFile);
                         busy = true;
-                        ProjectUtils.createConfiguration(task, true, project);
+                        ProjectUtils.createConfiguration(project, task, true);
                         busy = false;
                     }
                 };

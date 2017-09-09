@@ -53,7 +53,7 @@ public class TaskConfigurationPanel extends JPanel {
     private int panelWidth = new JTextField(27).getPreferredSize().width;
     private JCheckBox includeLocale;
 
-    public TaskConfigurationPanel(final Task task, boolean firstEdit, final Project project, final SizeChangeListener listener, JPanel buttonPanel) {
+    public TaskConfigurationPanel(final Project project, final Task task, boolean firstEdit, final SizeChangeListener listener, JPanel buttonPanel) {
         super(new BorderLayout(5, 5));
         this.task = task;
         this.project = project;
@@ -134,7 +134,7 @@ public class TaskConfigurationPanel extends JPanel {
         tests.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 TaskConfigurationPanel.this.task = TaskConfigurationPanel.this.task.setTests(
-                    EditTestsDialog.editTests(TaskConfigurationPanel.this.task.tests, TaskConfigurationPanel.this.project));
+                    EditTestsDialog.editTests(TaskConfigurationPanel.this.project, TaskConfigurationPanel.this.task.tests));
                 name.setText(name.getText());
             }
         });
@@ -164,7 +164,7 @@ public class TaskConfigurationPanel extends JPanel {
         };
         taskClass = new SelectOrCreateClass(task.taskClass, project, locationProvider, new FileCreator() {
             public String createFile(Project project, String path, String name) {
-                return FileUtils.createTaskClass(task, project, path, name);
+                return FileUtils.createTaskClass(project, task, path, name);
             }
 
             public boolean isValid(String name) {

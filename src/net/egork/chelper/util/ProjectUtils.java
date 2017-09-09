@@ -93,7 +93,7 @@ public class ProjectUtils {
                             ExecuteUtils.executeStrictWriteAction(new Runnable() {
                                 @Override
                                 public void run() {
-                                    ProjectUtils.removeConfiguration(TaskUtils.GetConfigurationSettingsByDataFile(project, event.getFile()));
+                                    ProjectUtils.removeConfiguration(TaskUtils.GetConfSettingsBySourceFile(project, event.getFile()));
                                 }
                             });
 
@@ -218,7 +218,7 @@ public class ProjectUtils {
     }
 
 
-    public static RunnerAndConfigurationSettings createConfiguration(TaskBase task, boolean setActive, Project project) {
+    public static RunnerAndConfigurationSettings createConfiguration(Project project, TaskBase task, boolean setActive) {
         RunManagerImpl manager = RunManagerImpl.getInstanceImpl(project);
         RunnerAndConfigurationSettings old = manager.findConfigurationByName(task.name);
         if (old != null) {
@@ -227,11 +227,11 @@ public class ProjectUtils {
         RunnerAndConfigurationSettings configuration = null;
         if (task instanceof Task) {
             configuration = new RunnerAndConfigurationSettingsImpl(manager,
-                new TaskConfiguration(task.name, project, (Task) task,
+                new TaskConfiguration(project, task.name, (Task) task,
                     TaskConfigurationType.INSTANCE.getConfigurationFactories()[0]), false);
         } else if (task instanceof TopCoderTask) {
             configuration = new RunnerAndConfigurationSettingsImpl(manager,
-                new TopCoderConfiguration(task.name, project, (TopCoderTask) task,
+                new TopCoderConfiguration(project, task.name, (TopCoderTask) task,
                     TopCoderConfigurationType.INSTANCE.getConfigurationFactories()[0]), false);
         }
         manager.addConfiguration(configuration, false);

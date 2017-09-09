@@ -22,7 +22,7 @@ public class NewTaskAction extends CreateElementActionBase {
         Task task = CreateTaskDialog.showDialog(psiDirectory, s, template, allowNameChange);
         if (task == null)
             return PsiElement.EMPTY_ARRAY;
-        Task oldTask = FileUtils.readTask(task.location + "/" + ArchiveAction.canonize(task.name) + ".task", psiDirectory.getProject());
+        Task oldTask = FileUtils.readTask(psiDirectory.getProject(), task.location + "/" + ArchiveAction.canonize(task.name) + ".task");
         if (oldTask != null) {
             task = oldTask;
         }
@@ -33,7 +33,7 @@ public class NewTaskAction extends CreateElementActionBase {
             return PsiElement.EMPTY_ARRAY;
         }
 
-        ProjectUtils.createConfiguration(task, true, psiDirectory.getProject());
+        ProjectUtils.createConfiguration(psiDirectory.getProject(), task, true);
         return new PsiElement[]{main};
     }
 

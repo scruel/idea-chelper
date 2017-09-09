@@ -25,7 +25,7 @@ public class ParseContestAction extends AnAction {
         PsiElement firstElement = null;
         for (Task task : tasks) {
             PsiElement element = JavaPsiFacade.getInstance(project).findClass(task.taskClass, GlobalSearchScope.allScope(project));
-            ProjectUtils.createConfiguration(task, firstConfiguration, project);
+            ProjectUtils.createConfiguration(project, task, firstConfiguration);
             firstConfiguration = false;
             if (firstElement == null)
                 firstElement = element;

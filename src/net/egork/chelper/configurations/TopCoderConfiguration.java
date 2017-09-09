@@ -36,7 +36,7 @@ import java.util.InputMismatchException;
 public class TopCoderConfiguration extends ModuleBasedConfiguration<JavaRunConfigurationModule> {
     private TopCoderTask configuration;
 
-    public TopCoderConfiguration(String name, Project project, TopCoderTask configuration, ConfigurationFactory factory) {
+    public TopCoderConfiguration(Project project, String name, TopCoderTask configuration, ConfigurationFactory factory) {
         super(name, new JavaRunConfigurationModule(project, false), factory);
         this.configuration = configuration;
         saveConfiguration(configuration);
@@ -54,7 +54,7 @@ public class TopCoderConfiguration extends ModuleBasedConfiguration<JavaRunConfi
 
     @Override
     protected ModuleBasedConfiguration createInstance() {
-        return new TopCoderConfiguration(getName(), getProject(), configuration, getFactory());
+        return new TopCoderConfiguration(getProject(), getName(), configuration, getFactory());
     }
 
     public SettingsEditor<? extends RunConfiguration> getConfigurationEditor() {
@@ -63,7 +63,7 @@ public class TopCoderConfiguration extends ModuleBasedConfiguration<JavaRunConfi
 
     public RunProfileState getState(@NotNull Executor executor, @NotNull ExecutionEnvironment env)
         throws ExecutionException {
-        SolutionGenerator.createSourceFile(configuration, getProject());
+        SolutionGenerator.createSourceFile(getProject(), configuration);
         JavaCommandLineState state = new JavaCommandLineState(env) {
             @Override
             protected JavaParameters createJavaParameters() throws ExecutionException {
@@ -137,7 +137,7 @@ public class TopCoderConfiguration extends ModuleBasedConfiguration<JavaRunConfi
         String fileName = element.getChildText("taskConf");
         if (fileName != null && fileName.trim().length() != 0) {
             try {
-                configuration = FileUtils.readTopCoderTask(fileName, getProject());
+                configuration = FileUtils.readTopCoderTask(getProject(), fileName);
             } catch (NullPointerException ignored) {
             }
         }

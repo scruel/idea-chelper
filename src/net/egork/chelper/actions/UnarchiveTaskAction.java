@@ -106,7 +106,7 @@ public class UnarchiveTaskAction extends AnAction {
                                     FileUtils.writeTextFile(baseDirectory, className + ".java", fileContent);
                                 }
                             }
-                            ProjectUtils.createConfiguration(task, true, project);
+                            ProjectUtils.createConfiguration(project, task, true);
                         } else if ("tctask".equals(taskFile.getExtension())) {
                             TopCoderTask task = TopCoderTask.load(new InputReader(taskFile.getInputStream()));
                             VirtualFile baseDirectory = FileUtils.getFile(project, ProjectUtils.getData(project).defaultDirectory);
@@ -130,7 +130,7 @@ public class UnarchiveTaskAction extends AnAction {
                                 if (file != null)
                                     FileUtils.writeTextFile(baseDirectory, className + ".java", FileUtils.readTextFile(file));
                             }
-                            ProjectUtils.createConfiguration(task, true, project);
+                            ProjectUtils.createConfiguration(project, task, true);
                         }
                     }
                 } catch (IOException e) {

@@ -28,7 +28,7 @@ public class CodeGenerationUtils {
     private CodeGenerationUtils() {
     }
 
-    public static String createCheckerStub(String location, String name, Project project, Task task) {
+    public static String createCheckerStub(Project project, Task task, String location, String name) {
         PsiDirectory directory = FileUtils.getPsiDirectory(project, location);
         String inputClass = task.inputClass;
         String inputClassShort = inputClass.substring(inputClass.lastIndexOf('.') + 1);
@@ -40,7 +40,7 @@ public class CodeGenerationUtils {
             inputClass, "OutputClass", outputClassShort, "OutputClassFQN", outputClass, "CheckerClass", name);
     }
 
-    public static String createStub(Task task, String location, String name, Project project) {
+    public static String createStub(Project project, Task task, String location, String name) {
         PsiDirectory directory = FileUtils.getPsiDirectory(project, location);
         String inputClass = task.inputClass;
         String inputClassShort = inputClass.substring(inputClass.lastIndexOf('.') + 1);
@@ -160,7 +160,7 @@ public class CodeGenerationUtils {
         return template;
     }
 
-    public static void createUnitTest(TaskBase task, final Project project) {
+    public static void createUnitTest(final Project project, TaskBase task) {
         if (!ProjectUtils.getData(project).enableUnitTests)
             return;
         TestBase[] tests = task.tests;
@@ -313,7 +313,7 @@ public class CodeGenerationUtils {
         return sourceFile;
     }
 
-    public static String createTestStub(String location, String name, Project project, Task task) {
+    public static String createTestStub(Project project, Task task, String location, String name) {
         PsiDirectory directory = FileUtils.getPsiDirectory(project, location);
         String inputClass = task.inputClass;
         String inputClassShort = inputClass.substring(inputClass.lastIndexOf('.') + 1);
@@ -325,7 +325,7 @@ public class CodeGenerationUtils {
             inputClass, "OutputClass", outputClassShort, "OutputClassFQN", outputClass, "TestCaseClass", name);
     }
 
-    public static String createTopCoderStub(TopCoderTask task, Project project, String packageName) {
+    public static String createTopCoderStub(Project project, TopCoderTask task, String packageName) {
         String template = createTopCoderTaskTemplateIfNeeded(project);
         StringBuilder signature = new StringBuilder();
         signature.append(task.signature.result.getSimpleName()).append(" ").append(task.signature.name).append("(");

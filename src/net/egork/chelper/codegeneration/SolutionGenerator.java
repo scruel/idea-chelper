@@ -429,7 +429,7 @@ public class SolutionGenerator {
         return true;
     }
 
-    public static MainFileTemplate createMainClassTemplate(Task task, Project project) {
+    public static MainFileTemplate createMainClassTemplate(Project project, Task task) {
         StringBuilder builder = new StringBuilder();
         builder.append("%IMPORTS%\n");
         builder.append("/**\n" +
@@ -540,7 +540,7 @@ public class SolutionGenerator {
         return new MainFileTemplate(builder.toString(), entryPoints, toImport);
     }
 
-    public static void createSourceFile(final TaskBase task, final Project project) {
+    public static void createSourceFile(final Project project, final TaskBase task) {
         ApplicationManager.getApplication().runWriteAction(new Runnable() {
             @Override
             public void run() {
@@ -560,7 +560,7 @@ public class SolutionGenerator {
                 VirtualFile file = null;
                 if (task instanceof Task) {
                     SolutionGenerator generator = new SolutionGenerator(new HashSet<String>(Arrays.asList(ProjectUtils.getData(project).excludedPackages)),
-                        createMainClassTemplate((Task) task, project), true, MainFileTemplate.getMethod(project, ((Task) task).taskClass, "solve", "void", "int", ((Task) task).inputClass, ((Task) task).outputClass));
+                        createMainClassTemplate(project, (Task) task), true, MainFileTemplate.getMethod(project, ((Task) task).taskClass, "solve", "void", "int", ((Task) task).inputClass, ((Task) task).outputClass));
                     String source = generator.createInlinedSource();
                     file = FileUtils.writeTextFile(directory, ((Task) task).mainClass + ".java", source);
                 } else if (task instanceof TopCoderTask) {

@@ -30,11 +30,11 @@ public class EditTestsAction extends AnAction {
         if (configuration instanceof TaskConfiguration) {
             TaskConfiguration taskConfiguration = (TaskConfiguration) configuration;
             Task task = taskConfiguration.getConfiguration();
-            taskConfiguration.setConfiguration(task.setTests(EditTestsDialog.editTests(task.tests, project)));
+            taskConfiguration.setConfiguration(task.setTests(EditTestsDialog.editTests(project, task.tests)));
         } else if (configuration instanceof TopCoderConfiguration) {
             TopCoderConfiguration taskConfiguration = (TopCoderConfiguration) configuration;
             TopCoderTask task = taskConfiguration.getConfiguration();
-            taskConfiguration.setConfiguration(task.setTests(TopCoderEditTestsDialog.editTests(task, project)));
+            taskConfiguration.setConfiguration(task.setTests(TopCoderEditTestsDialog.editTests(project, task)));
         }
     }
 }
