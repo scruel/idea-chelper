@@ -7,6 +7,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
+import net.egork.chelper.exception.TaskCorruptException;
 import net.egork.chelper.task.StreamConfiguration;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.task.TaskBase;
@@ -407,6 +408,9 @@ public class SolutionGenerator {
     }
 
     private boolean shouldAddElement(PsiElement element) {
+        if (element == null) {
+            throw new TaskCorruptException("configuration corrupt.");
+        }
         PsiClass containingClass = element instanceof PsiClass ? (PsiClass) element : ((PsiMember) element).getContainingClass();
         if (containingClass == null) {
             //TODO

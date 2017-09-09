@@ -11,6 +11,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vfs.VirtualFile;
 import net.egork.chelper.codegeneration.CodeGenerationUtils;
+import net.egork.chelper.exception.TaskCorruptException;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.task.TopCoderTask;
 import net.egork.chelper.util.*;
@@ -49,6 +50,9 @@ public class UnarchiveTaskAction extends AnAction {
                     for (VirtualFile taskFile : files) {
                         if ("task".equals(taskFile.getExtension())) {
                             Task task = Task.loadTask(new InputReader(taskFile.getInputStream()));
+                            if (task == null) {
+                                throw new TaskCorruptException();
+                            }
                             VirtualFile baseDirectory = FileUtils.getFile(project, task.location);
                             if (baseDirectory == null) {
                                 Messenger.publishMessage("Directory where task was located is no longer exists",

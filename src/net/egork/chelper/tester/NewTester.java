@@ -1,6 +1,7 @@
 package net.egork.chelper.tester;
 
 import net.egork.chelper.checkers.Checker;
+import net.egork.chelper.exception.TaskCorruptException;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.task.test.Test;
 import net.egork.chelper.task.test.TestType;
@@ -40,6 +41,9 @@ public class NewTester {
             throw new RuntimeException(e);
         }
         Task task = Task.loadTask(input);
+        if (task == null) {
+            throw new TaskCorruptException();
+        }
         String readerFQN = task.inputClass;
         String fqn = task.taskClass;
         List<Test> tests = new ArrayList<Test>(Arrays.asList(task.tests));
