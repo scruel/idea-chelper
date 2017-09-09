@@ -1,9 +1,9 @@
 <!--suppress ALL -->
 <idea-plugin>
   <name>CHelper</name>
-  <version>4.2.3</version>
+  <version>4.3.0</version>
   <vendor>Egor Kulikov</vendor>
-  <idea-version since-build="162"/>
+  <idea-version since-build="139.0"/>
 
   <description>
     <![CDATA[
