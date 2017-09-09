@@ -6,6 +6,7 @@ import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.text.StringUtilRt;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
@@ -27,6 +28,38 @@ import java.util.Properties;
 public class FileUtils {
     private FileUtils() {
     }
+
+    public static boolean deleteTaskIfExists(final PsiFile psiFile) {
+        if (psiFile == null) {
+            return false;
+        }
+        ExecuteUtils.executeStrictWriteActionAndWait(new Runnable() {
+            @Override
+            public void run() {
+                PsiFile _psiFile = psiFile;
+//            res = Files.deleteIfExists(file.toPath());
+                String nameWithOutExtension = _psiFile.getName();
+                int i = StringUtilRt.lastIndexOf(nameWithOutExtension, '.', 0, nameWithOutExtension.length());
+                nameWithOutExtension = i < 0 ? nameWithOutExtension : nameWithOutExtension.substring(0, i);
+                PsiDirectory parentFile = _psiFile.getParent();
+                if (parentFile != null) {
+                    _psiFile = parentFile.findFile(nameWithOutExtension + ".java");
+                    if (_psiFile != null) {
+                        _psiFile.delete();
+                    }
+                    _psiFile = parentFile.findFile(nameWithOutExtension + ".task");
+                    if (_psiFile != null) {
+                        _psiFile.delete();
+                    }
+                }
+//                Messenger.publishMessage("Unable to delete file " + _psiFile.getVirtualFile().getPath(),NotificationType.ERROR);
+
+
+            }
+        });
+        return true;
+    }
+
 
     public static Properties loadProperties(VirtualFile file) {
         InputStream is = getInputStream(file);

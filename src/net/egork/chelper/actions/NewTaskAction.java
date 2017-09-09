@@ -16,6 +16,27 @@ import org.jetbrains.annotations.NotNull;
  * @author Egor Kulikov (kulikov@devexperts.com)
  */
 public class NewTaskAction extends CreateElementActionBase {
+    public static PsiElement[] createTask(String s, PsiDirectory psiDirectory, Task template, boolean allowNameChange) {
+        if (!FileUtils.isJavaDirectory(psiDirectory))
+            return PsiElement.EMPTY_ARRAY;
+        Task task = CreateTaskDialog.showDialog(psiDirectory, s, template, allowNameChange);
+        if (task == null)
+            return PsiElement.EMPTY_ARRAY;
+        Task oldTask = FileUtils.readTask(task.location + "/" + ArchiveAction.canonize(task.name) + ".task", psiDirectory.getProject());
+        if (oldTask != null) {
+            task = oldTask;
+        }
+
+        PsiElement main = ProjectUtils.getPsiElement(psiDirectory.getProject(), task.taskClass);
+        if (main == null) {
+            FileUtils.deleteTaskIfExists(FileUtils.getPsiFile(psiDirectory.getProject(), task.location + "/" + ArchiveAction.canonize(task.name) + ".java"));
+            return PsiElement.EMPTY_ARRAY;
+        }
+
+        ProjectUtils.createConfiguration(task, true, psiDirectory.getProject());
+        return new PsiElement[]{main};
+    }
+
     @NotNull
     @Override
     protected PsiElement[] invokeDialog(Project project, PsiDirectory psiDirectory) {
@@ -29,19 +50,6 @@ public class NewTaskAction extends CreateElementActionBase {
     @Override
     protected PsiElement[] create(String s, PsiDirectory psiDirectory) {
         return createTask(s, psiDirectory, null, true);
-    }
-
-    public static PsiElement[] createTask(String s, PsiDirectory psiDirectory, Task template, boolean allowNameChange) {
-        if (!FileUtils.isJavaDirectory(psiDirectory))
-            return PsiElement.EMPTY_ARRAY;
-        Task task = CreateTaskDialog.showDialog(psiDirectory, s, template, allowNameChange);
-        if (task == null)
-            return PsiElement.EMPTY_ARRAY;
-        PsiElement main = ProjectUtils.getPsiElement(psiDirectory.getProject(), task.taskClass);
-        if (main == null)
-            return PsiElement.EMPTY_ARRAY;
-        ProjectUtils.createConfiguration(task, true, psiDirectory.getProject());
-        return new PsiElement[]{main};
     }
 
     @Override
