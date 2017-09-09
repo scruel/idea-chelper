@@ -16,6 +16,7 @@ import java.util.*;
 /**
  * @author Egor Kulikov (kulikov@devexperts.com)
  */
+@SuppressWarnings("unchecked")
 public class NewTester {
     public static void main(String[] args) throws InterruptedException, InvocationTargetException,
         ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException {
@@ -97,7 +98,7 @@ public class NewTester {
                 Verdict checkResult = check(checkerClass, test.input, test.output, result, task.checkerParameters);
                 verdicts.add(checkResult);
                 System.out.print(checkResult);
-                System.out.printf(" in %.3f s.\n", time / 1000.);
+                System.out.printf(" in %.3f s.%n", time / 1000.);
                 if (checkResult.type != Verdict.VerdictType.OK && checkResult.type != Verdict.VerdictType.UNDECIDED)
                     ok = false;
             } catch (Throwable e) {
@@ -113,7 +114,7 @@ public class NewTester {
         System.out.println("==================================================================");
         System.out.println("Test results:");
         if (ok) {
-            System.out.printf("All test passed input %.3f s.\n", maximalTime / 1000.);
+            System.out.printf("All test passed input %.3f s.%n", maximalTime / 1000.);
             if (singleTest != -1)
                 return test(args[0]);
         } else {
@@ -151,7 +152,6 @@ public class NewTester {
     private static Verdict check(Class checkerClass, String input, String expectedOutput,
                                  String actualOutput, String checkerParameters)
         throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException {
-        Method check = checkerClass.getMethod("check", String.class, String.class, String.class);
         Checker checker = (Checker) checkerClass.getConstructor(String.class).newInstance(checkerParameters);
         return checker.check(input, expectedOutput, actualOutput);
     }

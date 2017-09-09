@@ -429,7 +429,7 @@ public class SolutionGenerator {
         StringBuilder builder = new StringBuilder();
         builder.append("%IMPORTS%\n");
         builder.append("/**\n" +
-            " * Built using CHelper plug-in\n" +
+            " * Built using " + ProjectUtils.PROJECT_NAME + " plug-in\n" +
             " * Actual solution is at the top\n");
         String author = ProjectUtils.getData(project).author;
         if (!author.isEmpty()) {
@@ -578,7 +578,9 @@ public class SolutionGenerator {
                 } else {
                     String source = FileUtils.readTextFile(file);
                     VirtualFile virtualFile = FileUtils.writeTextFile(LocalFileSystem.getInstance().findFileByPath(System.getProperty("user.home")), ".java", source);
-                    new File(virtualFile.getCanonicalPath()).deleteOnExit();
+                    String path = virtualFile.getCanonicalPath();
+                    if (path == null) return;
+                    new File(path).deleteOnExit();
                 }
             }
         });

@@ -16,6 +16,7 @@ import java.util.*;
 /**
  * @author Egor Kulikov (kulikov@devexperts.com)
  */
+@SuppressWarnings("unckecked")
 public class NewTopCoderTester {
     public static void main(String[] args)
         throws InterruptedException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException,
@@ -88,7 +89,7 @@ public class NewTopCoderTester {
                 Verdict checkResult = check(actual, test.result, task.signature.result);
                 verdicts.add(checkResult);
                 System.out.print(checkResult);
-                System.out.printf(" in %.3f s.\n", time / 1000.);
+                System.out.printf(" in %.3f s.%n", time / 1000.);
                 if (checkResult.type != Verdict.VerdictType.OK && checkResult.type != Verdict.VerdictType.UNDECIDED)
                     ok = false;
             } catch (Throwable e) {
@@ -104,7 +105,7 @@ public class NewTopCoderTester {
         System.out.println("==================================================================");
         System.out.println("Test results:");
         if (ok) {
-            System.out.printf("All test passed in %.3f s.\n", maximalTime / 1000.);
+            System.out.printf("All test passed in %.3f s.%n", maximalTime / 1000.);
             if (singleTest != -1)
                 return test(args[0]);
         } else {

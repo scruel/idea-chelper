@@ -169,8 +169,8 @@ public class VariableGridLayout extends GridLayout {
      * @see Container
      */
     public void layoutContainer(Container parent) {
-        Insets insets = parent.insets();
-        int ncomponents = parent.countComponents();
+        Insets insets = parent.getInsets();
+        int ncomponents = parent.getComponentCount();
         int nrows = rows;
         int ncols = cols;
 
@@ -187,7 +187,7 @@ public class VariableGridLayout extends GridLayout {
             stdColFractions(ncols);
         }
 
-        Dimension size = parent.size();
+        Dimension size = parent.getSize();
         int w = size.width - (insets.left + insets.right);
         int h = size.height - (insets.top + insets.bottom);
 
@@ -203,7 +203,7 @@ public class VariableGridLayout extends GridLayout {
                 int rowHeight = (int) (getRowFraction(r) * h);
 
                 if (i < ncomponents) {
-                    parent.getComponent(i).reshape(x, y, colWidth, rowHeight);
+                    parent.getComponent(i).setBounds(x, y, colWidth, rowHeight);
                 }
                 y += rowHeight + vgap;
             }
@@ -212,12 +212,12 @@ public class VariableGridLayout extends GridLayout {
     }
 
     static String fracsToString(double array[]) {
-        String result = "[" + array.length + "]";
+        StringBuilder result = new StringBuilder("[" + array.length + "]");
 
         for (int i = 0; i < array.length; i++) {
-            result += "<" + array[i] + ">";
+            result.append("<").append(array[i]).append(">");
         }
-        return result;
+        return result.toString();
     }
 
     /**

@@ -225,6 +225,7 @@ public class FileUtils {
                 while ((s = reader.readLine()) != null) {
                     builder.append(s).append('\n');
                 }
+                reader.close();
                 return new String(builder.toString().getBytes("UTF-8"), "UTF-8");
             } catch (IOException ignored) {
             }

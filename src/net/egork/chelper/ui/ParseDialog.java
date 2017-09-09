@@ -36,6 +36,7 @@ import java.util.List;
 /**
  * @author Egor Kulikov (kulikov@devexperts.com)
  */
+@SuppressWarnings("unchecked")
 public class ParseDialog extends JDialog {
     private Collection<Task> result = Collections.emptyList();
     private JBList contestList;
@@ -291,7 +292,7 @@ public class ParseDialog extends JDialog {
         return dialog.result;
     }
 
-    private class ParseListModel extends AbstractListModel {
+    private static class ParseListModel extends AbstractListModel {
         private List<Description> list = new ArrayList<Description>();
 
         public int getSize() {

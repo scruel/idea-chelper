@@ -29,7 +29,7 @@ public class RCCParser implements Parser {
     }
 
     public void getContests(DescriptionReceiver receiver) {
-        int currentRound = -1;
+        int currentRound;
         String currentPage = FileUtils.getWebPageContent("http://russiancodecup.ru/en/championship/", "UTF-8");
         StringParser parser = new StringParser(currentPage);
         List<Integer> championshipIDs = new ArrayList<Integer>();
@@ -129,7 +129,6 @@ public class RCCParser implements Parser {
             parser.advance(true, "<div class=\"container\">");
             String name = parser.advance(false, "</div>", "<span>").trim();
             char letter = name.charAt(1);
-            String taskName = letter + " - " + name.substring(4);
             parser.advance(true, "<span class=\"iconSmall isMemory\">");
             parser.advance(true, "<td>");
             String memoryLimit = parser.advance(false, " ");

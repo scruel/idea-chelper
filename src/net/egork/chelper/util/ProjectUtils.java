@@ -114,7 +114,7 @@ public class ProjectUtils {
         LibraryTable table = ProjectLibraryTable.getInstance(project);
         String path = TopCoderAction.getJarPathForClass(NewTester.class);
         if (path == null) {
-            throw new RuntimeException("Could not find CHelper jar!");
+            throw new RuntimeException("Could not find " + ProjectUtils.PROJECT_NAME + " jar!");
         }
         VirtualFile jar;
         jar = VirtualFileManager.getInstance().findFileByUrl(VirtualFileManager.constructUrl(JarFileSystem.PROTOCOL, path) + JarFileSystem.JAR_SEPARATOR);
@@ -123,7 +123,7 @@ public class ProjectUtils {
             jar = LocalFileSystem.getInstance().refreshAndFindFileByPath(path);
         }
         if (jar == null) {
-            throw new RuntimeException("Could not find CHelper jar!");
+            throw new RuntimeException("Could not find " + ProjectUtils.PROJECT_NAME + " jar!");
         }
         Library library = table.getLibraryByName(PROJECT_NAME);
         if (library != null) {
@@ -133,7 +133,6 @@ public class ProjectUtils {
         Library.ModifiableModel libraryModel = library.getModifiableModel();
         libraryModel.addRoot(jar, OrderRootType.CLASSES);
         libraryModel.commit();
-        // check module CHelper dependency.
         addLibray(project, library);
     }
 

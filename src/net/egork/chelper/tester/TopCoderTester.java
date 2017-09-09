@@ -14,6 +14,7 @@ import java.util.Locale;
 /**
  * @author Egor Kulikov (kulikov@devexperts.com)
  */
+@SuppressWarnings("unchecked")
 public class TopCoderTester {
     public static void main(String[] args)
         throws InterruptedException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException,
@@ -59,7 +60,7 @@ public class TopCoderTester {
                 Verdict checkResult = check(actual, test.result, methodSignature.result);
                 verdicts.add(checkResult);
                 System.out.print(checkResult);
-                System.out.printf(" in %.3f s.\n", time / 1000.);
+                System.out.printf(" in %.3f s.%n", time / 1000.);
                 if (checkResult.type != Verdict.VerdictType.OK)
                     ok = false;
             } catch (Throwable e) {
@@ -75,7 +76,7 @@ public class TopCoderTester {
         System.out.println("==================================================================");
         System.out.println("Test results:");
         if (ok)
-            System.out.printf("All test passed in %.3f s.\n", maximalTime / 1000.);
+            System.out.printf("All test passed in %.3f s.%n", maximalTime / 1000.);
         else {
             for (int i = 0; i < verdicts.size(); i++)
                 System.out.println("Test #" + i + ": " + verdicts.get(i));

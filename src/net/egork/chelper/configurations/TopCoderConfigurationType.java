@@ -6,6 +6,7 @@ import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
 import net.egork.chelper.task.TopCoderTask;
+import net.egork.chelper.util.ProjectUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -16,17 +17,16 @@ import javax.swing.*;
 public class TopCoderConfigurationType implements ConfigurationType {
     private static final Icon ICON = IconLoader.getIcon("/icons/topcoder.png");
     private final ConfigurationFactory factory;
-    public static TopCoderConfigurationType INSTANCE;
+    public static final TopCoderConfigurationType INSTANCE = new TopCoderConfigurationType();
 
-    public TopCoderConfigurationType() {
+    private TopCoderConfigurationType() {
         factory = new ConfigurationFactory(this) {
             @Override
-            public RunConfiguration createTemplateConfiguration(Project project) {
+            public RunConfiguration createTemplateConfiguration(@NotNull Project project) {
                 return new TopCoderConfiguration("TopCoderTask", project,
                     new TopCoderTask("TopCoderTask", null, null, "", "", new String[0], null, false, "256M"), factory);
             }
         };
-        INSTANCE = this;
     }
 
     public String getDisplayName() {
@@ -34,7 +34,7 @@ public class TopCoderConfigurationType implements ConfigurationType {
     }
 
     public String getConfigurationTypeDescription() {
-        return "CHelper TopCoder Task";
+        return ProjectUtils.PROJECT_NAME + " TopCoder Task";
     }
 
     public Icon getIcon() {

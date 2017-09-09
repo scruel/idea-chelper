@@ -46,7 +46,7 @@ public class CHelperArenaPlugin implements ArenaPlugin {
             StringBuilder source = new StringBuilder();
             try {
                 File file = new File(System.getProperty("user.home") + File.separator + ".java");
-                Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+                Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "utf-8"));
                 int next;
                 while ((next = reader.read()) != -1)
                     source.append((char) next);
@@ -111,7 +111,9 @@ public class CHelperArenaPlugin implements ArenaPlugin {
         } catch (IOException e) {
             messagePanel.showInfoMessage("Probably socket was not opened, trying file method");
             try {
-                String path = new BufferedReader(new InputStreamReader(new FileInputStream(System.getProperty("user.home") + File.separator + ".chelper"))).readLine();
+                BufferedReader bfr = new BufferedReader(new InputStreamReader(new FileInputStream(System.getProperty("user.home") + File.separator + ".chelper"), "utf-8"));
+                String path = bfr.readLine();
+                bfr.close();
                 File file = new File(path + File.separator + ".tctask");
                 file.deleteOnExit();
                 FileOutputStream outputStream = new FileOutputStream(file);

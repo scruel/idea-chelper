@@ -127,7 +127,7 @@ public class ChromeParser implements ProjectComponent {
                 }
             }).start();
         } catch (IOException e) {
-            Messenger.publishMessage("Could not create serverSocket for Chrome parser, probably another CHelper-" +
+            Messenger.publishMessage("Could not create serverSocket for Chrome parser, probably another " + ProjectUtils.PROJECT_NAME + "-" +
                 "eligible project is running?", NotificationType.ERROR);
         }
     }
@@ -144,7 +144,7 @@ public class ChromeParser implements ProjectComponent {
     public static void checkInstalled(Project project, ProjectData configuration) {
         if (!configuration.extensionProposed) {
             JPanel panel = new JPanel(new BorderLayout(15, 15));
-            JLabel description = new JLabel("<html>You can now use new CHelper extension to parse<br>" +
+            JLabel description = new JLabel("<html>You can now use new " + ProjectUtils.PROJECT_NAME + " extension to parse<br>" +
                 "tasks directly from Google Chrome<br>(currently supported - Yandex.Contest, Codeforces and HackerRank)<br><br>Do you want to install it?</html>");
             JButton download = new JButton("Download");
             JButton close = new JButton("Close");

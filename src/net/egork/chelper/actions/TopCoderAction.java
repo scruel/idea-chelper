@@ -169,7 +169,9 @@ public class TopCoderAction extends AnAction {
             }
         });
         VirtualFile file = FileUtils.writeTextFile(LocalFileSystem.getInstance().findFileByPath(System.getProperty("user.home")), ".chelper", project.getBasePath() + "\n");
-        new File(file.getCanonicalPath()).deleteOnExit();
+        String path = file.getCanonicalPath();
+        if (path == null) return;
+        new File(path).deleteOnExit();
     }
 
     private static void createConfiguration(Project project, TopCoderTask task) {
@@ -180,7 +182,7 @@ public class TopCoderAction extends AnAction {
             JOptionPane.showMessageDialog(null, "defaultDirectory should be under source and in non-default package");
             return;
         }
-        String fqn = (packageName.length() == 0 ? "" : packageName + ".") + task.name;
+        String fqn = packageName + "." + task.name;
         TopCoderTask taskToWrite = task.setFQN(fqn).setFailOnOverflow(ProjectUtils.getData(project).failOnIntegerOverflowForNewTasks);
         if (FileUtils.getFile(project, defaultDir + "/" + task.name + ".java") == null) {
             FileUtils.writeTextFile(FileUtils.getFile(project, defaultDir),
@@ -194,27 +196,30 @@ public class TopCoderAction extends AnAction {
     private void fixTopCoderSettings() {
         Properties properties = new Properties();
         try {
-            properties.load(new FileInputStream(new File(System.getProperty("user.home") + File.separator + "contestapplet.conf")));
+            FileInputStream in = new FileInputStream(new File(System.getProperty("user.home") + File.separator + "contestapplet.conf"));
+            properties.load(in);
+            in.close();
         } catch (IOException ignored) {
         }
-        properties.put("editor.defaultname", "CHelper");
+        properties.put("editor.defaultname", ProjectUtils.PROJECT_NAME);
         int pluginCount = Integer.parseInt(properties.getProperty("editor.numplugins", "0"));
         int index = pluginCount + 1;
         for (int i = 1; i <= pluginCount; i++) {
-            if ("CHelper".equals(properties.getProperty("editor." + i + ".name"))) {
+            if (ProjectUtils.PROJECT_NAME.equals(properties.getProperty("editor." + i + ".name"))) {
                 index = i;
                 break;
             }
         }
         pluginCount = Math.max(pluginCount, index);
         properties.put("editor.numplugins", Integer.toString(pluginCount));
-        properties.put("editor." + index + ".name", "CHelper");
+        properties.put("editor." + index + ".name", ProjectUtils.PROJECT_NAME);
         properties.put("editor." + index + ".entrypoint", CHelperArenaPlugin.class.getName());
         properties.put("editor." + index + ".classpath", getJarPathForClass(CHelperArenaPlugin.class));
         properties.put("editor." + index + ".eager", "0");
         try {
             OutputStream outputStream = new FileOutputStream(new File(System.getProperty("user.home") + File.separator + "contestapplet.conf"));
             properties.store(outputStream, "");
+            outputStream.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

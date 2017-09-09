@@ -16,16 +16,15 @@ import javax.swing.*;
 public class TaskConfigurationType implements ConfigurationType {
     private static final Icon ICON = IconLoader.getIcon("/icons/taskIcon.png");
     private final ConfigurationFactory factory;
-    public static TaskConfigurationType INSTANCE;
+    public static final TaskConfigurationType INSTANCE = new TaskConfigurationType();
 
-    public TaskConfigurationType() {
+    private TaskConfigurationType() {
         factory = new ConfigurationFactory(this) {
             @Override
-            public RunConfiguration createTemplateConfiguration(Project project) {
+            public RunConfiguration createTemplateConfiguration(@NotNull Project project) {
                 return new TaskConfiguration("Task", project, ProjectUtils.getDefaultTask(), factory);
             }
         };
-        INSTANCE = this;
     }
 
     public String getDisplayName() {
@@ -33,7 +32,7 @@ public class TaskConfigurationType implements ConfigurationType {
     }
 
     public String getConfigurationTypeDescription() {
-        return "CHelper Task";
+        return ProjectUtils.PROJECT_NAME + " Task";
     }
 
     public Icon getIcon() {

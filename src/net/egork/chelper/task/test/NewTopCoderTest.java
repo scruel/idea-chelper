@@ -62,8 +62,7 @@ public class NewTopCoderTest extends TestBase {
                 String[] tokens = mySplit(value);
                 String[] result = new String[tokens.length];
                 for (int j = 0; j < tokens.length; j++) {
-                    if ((result[j] = getString(tokens[j])) == null)
-                        return null;
+                    result[j] = getString(tokens[j]);
                 }
                 return result;
             } else {
