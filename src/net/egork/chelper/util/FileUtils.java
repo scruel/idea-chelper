@@ -151,7 +151,7 @@ public class FileUtils {
         return location.findFile(fileName);
     }
 
-    public static boolean isValiDirectory(Project project, String location) {
+    public static boolean isValidDirectory(Project project, String location) {
         PsiDirectory directory = FileUtils.getPsiDirectory(project, location);
         return !(directory == null || !directory.isValid());
     }
@@ -169,15 +169,7 @@ public class FileUtils {
     }
 
     public static boolean isValidClass(Project project, String clazz) {
-        try {
-            Class.forName(clazz).newInstance();
-        } catch (IllegalAccessException ignore) {
-        } catch (InstantiationException ignore) {
-        } catch (ClassNotFoundException igonre) {
-            if (MainFileTemplate.getClass(project, clazz) == null)
-                return false;
-        }
-        return true;
+        return MainFileTemplate.getClass(project, clazz) != null;
     }
 
     public static String getRelativePath(VirtualFile baseDir, VirtualFile file) {
@@ -247,7 +239,7 @@ public class FileUtils {
 
     public static PsiDirectory getPsiDirectory(Project project, String location) {
         VirtualFile file = getFile(project, location);
-        if (file == null) {
+        if (file == null || location == null) {
             return null;
         }
         return PsiManager.getInstance(project).findDirectory(file);

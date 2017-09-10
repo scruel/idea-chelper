@@ -561,7 +561,8 @@ public class SolutionGenerator {
                 VirtualFile file = null;
                 if (task instanceof Task) {
                     SolutionGenerator generator = new SolutionGenerator(new HashSet<String>(Arrays.asList(ProjectUtils.getData(project).excludedPackages)),
-                        createMainClassTemplate(project, (Task) task), true, MainFileTemplate.getMethod(project, ((Task) task).taskClass, "solve", "void", "int", ((Task) task).inputClass, ((Task) task).outputClass));
+                        createMainClassTemplate(project, (Task) task), true,
+                        MainFileTemplate.getMethod(project, ((Task) task).taskClass, "solve", "void", "int", ((Task) task).inputClass, ((Task) task).outputClass));
                     String source = generator.createInlinedSource();
                     file = FileUtils.writeTextFile(directory, ((Task) task).mainClass + ".java", source);
                 } else if (task instanceof TopCoderTask) {

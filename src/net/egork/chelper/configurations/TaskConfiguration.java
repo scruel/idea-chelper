@@ -2,6 +2,7 @@ package net.egork.chelper.configurations;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Executor;
+import com.intellij.execution.JavaRunConfigurationExtensionManager;
 import com.intellij.execution.configurations.*;
 import com.intellij.execution.filters.TextConsoleBuilderImpl;
 import com.intellij.execution.runners.ExecutionEnvironment;
@@ -12,6 +13,7 @@ import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -19,10 +21,7 @@ import net.egork.chelper.actions.ArchiveAction;
 import net.egork.chelper.actions.TopCoderAction;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.ui.TaskConfigurationEditor;
-import net.egork.chelper.util.FileUtils;
-import net.egork.chelper.util.InputReader;
-import net.egork.chelper.util.ProjectUtils;
-import net.egork.chelper.util.TaskUtils;
+import net.egork.chelper.util.*;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -58,10 +57,27 @@ public class TaskConfiguration extends ModuleBasedConfiguration<JavaRunConfigura
         return getValidModules();
     }
 
+    @Override
     public SettingsEditor<? extends RunConfiguration> getConfigurationEditor() {
         return new TaskConfigurationEditor(this);
     }
 
+    @Override
+    public void checkConfiguration() throws RuntimeConfigurationException {
+        final JavaRunConfigurationModule configurationModule = getConfigurationModule();
+        final PsiClass psiClass = configurationModule.findNotNullClass(configuration.taskClass);
+        if (psiClass.findMethodsByName("solve", false).length == 0) {
+//            if (MainFileTemplate.getMethod(getProject(), configuration.taskClass, "solve", "int","")){
+            throw new RuntimeConfigurationWarning("solve method not found in class " + configuration.taskClass);
+        }
+        ClassUtils.checkClass(getProject(), configuration.inputClass);
+        ClassUtils.checkClass(getProject(), configuration.outputClass);
+        ClassUtils.checkClass(getProject(), configuration.checkerClass);
+        JavaRunConfigurationExtensionManager.checkConfigurationIsValid(this);
+    }
+
+
+    @Override
     public RunProfileState getState(@NotNull Executor executor, @NotNull ExecutionEnvironment env)
         throws ExecutionException {
         TaskUtils.createSourceFile(getProject(), configuration);

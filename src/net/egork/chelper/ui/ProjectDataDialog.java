@@ -121,7 +121,7 @@ public class ProjectDataDialog extends JDialog {
             return false;
         }
 
-        if (!FileUtils.isValiDirectory(project, ProjectDataDialog.this.defaultDirectory.getText())) {
+        if (!FileUtils.isValidDirectory(project, ProjectDataDialog.this.defaultDirectory.getText())) {
             Messenger.publishMessageWithBalloon(project, defaultDirectory.getTextField(), "invalid defaultDirectory!", MessageType.ERROR);
             return false;
         }

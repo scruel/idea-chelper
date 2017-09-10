@@ -2,6 +2,7 @@ package net.egork.chelper.configurations;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Executor;
+import com.intellij.execution.JavaRunConfigurationExtensionManager;
 import com.intellij.execution.configurations.*;
 import com.intellij.execution.filters.TextConsoleBuilderImpl;
 import com.intellij.execution.runners.ExecutionEnvironment;
@@ -59,6 +60,18 @@ public class TopCoderConfiguration extends ModuleBasedConfiguration<JavaRunConfi
 
     public SettingsEditor<? extends RunConfiguration> getConfigurationEditor() {
         return new TopCoderConfigurationEditor(this);
+    }
+
+    @Override
+    public void checkConfiguration() throws RuntimeConfigurationException {
+        //TODO haven't use TopCoder
+//        final JavaRunConfigurationModule configurationModule = getConfigurationModule();
+//        final PsiClass psiClass = configurationModule.findNotNullClass(configuration.name);
+//        if (psiClass.findMethodsByName("solve", false).length == 0) {
+////            if (MainFileTemplate.getMethod(getProject(), configuration.taskClass, "solve", "int","")){
+//            throw new RuntimeConfigurationWarning("solve method not found in class " + configuration.name);
+//        }
+        JavaRunConfigurationExtensionManager.checkConfigurationIsValid(this);
     }
 
     public RunProfileState getState(@NotNull Executor executor, @NotNull ExecutionEnvironment env)
