@@ -28,7 +28,7 @@ public class CopyAction extends AnAction {
         if (selectedConfiguration == null)
             return;
         RunConfiguration configuration = selectedConfiguration.getConfiguration();
-        if (!ProjectUtils.isValidConfigurationAndDeleteIfNot(configuration)) {
+        if (!ProjectUtils.isValidConfigurationOrDeleteIfNot(configuration)) {
             return;
         }
         if (configuration instanceof TaskConfiguration) {

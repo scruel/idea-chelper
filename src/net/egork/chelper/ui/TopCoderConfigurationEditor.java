@@ -25,7 +25,7 @@ public class TopCoderConfigurationEditor extends SettingsEditor<TopCoderConfigur
     private void applyTask() {
         if (wrapper == null)
             wrapper = new JPanel(new BorderLayout());
-        if (!ProjectUtils.isValidConfigurationAndDeleteIfNot(taskConfiguration)) {
+        if (!ProjectUtils.isValidConfigurationOrDeleteIfNot(taskConfiguration)) {
             return;
         }
         taskConfigurationPanel = new TopCoderTaskPanel(taskConfiguration.getProject(), taskConfiguration.getConfiguration());

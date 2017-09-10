@@ -144,7 +144,7 @@ public class TaskUtils {
         if (sourceFile == null)
             return null;
         for (RunConfiguration configuration : runManager.getAllConfigurationsList()) {
-            if (!ProjectUtils.isValidConfigurationAndDeleteIfNot(configuration)) {
+            if (!ProjectUtils.isValidConfigurationOrDeleteIfNot(configuration)) {
                 continue;
             }
             if (configuration instanceof TopCoderConfiguration) {

@@ -325,7 +325,7 @@ public class ProjectUtils {
      * @param configuration
      * @return
      */
-    public static boolean isValidConfigurationAndDeleteIfNot(RunConfiguration configuration) {
+    public static boolean isValidConfigurationOrDeleteIfNot(RunConfiguration configuration) {
         boolean res = true;
         if (configuration instanceof TaskConfiguration) {
             res = ((TaskConfiguration) configuration).getConfiguration() != null;

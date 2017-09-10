@@ -36,7 +36,7 @@ public class DeleteTaskAction extends AnAction {
         if (selectedConfiguration == null)
             return;
         RunConfiguration configuration = selectedConfiguration.getConfiguration();
-        if (!ProjectUtils.isValidConfigurationAndDeleteIfNot(configuration)) {
+        if (!ProjectUtils.isValidConfigurationOrDeleteIfNot(configuration)) {
             return;
         }
         int result = JOptionPane.showConfirmDialog(WindowManager.getInstance().getFrame(project), "Are you sure you want to delete current configuration?",

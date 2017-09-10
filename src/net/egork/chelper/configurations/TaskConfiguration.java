@@ -16,7 +16,6 @@ import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.search.GlobalSearchScope;
 import net.egork.chelper.actions.ArchiveAction;
 import net.egork.chelper.actions.TopCoderAction;
@@ -133,10 +132,6 @@ public class TaskConfiguration extends ModuleBasedConfiguration<JavaRunConfigura
 
     public void setConfiguration(Task configuration) {
         this.configuration = configuration;
-        PsiDocumentManager psiDocumentManager = PsiDocumentManager.getInstance(getProject());
-        if (psiDocumentManager.hasUncommitedDocuments()) {
-            psiDocumentManager.commitAllDocuments();
-        }
         saveConfiguration(configuration);
     }
 
@@ -175,8 +170,8 @@ public class TaskConfiguration extends ModuleBasedConfiguration<JavaRunConfigura
 
     @Override
     public void writeExternal(Element element) throws WriteExternalException {
-        super.writeExternal(element);
         if (configuration == null) return;
+        super.writeExternal(element);
         Element configurationElement = new Element("taskConf");
         element.addContent(configurationElement);
         String configurationFile = TaskUtils.getTaskFileName(configuration.location, configuration.name);

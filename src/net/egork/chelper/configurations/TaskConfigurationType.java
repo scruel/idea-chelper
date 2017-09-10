@@ -21,6 +21,7 @@ public class TaskConfigurationType implements ConfigurationType {
     private TaskConfigurationType() {
         factory = new ConfigurationFactory(this) {
             @Override
+            @NotNull
             public RunConfiguration createTemplateConfiguration(@NotNull Project project) {
                 return new TaskConfiguration(project, "Task", ProjectUtils.getDefaultTask(), factory);
             }
