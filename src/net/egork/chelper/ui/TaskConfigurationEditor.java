@@ -25,8 +25,7 @@ public class TaskConfigurationEditor extends SettingsEditor<TaskConfiguration> {
     private void applyTask() {
         if (wrapper == null)
             wrapper = new JPanel(new BorderLayout());
-        if (taskConfiguration.getConfiguration() == null) {
-            ProjectUtils.removeConfigurationIfExists(taskConfiguration);
+        if (!ProjectUtils.isValidConfigurationAndDeleteIfNot(taskConfiguration)) {
             return;
         }
         taskConfigurationPanel = new TaskConfigurationPanel(taskConfiguration.getProject(), taskConfiguration.getConfiguration(), false, null, null);

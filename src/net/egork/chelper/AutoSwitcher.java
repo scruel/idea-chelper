@@ -61,6 +61,9 @@ public class AutoSwitcher implements ProjectComponent {
                 if (selectedConfiguration == null)
                     return;
                 RunConfiguration configuration = selectedConfiguration.getConfiguration();
+                if (!ProjectUtils.isValidConfigurationAndDeleteIfNot(configuration)) {
+                    return;
+                }
                 if (busy
                     || !(configuration instanceof TopCoderConfiguration || configuration instanceof TaskConfiguration)) {
                     return;

@@ -265,14 +265,16 @@ public class ProjectUtils {
         for (RunConfiguration configuration : allConfigurations) {
             if (configuration instanceof TopCoderConfiguration) {
                 TopCoderTask other = ((TopCoderConfiguration) configuration).getConfiguration();
-                if (task != null && !task.contestName.equals(other.contestName))
+                if (other == null || !(task == null || task.contestName.equals(other.contestName))) {
                     continue;
+                }
                 manager.setSelectedConfiguration(new RunnerAndConfigurationSettingsImpl(manager, configuration, false));
                 return;
             } else if (configuration instanceof TaskConfiguration) {
                 Task other = ((TaskConfiguration) configuration).getConfiguration();
-                if (task != null && !task.contestName.equals(other.contestName))
+                if (other == null || !(task == null || task.contestName.equals(other.contestName))) {
                     continue;
+                }
                 manager.setSelectedConfiguration(new RunnerAndConfigurationSettingsImpl(manager, configuration, false));
                 return;
             }
@@ -315,5 +317,24 @@ public class ProjectUtils {
 
     public static boolean isSupported(RunConfiguration configuration) {
         return configuration instanceof TaskConfiguration || configuration instanceof TopCoderConfiguration;
+    }
+
+    /**
+     * if it {@param configuration} could not be valid, then delete and return false.
+     *
+     * @param configuration
+     * @return
+     */
+    public static boolean isValidConfigurationAndDeleteIfNot(RunConfiguration configuration) {
+        boolean res = true;
+        if (configuration instanceof TaskConfiguration) {
+            res = ((TaskConfiguration) configuration).getConfiguration() != null;
+        } else if (configuration instanceof TopCoderConfiguration) {
+            res = ((TopCoderConfiguration) configuration).getConfiguration() != null;
+        }
+        if (!res) {
+            ProjectUtils.removeConfigurationIfExists(configuration);
+        }
+        return res;
     }
 }

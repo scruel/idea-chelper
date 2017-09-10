@@ -17,7 +17,7 @@ public class ClassUtils {
     public static void checkClass(Project project, String clazzName) throws RuntimeConfigurationException {
         PsiClass clazz = MainFileTemplate.getClass(project, clazzName);
         if (clazz == null) {
-            throw new RuntimeConfigurationWarning("Class '" + clazzName + "' not found");
+            throw new RuntimeConfigurationWarning("Class '" + clazzName + "' not found.");
         }
     }
 }

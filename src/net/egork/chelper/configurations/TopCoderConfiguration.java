@@ -159,6 +159,7 @@ public class TopCoderConfiguration extends ModuleBasedConfiguration<JavaRunConfi
     @Override
     public void writeExternal(Element element) throws WriteExternalException {
         super.writeExternal(element);
+        if (configuration == null) return;
         Element configurationElement = new Element("taskConf");
         element.addContent(configurationElement);
         String configurationFile = TaskUtils.getTopCoderTaskFileName(ProjectUtils.getData(getProject()).defaultDirectory, configuration.name);

@@ -3,6 +3,7 @@ package net.egork.chelper.ui;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
 import net.egork.chelper.configurations.TopCoderConfiguration;
+import net.egork.chelper.util.ProjectUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -22,9 +23,12 @@ public class TopCoderConfigurationEditor extends SettingsEditor<TopCoderConfigur
     }
 
     private void applyTask() {
-        taskConfigurationPanel = new TopCoderTaskPanel(taskConfiguration.getProject(), taskConfiguration.getConfiguration());
         if (wrapper == null)
             wrapper = new JPanel(new BorderLayout());
+        if (!ProjectUtils.isValidConfigurationAndDeleteIfNot(taskConfiguration)) {
+            return;
+        }
+        taskConfigurationPanel = new TopCoderTaskPanel(taskConfiguration.getProject(), taskConfiguration.getConfiguration());
         wrapper.add(taskConfigurationPanel, BorderLayout.CENTER);
     }
 

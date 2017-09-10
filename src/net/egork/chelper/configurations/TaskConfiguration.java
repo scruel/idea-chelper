@@ -9,6 +9,7 @@ import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ex.ProjectManagerEx;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
@@ -64,18 +65,20 @@ public class TaskConfiguration extends ModuleBasedConfiguration<JavaRunConfigura
 
     @Override
     public void checkConfiguration() throws RuntimeConfigurationException {
+        ProjectManagerEx projectManager = ProjectManagerEx.getInstanceEx();
         final JavaRunConfigurationModule configurationModule = getConfigurationModule();
+        if (configuration == null) {
+            throw new RuntimeConfigurationWarning("configuration method not found in project.");
+        }
         final PsiClass psiClass = configurationModule.findNotNullClass(configuration.taskClass);
         if (psiClass.findMethodsByName("solve", false).length == 0) {
-//            if (MainFileTemplate.getMethod(getProject(), configuration.taskClass, "solve", "int","")){
-            throw new RuntimeConfigurationWarning("solve method not found in class " + configuration.taskClass);
+            throw new RuntimeConfigurationWarning("solve method not found in class '" + configuration.taskClass + "'");
         }
         ClassUtils.checkClass(getProject(), configuration.inputClass);
         ClassUtils.checkClass(getProject(), configuration.outputClass);
         ClassUtils.checkClass(getProject(), configuration.checkerClass);
         JavaRunConfigurationExtensionManager.checkConfigurationIsValid(this);
     }
-
 
     @Override
     public RunProfileState getState(@NotNull Executor executor, @NotNull ExecutionEnvironment env)
@@ -168,12 +171,12 @@ public class TaskConfiguration extends ModuleBasedConfiguration<JavaRunConfigura
             } catch (NullPointerException ignored) {
             }
         }
-
     }
 
     @Override
     public void writeExternal(Element element) throws WriteExternalException {
         super.writeExternal(element);
+        if (configuration == null) return;
         Element configurationElement = new Element("taskConf");
         element.addContent(configurationElement);
         String configurationFile = TaskUtils.getTaskFileName(configuration.location, configuration.name);

@@ -24,6 +24,9 @@ public class BulkAddTests extends AnAction {
         if (selectedConfiguration == null)
             return;
         RunConfiguration configuration = selectedConfiguration.getConfiguration();
+        if (!ProjectUtils.isValidConfigurationAndDeleteIfNot(configuration)) {
+            return;
+        }
         if (configuration instanceof TaskConfiguration) {
             TaskConfiguration taskConfiguration = (TaskConfiguration) configuration;
             Task task = taskConfiguration.getConfiguration();

@@ -40,13 +40,16 @@ public class ArchiveAction extends AnAction {
             return;
         }
         final RunConfiguration configuration = selectedConfiguration.getConfiguration();
+        if (!ProjectUtils.isValidConfigurationAndDeleteIfNot(configuration)) {
+            return;
+        }
         final TaskBase taskBase;
         if (configuration instanceof TaskConfiguration) {
             taskBase = ((TaskConfiguration) configuration).getConfiguration();
         } else {
             taskBase = ((TopCoderConfiguration) configuration).getConfiguration();
         }
-
+        if (taskBase == null) return;
         String archiveDir = ProjectUtils.getData(project).archiveDirectory;
         String dateAndContest = getDateAndContest(taskBase);
         final PsiDirectory directory = FileUtils.createPsiDirectoryIfMissing(project, archiveDir + "/" + dateAndContest);

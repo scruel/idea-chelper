@@ -141,7 +141,12 @@ public class TaskUtils {
      * @return
      */
     public static RunConfiguration GetConfSettingsBySourceFile(Project project, RunManagerImpl runManager, VirtualFile sourceFile) {
+        if (sourceFile == null)
+            return null;
         for (RunConfiguration configuration : runManager.getAllConfigurationsList()) {
+            if (!ProjectUtils.isSupported(configuration) || !ProjectUtils.isValidConfigurationAndDeleteIfNot(configuration)) {
+                continue;
+            }
             if (configuration instanceof TopCoderConfiguration) {
                 TopCoderTask task = ((TopCoderConfiguration) configuration).getConfiguration();
                 if (sourceFile.equals(TaskUtils.getFile(project, task.name, ProjectUtils.getData(project).defaultDirectory))) {
