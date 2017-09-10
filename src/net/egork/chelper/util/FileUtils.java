@@ -132,7 +132,7 @@ public class FileUtils {
      * @param fileName
      * @return
      */
-    public static PsiFile writeTextFile(final Project project, final PsiDirectory location, final String fileName, final String document) {
+    public static PsiFile writeTextFile(final Project project, final PsiDirectory location, final String fileName, final String context) {
         if (location == null) {
             return null;
         }
@@ -140,12 +140,23 @@ public class FileUtils {
             @Override
             public void run() {
                 PsiFileFactory factory = PsiFileFactory.getInstance(project);
+                PsiFile psiFile = location.findFile(fileName);
                 FileType type = FileTypeRegistry.getInstance().getFileTypeByFileName(fileName);
-                if (type.isBinary()) {
-                    type = UnknownFileType.INSTANCE;
+                if (psiFile == null) {
+                    if (type.isBinary()) {
+                        type = UnknownFileType.INSTANCE;
+                    }
+                    psiFile = factory.createFileFromText(fileName, type, context);
+                    location.add(psiFile);
+                } else {
+                    VirtualFile vFile = psiFile.getVirtualFile();
+                    try {
+                        BufferedOutputStream out = new BufferedOutputStream(vFile.getOutputStream(null));
+                        out.write(context.getBytes("UTF-8"));
+                        out.close();
+                    } catch (IOException ignore) {
+                    }
                 }
-                PsiFile psiFile = factory.createFileFromText(fileName, type, document);
-                location.add(psiFile);
             }
         });
         return location.findFile(fileName);
@@ -158,10 +169,21 @@ public class FileUtils {
 
     public static String readTextFile(VirtualFile file) {
         try {
-            return VfsUtil.loadText(file).replaceAll("\\r\\n", "\n");
+            return reformatLineSeparator(VfsUtil.loadText(file));
         } catch (IOException e) {
             return null;
         }
+    }
+
+    public static String reformatLineSeparator(String original) {
+        String OSLS = System.getProperty("line.separator");
+        if (!"\n".equals(OSLS)) {
+            original = original.replaceAll(OSLS, "\n");
+        }
+        if (!"\r\n".equals(OSLS)) {
+            original = original.replaceAll("\\r\\n", "\n");
+        }
+        return original;
     }
 
     public static boolean isValidClass(Project project, String clazz) {

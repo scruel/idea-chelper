@@ -77,14 +77,18 @@ public class ProjectUtils {
         ProjectManager.getInstance().addProjectManagerListener(new ProjectManagerAdapter() {
             @Override
             public void projectOpened(final Project project) {
-                ProjectData configuration = ProjectData.load(project);
+                final ProjectData configuration = ProjectData.load(project);
                 if (configuration != null) {
                     eligibleProjects.put(project, configuration);
                     TopCoderAction.start(project);
                     ensureLibraryAndData(project);
                     CodeGenerationUtils.createTemplatesIfNeeded(project);
-                    ChromeParser.checkInstalled(project, configuration);
-
+                    DumbService.getInstance(project).smartInvokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            ChromeParser.checkInstalled(project, configuration);
+                        }
+                    });
                     PsiManagerImpl.getInstance(project).addPsiTreeChangeListener(
                         new PsiTreeChangeAdapter() {
                             @Override
