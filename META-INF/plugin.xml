@@ -102,5 +102,6 @@
   <extensions defaultExtensionNs="com.intellij">
     <configurationType implementation="net.egork.chelper.configurations.TaskConfigurationType"/>
     <configurationType implementation="net.egork.chelper.configurations.TopCoderConfigurationType"/>
+    <runConfigurationProducer implementation="net.egork.chelper.configurations.TaskConfigurationProducer"/>
   </extensions>
 </idea-plugin>
