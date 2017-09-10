@@ -1,8 +1,14 @@
 package net.egork.chelper;
 
-import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.openapi.fileTypes.FileTypeRegistry;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiFileFactory;
+import com.intellij.psi.PsiManager;
+import net.egork.chelper.util.ExecuteUtils;
 import net.egork.chelper.util.FileUtils;
 import net.egork.chelper.util.ProjectUtils;
 
@@ -77,33 +83,42 @@ public class ProjectData {
     }
 
     public void save(final Project project) {
-        ApplicationManager.getApplication().runWriteAction(new Runnable() {
+        ExecuteUtils.executeWriteCommandAction(project, new Runnable() {
             public void run() {
                 if (project == null)
                     return;
-                VirtualFile root = project.getBaseDir();
+                final VirtualFile root = project.getBaseDir();
                 if (root == null)
                     return;
+                final Properties properties = new Properties();
+                properties.setProperty("inputClass", inputClass);
+                properties.setProperty("outputClass", outputClass);
+                properties.setProperty("excludePackages", join(excludedPackages));
+                properties.setProperty("outputDirectory", outputDirectory);
+                properties.setProperty("author", author);
+                properties.setProperty("archiveDirectory", archiveDirectory);
+                properties.setProperty("defaultDirectory", defaultDirectory);
+                properties.setProperty("testDirectory", testDirectory);
+                properties.setProperty("enableUnitTests", Boolean.toString(enableUnitTests));
+                properties.setProperty("failOnIntegerOverflowForNewTasks", Boolean.toString(failOnIntegerOverflowForNewTasks));
+                properties.setProperty("smartTesting", Boolean.toString(smartTesting));
+                properties.setProperty("extensionProposed", Boolean.toString(extensionProposed));
+
+                final String name = "chelper.properties";
+                VirtualFile config = root.findChild(name);
+                if (config == null) {
+                    PsiDirectory directory = PsiManager.getInstance(project).findDirectory(project.getBaseDir());
+                    FileType type = FileTypeRegistry.getInstance().getFileTypeByFileName(name);
+                    PsiFile psiFile = PsiFileFactory.getInstance(project).createFileFromText(name, type, "");
+                    directory.add(psiFile);
+                    config = root.findChild(name);
+                }
+                OutputStream out;
                 try {
-                    VirtualFile config = root.findOrCreateChildData(null, "chelper.properties");
-                    Properties properties = new Properties();
-                    properties.setProperty("inputClass", inputClass);
-                    properties.setProperty("outputClass", outputClass);
-                    properties.setProperty("excludePackages", join(excludedPackages));
-                    properties.setProperty("outputDirectory", outputDirectory);
-                    properties.setProperty("author", author);
-                    properties.setProperty("archiveDirectory", archiveDirectory);
-                    properties.setProperty("defaultDirectory", defaultDirectory);
-                    properties.setProperty("testDirectory", testDirectory);
-                    properties.setProperty("enableUnitTests", Boolean.toString(enableUnitTests));
-                    properties.setProperty("failOnIntegerOverflowForNewTasks", Boolean.toString(failOnIntegerOverflowForNewTasks));
-                    properties.setProperty("smartTesting", Boolean.toString(smartTesting));
-                    properties.setProperty("extensionProposed", Boolean.toString(extensionProposed));
-                    OutputStream outputStream = config.getOutputStream(null);
-                    properties.store(outputStream, "");
-                    outputStream.close();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    out = config.getOutputStream(this);
+                    properties.store(out, "");
+                    out.close();
+                } catch (IOException ignore) {
                 }
             }
         });
