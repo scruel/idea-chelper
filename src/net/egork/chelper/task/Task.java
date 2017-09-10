@@ -80,15 +80,19 @@ public class Task extends TaskBase<Test> {
     }
 
     public static String getDateString() {
+        return getDateString('.');
+    }
+
+    public static String getDateString(char delimiter) {
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH) + 1;
         int day = calendar.get(Calendar.DAY_OF_MONTH);
         StringBuilder result = new StringBuilder();
-        result.append(year).append('.');
+        result.append(year).append(delimiter);
         if (month < 10)
             result.append('0');
-        result.append(month).append('.');
+        result.append(month).append(delimiter);
         if (day < 10)
             result.append('0');
         result.append(day);

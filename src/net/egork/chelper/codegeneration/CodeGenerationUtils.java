@@ -426,11 +426,11 @@ public class CodeGenerationUtils {
         builder.append("import org.junit.Assert;\n");
         builder.append("import org.junit.Test;\n\n");
         builder.append("public class Main {\n");
-        builder.append("\t@Test\n");
-        builder.append("\tpublic void test() throws Exception {\n");
-        builder.append("\t\tif (!NewTopCoderTester.test(\"").append(taskPath).append("\"))\n");
-        builder.append("\t\t\tAssert.fail();\n");
-        builder.append("\t}\n");
+        builder.append("  @Test\n");
+        builder.append("  public void test() throws Exception {\n");
+        builder.append("    if (!NewTopCoderTester.test(\"").append(taskPath).append("\"))\n");
+        builder.append("      Assert.fail();\n");
+        builder.append("  }\n");
         builder.append("}\n");
         return builder.toString();
     }
@@ -441,11 +441,11 @@ public class CodeGenerationUtils {
         builder.append("import org.junit.Assert;\n");
         builder.append("import org.junit.Test;\n\n");
         builder.append("public class Main {\n");
-        builder.append("\t@Test\n");
-        builder.append("\tpublic void test() throws Exception {\n");
-        builder.append("\t\tif (!NewTester.test(\"").append(taskPath).append("\"))\n");
-        builder.append("\t\t\tAssert.fail();\n");
-        builder.append("\t}\n");
+        builder.append("  @Test\n");
+        builder.append("  public void test() throws Exception {\n");
+        builder.append("    if (!NewTester.test(\"").append(taskPath).append("\"))\n");
+        builder.append("      Assert.fail();\n");
+        builder.append("  }\n");
         builder.append("}\n");
         return builder.toString();
     }

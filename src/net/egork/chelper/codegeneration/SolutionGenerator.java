@@ -438,91 +438,94 @@ public class SolutionGenerator {
             " * Actual solution is at the top\n");
         String author = ProjectUtils.getData(project).author;
         if (!author.isEmpty()) {
-            builder.append(" * @author ").append(author).append("\n");
+            builder.append(" * Created by ").append(author).append(".\n");
         }
         builder.append("*/");
         builder.append("public class ").append(task.mainClass).append(" {\n");
-        builder.append("\tpublic static void main(String[] args) {\n");
+        builder.append("  public static void main(String[] args) {\n");
         if (task.includeLocale)
-            builder.append("\t\tLocale.setDefault(Locale.US);\n");
+            builder.append("    Locale.setDefault(Locale.US);\n");
         if (task.input.type == StreamConfiguration.StreamType.STANDARD)
-            builder.append("\t\tInputStream inputStream = System.in;\n");
+            builder.append("    InputStream inputStream = System.in;\n");
         else if (task.input.type != StreamConfiguration.StreamType.LOCAL_REGEXP) {
-            builder.append("\t\tInputStream inputStream;\n");
-            builder.append("\t\ttry {\n");
-            builder.append("\t\t\tinputStream = new FileInputStream(\"").append(task.input.
-                getFileName(task.name, ".in")).append("\");\n");
-            builder.append("\t\t} catch (IOException e) {\n");
-            builder.append("\t\t\tthrow new RuntimeException(e);\n");
-            builder.append("\t\t}\n");
+            builder.append("    InputStream inputStream;\n");
+            builder.append("    try {\n");
+            builder.append("      inputStream = new FileInputStream(\"")
+                .append(task.input.getFileName(task.name, ".in")).append("\");\n");
+            builder.append("    } catch (IOException e) {\n");
+            builder.append("      throw new RuntimeException(e);\n");
+            builder.append("    }\n");
         } else {
-            builder.append("\t\tInputStream inputStream;\n");
-            builder.append("\t\ttry {\n");
-            builder.append("\t\t\tfinal String regex = \"").append(task.input.fileName).append("\";\n");
-            builder.append("\t\t\tFile directory = new File(\".\");\n" +
-                "\t\t\tFile[] candidates = directory.listFiles(new FilenameFilter() {\n" +
-                "\t\t\t\tpublic boolean accept(File dir, String name) {\n" +
-                "\t\t\t\t\treturn name.matches(regex);\n" +
-                "\t\t\t\t}\n" +
-                "\t\t\t});\n" +
-                "\t\t\tFile toRun = null;\n" +
-                "\t\t\tfor (File candidate : candidates) {\n" +
-                "\t\t\t\tif (toRun == null || candidate.lastModified() > toRun.lastModified())\n" +
-                "\t\t\t\t\ttoRun = candidate;\n" +
-                "\t\t\t}\n" +
-                "\t\t\tinputStream = new FileInputStream(toRun);\n");
-            builder.append("\t\t} catch (IOException e) {\n");
-            builder.append("\t\t\tthrow new RuntimeException(e);\n");
-            builder.append("\t\t}\n");
+            builder.append("    InputStream inputStream;\n");
+            builder.append("    try {\n");
+            builder.append("      final String regex = \"").append(task.input.fileName).append("\";\n");
+            builder.append("      File directory = new File(\".\");\n"
+                + "      File[] candidates = directory.listFiles(new FilenameFilter() {\n"
+                + "        public boolean accept(File dir, String name) {\n"
+                + "          return name.matches(regex);\n"
+                + "        }\n"
+                + "      });\n"
+                + "      File toRun = null;\n"
+                + "      for (File candidate : candidates) {\n"
+                + "        if (toRun == null || candidate.lastModified() > toRun.lastModified())\n"
+                + "          toRun = candidate;\n"
+                + "      }\n"
+                + "      inputStream = new FileInputStream(toRun);\n");
+            builder.append("    } catch (IOException e) {\n");
+            builder.append("      throw new RuntimeException(e);\n");
+            builder.append("    }\n");
         }
         if (task.output.type == StreamConfiguration.StreamType.STANDARD)
-            builder.append("\t\tOutputStream outputStream = System.out;\n");
+            builder.append("    OutputStream outputStream = System.out;\n");
         else {
-            builder.append("\t\tOutputStream outputStream;\n");
-            builder.append("\t\ttry {\n");
-            builder.append("\t\t\toutputStream = new FileOutputStream(\"").append(task.output.getFileName(task.name,
+            builder.append("    OutputStream outputStream;\n");
+            builder.append("    try {\n");
+            builder.append("      outputStream = new FileOutputStream(\"").append(task.output.getFileName(task.name,
                 ".out")).append("\");\n");
-            builder.append("\t\t} catch (IOException e) {\n");
-            builder.append("\t\t\tthrow new RuntimeException(e);\n");
-            builder.append("\t\t}\n");
+            builder.append("    } catch (IOException e) {\n");
+            builder.append("      throw new RuntimeException(e);\n");
+            builder.append("    }\n");
         }
         String inputClass = CodeGenerationUtils.getSimpleName(task.inputClass);
-        builder.append("\t\t").append(inputClass).append(" in = new ").append(inputClass).
+        builder.append("    ").append(inputClass).append(" in = new ").append(inputClass).
             append("(inputStream);\n");
         String outputClass = CodeGenerationUtils.getSimpleName(task.outputClass);
-        builder.append("\t\t").append(outputClass).append(" out = new ").append(outputClass).
+        builder.append("    ").append(outputClass).append(" out = new ").append(outputClass).
             append("(outputStream);\n");
         String className = CodeGenerationUtils.getSimpleName(task.taskClass);
-        builder.append("\t\t").append(className).append(" solver = new ").append(className).append("();\n");
+        builder.append("    ").append(className).append(" solver = new ").append(className).append("();\n");
         switch (task.testType) {
             case SINGLE:
-                builder.append("\t\tsolver.solve(1, in, out);\n");
-                builder.append("\t\tout.close();\n");
+                builder.append("    solver.solve(1, in, out);\n");
+                builder.append("    out.close();\n");
                 break;
             case MULTI_EOF:
-                builder.append("\t\ttry {\n");
-                builder.append("\t\t\tint testNumber = 1;\n");
-                builder.append("\t\t\twhile (true)\n");
-                builder.append("\t\t\t\tsolver.solve(testNumber++, in, out);\n");
-                builder.append("\t\t} catch (UnknownError e) {\n");
-                builder.append("\t\t\tout.close();\n");
-                builder.append("\t\t}\n");
+                builder.append("    try {\n");
+                builder.append("      int testNumber = 1;\n");
+                builder.append("      while (true)\n");
+                builder.append("        solver.solve(testNumber++, in, out);\n");
+                builder.append("    } catch (UnknownError e) {\n");
+                builder.append("      out.close();\n");
+                builder.append("    }\n");
                 break;
             case MULTI_NUMBER:
-                builder.append("\t\tint testCount = Integer.parseInt(in.next());\n");
-                builder.append("\t\tfor (int i = 1; i <= testCount; i++)\n");
-                builder.append("\t\t\tsolver.solve(i, in, out);\n");
-                builder.append("\t\tout.close();\n");
+                builder.append("    int testCount = Integer.parseInt(in.next());\n");
+                builder.append("    for (int i = 1; i <= testCount; i++)\n");
+                builder.append("      solver.solve(i, in, out);\n");
+                builder.append("    out.close();\n");
                 break;
         }
-        builder.append("\t}\n");
+        builder.append("  }\n");
         builder.append("%INLINED_SOURCE%");
         builder.append("}\n\n");
-        List<PsiElement> entryPoints = new ArrayList<PsiElement>(Arrays.asList(MainFileTemplate.getInputConstructor(project),
+        List<PsiElement> entryPoints = new ArrayList<PsiElement>(Arrays.asList(
+            MainFileTemplate.getInputConstructor(project),
             MainFileTemplate.getOutputConstructor(project)));
-        entryPoints.add(MainFileTemplate.getMethod(project, ProjectUtils.getData(project).outputClass, "close", "void"));
+        entryPoints.add(
+            MainFileTemplate.getMethod(project, ProjectUtils.getData(project).outputClass, "close", "void"));
         if (task.testType == TestType.MULTI_NUMBER) {
-            entryPoints.add(MainFileTemplate.getMethod(project, ProjectUtils.getData(project).inputClass, "next", "java.lang.String"));
+            entryPoints.add(
+                MainFileTemplate.getMethod(project, ProjectUtils.getData(project).inputClass, "next", "java.lang.String"));
         }
         Set<String> toImport = new HashSet<String>();
         toImport.add("java.io.InputStream");
