@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.VerticalFlowLayout;
 import net.egork.chelper.ProjectData;
+import net.egork.chelper.codegeneration.MainFileTemplate;
 import net.egork.chelper.util.FileUtils;
 import net.egork.chelper.util.Messenger;
 import net.egork.chelper.util.ProjectUtils;
@@ -113,18 +114,29 @@ public class ProjectDataDialog extends JDialog {
 
     private boolean isValidData(Project project) {
         if (!FileUtils.isValidClass(project, ProjectDataDialog.this.inputClass.getText())) {
-            Messenger.publishMessageWithBalloon(project, inputClass, "invalid inputClass!", MessageType.ERROR);
-            return false;
-        }
-        if (!FileUtils.isValidClass(project, ProjectDataDialog.this.outputClass.getText())) {
-            Messenger.publishMessageWithBalloon(project, outputClass, "invalid outputClass!", MessageType.ERROR);
+            Messenger.publishMessageWithBalloon(project, this.inputClass, "Class '" + ProjectDataDialog.this.inputClass.getText() + "'\n not found", MessageType.ERROR);
             return false;
         }
 
-        if (!FileUtils.isValidDirectory(project, ProjectDataDialog.this.defaultDirectory.getText())) {
-            Messenger.publishMessageWithBalloon(project, defaultDirectory.getTextField(), "invalid defaultDirectory!", MessageType.ERROR);
+        if (!FileUtils.isValidClass(project, ProjectDataDialog.this.outputClass.getText())) {
+            Messenger.publishMessageWithBalloon(project, this.outputClass, "Class '" + ProjectDataDialog.this.outputClass.getText() + "'\n not found", MessageType.ERROR);
             return false;
         }
+
+        if (!MainFileTemplate.isValidInputClass(project, ProjectDataDialog.this.inputClass.getText())) {
+            Messenger.publishMessageWithBalloon(project, this.inputClass, "not all mandatory methods in\n" +
+                "input class '" + ProjectDataDialog.this.inputClass.getText() + "'\n" +
+                "are defined.", MessageType.ERROR);
+            return false;
+        }
+
+        if (!MainFileTemplate.isValidOutputClass(project, ProjectDataDialog.this.outputClass.getText())) {
+            Messenger.publishMessageWithBalloon(project, this.outputClass, "not all mandatory methods in\n" +
+                "output class '" + ProjectDataDialog.this.outputClass.getText() + "\n'" +
+                "are defined.", MessageType.ERROR);
+            return false;
+        }
+
         return true;
     }
 

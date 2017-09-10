@@ -71,11 +71,19 @@ public class MainFileTemplate extends Template {
     }
 
     public static PsiElement getInputConstructor(Project project) {
-        return getConstructor(project, ProjectUtils.getData(project).inputClass, "java.io.InputStream");
+        return getConstructor(project, ProjectUtils.getData(project).inputClass, "java.io.OutputStream");
     }
 
     public static PsiElement getOutputConstructor(Project project) {
         return getConstructor(project, ProjectUtils.getData(project).outputClass, "java.io.OutputStream");
+    }
+
+    public static boolean isValidOutputClass(Project project, String clazz) {
+        return getConstructor(project, clazz, "java.io.OutputStream") != null;
+    }
+
+    public static boolean isValidInputClass(Project project, String clazz) {
+        return getConstructor(project, clazz, "java.io.InputStream") != null;
     }
 
     private static PsiElement getConstructor(Project project, String aClass, String... arguments) {
