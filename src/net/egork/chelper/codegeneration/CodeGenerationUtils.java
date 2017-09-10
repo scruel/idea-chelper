@@ -1,8 +1,6 @@
 package net.egork.chelper.codegeneration;
 
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -90,7 +88,7 @@ public class CodeGenerationUtils {
             "    public void solve(int testNumber, %InputClass% in, %OutputClass% out) {\n" +
             "    }\n" +
             "}\n";
-        FileUtils.writeTextFile(project, PsiManager.getInstance(project).findDirectory(project.getBaseDir()), taskClassFileName, EditorFactory.getInstance().createDocument(template));
+        FileUtils.writeTextFile(project, PsiManager.getInstance(project).findDirectory(project.getBaseDir()), taskClassFileName, template);
         return template;
     }
 
@@ -123,7 +121,8 @@ public class CodeGenerationUtils {
             "        return Verdict.UNDECIDED;\n" +
             "    }\n" +
             "}\n";
-        FileUtils.writeTextFile(project, PsiManager.getInstance(project).findDirectory(project.getBaseDir()), checkerClassFileName, EditorFactory.getInstance().createDocument(template));
+        FileUtils.writeTextFile(project, PsiManager.getInstance(project).findDirectory(project.getBaseDir()), checkerClassFileName, template);
+
         return template;
     }
 
@@ -158,7 +157,7 @@ public class CodeGenerationUtils {
             "        return Collections.emptyList();\n" +
             "    }\n" +
             "}\n";
-        FileUtils.writeTextFile(project, PsiManager.getInstance(project).findDirectory(project.getBaseDir()), testCaseClassFileName, EditorFactory.getInstance().createDocument(template));
+        FileUtils.writeTextFile(project, PsiManager.getInstance(project).findDirectory(project.getBaseDir()), testCaseClassFileName, template);
         return template;
     }
 
@@ -192,7 +191,7 @@ public class CodeGenerationUtils {
             "        return Collections.emptyList();\n" +
             "    }\n" +
             "}\n";
-        FileUtils.writeTextFile(project, PsiManager.getInstance(project).findDirectory(project.getBaseDir()), topCoderTestCaseClassFileName, EditorFactory.getInstance().createDocument(template));
+        FileUtils.writeTextFile(project, PsiManager.getInstance(project).findDirectory(project.getBaseDir()), topCoderTestCaseClassFileName, template);
         return template;
     }
 
@@ -220,7 +219,7 @@ public class CodeGenerationUtils {
             "        return %DefaultValue%;\n" +
             "    }\n" +
             "}\n";
-        FileUtils.writeTextFile(project, PsiManager.getInstance(project).findDirectory(project.getBaseDir()), topCoderTaskClass, EditorFactory.getInstance().createDocument(template));
+        FileUtils.writeTextFile(project, PsiManager.getInstance(project).findDirectory(project.getBaseDir()), topCoderTaskClass, template);
         return template;
     }
 
@@ -461,11 +460,6 @@ public class CodeGenerationUtils {
             return source;
         source = "package " + packageName + ";\n\n" + source;
         return source;
-    }
-
-    public static Document changeDocPackage(Document sourceDoc, String packageName) {
-        sourceDoc.setText(changePackage(sourceDoc.getText(), packageName));
-        return sourceDoc;
     }
 
     public static String createTestStub(Project project, Task task, String location, String name) {

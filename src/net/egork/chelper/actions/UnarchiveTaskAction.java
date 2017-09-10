@@ -3,7 +3,6 @@ package net.egork.chelper.actions;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDialog;
 import com.intellij.openapi.fileChooser.FileChooserFactory;
@@ -89,9 +88,9 @@ public class UnarchiveTaskAction extends AnAction {
                                         className = className.substring(position + 1);
                                     VirtualFile file = taskFile.getParent().findChild(className + ".java");
                                     if (file != null) {
-                                        Document fileContent = FileUtils.readDocumentFile(file);
+                                        String fileContent = FileUtils.readTextFile(file);
                                         if (aPackage != null && !aPackage.isEmpty()) {
-                                            fileContent = CodeGenerationUtils.changeDocPackage(fileContent, aPackage);
+                                            fileContent = CodeGenerationUtils.changePackage(fileContent, aPackage);
                                             String fqn = aPackage + "." + className;
                                             if (task.taskClass.equals(fullClassName))
                                                 task = task.setTaskClass(fqn);
@@ -123,7 +122,7 @@ public class UnarchiveTaskAction extends AnAction {
                                 List<String> toCopy = new ArrayList<String>();
                                 VirtualFile sourceFile = taskFile.getParent().findChild(task.name + ".java");
                                 if (sourceFile != null)
-                                    FileUtils.writeTextFile(project, baseDirectory, task.name + ".java", FileUtils.readDocumentFile(sourceFile));
+                                    FileUtils.writeTextFile(project, baseDirectory, task.name + ".java", FileUtils.readTextFile(sourceFile));
                                 Collections.addAll(toCopy, task.testClasses);
                                 for (String className : toCopy) {
                                     int position = className.lastIndexOf('.');
@@ -131,7 +130,7 @@ public class UnarchiveTaskAction extends AnAction {
                                         className = className.substring(position + 1);
                                     VirtualFile file = taskFile.getParent().findChild(className + ".java");
                                     if (file != null)
-                                        FileUtils.writeTextFile(project, baseDirectory, className + ".java", FileUtils.readDocumentFile(file));
+                                        FileUtils.writeTextFile(project, baseDirectory, className + ".java", FileUtils.readTextFile(file));
                                 }
                                 ProjectUtils.createConfiguration(project, task, true);
                             }

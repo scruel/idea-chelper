@@ -132,24 +132,19 @@ public class FileUtils {
      * @param fileName
      * @return
      */
-    public static PsiFile writeTextFile(final Project project, final PsiDirectory location, final String fileName, final Document document) {
+    public static PsiFile writeTextFile(final Project project, final PsiDirectory location, final String fileName, final String document) {
         if (location == null) {
             return null;
         }
         ExecuteUtils.executeWriteCommandAction(project, new Runnable() {
             @Override
             public void run() {
-                PsiFile docFile = PsiDocumentManager.getInstance(project).getPsiFile(document);
-                if (docFile != null) {
-                    location.add(docFile);
-                    return;
-                }
                 PsiFileFactory factory = PsiFileFactory.getInstance(project);
                 FileType type = FileTypeRegistry.getInstance().getFileTypeByFileName(fileName);
                 if (type.isBinary()) {
                     type = UnknownFileType.INSTANCE;
                 }
-                PsiFile psiFile = factory.createFileFromText(fileName, type, document.getText());
+                PsiFile psiFile = factory.createFileFromText(fileName, type, document);
                 location.add(psiFile);
             }
         });
@@ -162,15 +157,11 @@ public class FileUtils {
     }
 
     public static String readTextFile(VirtualFile file) {
-        Document doc = readDocumentFile(file);
-        if (doc == null) return null;
-        return doc.getText();
-    }
-
-    public static Document readDocumentFile(VirtualFile file) {
-        Document doc = FileDocumentManager.getInstance().getDocument(file);
-        if (doc == null) return null;
-        return doc;
+        try {
+            return VfsUtil.loadText(file).replaceAll("\\r\\n", "\n");
+        } catch (IOException e) {
+            return null;
+        }
     }
 
     public static boolean isValidClass(Project project, String clazz) {
