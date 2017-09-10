@@ -98,7 +98,7 @@ public class ArchiveAction extends AnAction {
                 if (taskFile != null) {
                     directory.copyFileFrom(taskFile.getName(), taskFile);
                 }
-                FileUtils.deleteTaskIfExists(project, PsiUtil.getPsiFile(project, sourceFile.getVirtualFile()), false);
+                FileUtils.deleteTaskIfExists(project, PsiUtil.getPsiFile(project, sourceFile.getVirtualFile()), true);
                 ProjectUtils.setOtherConfiguration(manager, taskBase);
                 Messenger.publishMessage("Configuration '" + configuration.getName() + "' successfully archived",
                     NotificationType.INFORMATION);
