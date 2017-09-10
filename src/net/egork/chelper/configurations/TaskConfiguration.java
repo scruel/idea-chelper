@@ -152,6 +152,7 @@ public class TaskConfiguration extends ModuleBasedConfiguration<JavaRunConfigura
             } catch (NullPointerException ignored) {
             }
         }
+
     }
 
     @Override

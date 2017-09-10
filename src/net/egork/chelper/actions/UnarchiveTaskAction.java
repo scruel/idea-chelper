@@ -3,13 +3,15 @@ package net.egork.chelper.actions;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDialog;
 import com.intellij.openapi.fileChooser.FileChooserFactory;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiManager;
+import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.util.PsiUtil;
 import net.egork.chelper.codegeneration.CodeGenerationUtils;
 import net.egork.chelper.exception.TaskCorruptException;
 import net.egork.chelper.task.Task;
@@ -19,6 +21,7 @@ import net.egork.chelper.util.*;
 import javax.swing.*;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -49,23 +52,21 @@ public class UnarchiveTaskAction extends AnAction {
                 try {
                     for (VirtualFile taskFile : files) {
                         if ("task".equals(taskFile.getExtension())) {
-                            Task task = Task.loadTask(new InputReader(taskFile.getInputStream()));
+                            Task task = Task.load(new InputReader(taskFile.getInputStream()));
                             if (task == null) {
                                 throw new TaskCorruptException();
                             }
-                            VirtualFile baseDirectory = FileUtils.getFile(project, task.location);
+                            PsiDirectory baseDirectory = FileUtils.getPsiDirectory(project, task.location);
                             if (baseDirectory == null) {
                                 Messenger.publishMessage("Directory where task was located is no longer exists",
                                     NotificationType.ERROR);
                                 return;
                             }
+
                             task.saveTask(new OutputWriter(
-                                baseDirectory.findOrCreateChildData(null, ArchiveAction.canonize(task.name) + ".task").
-                                    getOutputStream(null)));
-                            List<String> toCopy = new ArrayList<String>();
-                            toCopy.add(task.taskClass);
-                            toCopy.add(task.checkerClass);
-                            Collections.addAll(toCopy, task.testClasses);
+                                baseDirectory.createFile(ArchiveAction.canonize(task.name) + ".task").getVirtualFile().getOutputStream(null)));
+                            Collection<String> toCopy = new ArrayList<String>();
+                            Collections.addAll(toCopy, task.taskClass, task.checkerClass);
                             String aPackage = FileUtils.getPackage(FileUtils.getPsiDirectory(project, task.location));
                             if (aPackage == null || aPackage.isEmpty()) {
                                 int result = JOptionPane.showOptionDialog(null, "Task location is not under source or in default" +
@@ -74,11 +75,12 @@ public class UnarchiveTaskAction extends AnAction {
                                     IconLoader.getIcon("/icons/restore.png"), null, null);
                                 if (result == JOptionPane.YES_OPTION) {
                                     String defaultDirectory = ProjectUtils.getData(project).defaultDirectory;
-                                    baseDirectory = FileUtils.getFile(project, defaultDirectory);
+                                    baseDirectory = FileUtils.getPsiDirectory(project, defaultDirectory);
                                     aPackage = FileUtils.getPackage(FileUtils.getPsiDirectory(project, defaultDirectory));
                                     task = task.setLocation(defaultDirectory);
                                 }
                             }
+
                             for (String className : toCopy) {
                                 String fullClassName = className;
                                 int position = className.lastIndexOf('.');
@@ -86,9 +88,9 @@ public class UnarchiveTaskAction extends AnAction {
                                     className = className.substring(position + 1);
                                 VirtualFile file = taskFile.getParent().findChild(className + ".java");
                                 if (file != null) {
-                                    String fileContent = FileUtils.readTextFile(file);
+                                    Document fileContent = FileUtils.readDocumentFile(file);
                                     if (aPackage != null && !aPackage.isEmpty()) {
-                                        fileContent = CodeGenerationUtils.changePackage(fileContent, aPackage);
+                                        fileContent = CodeGenerationUtils.changeDocPackage(fileContent, aPackage);
                                         String fqn = aPackage + "." + className;
                                         if (task.taskClass.equals(fullClassName))
                                             task = task.setTaskClass(fqn);
@@ -103,24 +105,24 @@ public class UnarchiveTaskAction extends AnAction {
                                             }
                                         }
                                     }
-                                    FileUtils.writeTextFile(baseDirectory, className + ".java", fileContent);
+                                    FileUtils.writeTextFile(project, baseDirectory, className + ".java", fileContent);
                                 }
                             }
                             ProjectUtils.createConfiguration(project, task, true);
                         } else if ("tctask".equals(taskFile.getExtension())) {
                             TopCoderTask task = TopCoderTask.load(new InputReader(taskFile.getInputStream()));
-                            VirtualFile baseDirectory = FileUtils.getFile(project, ProjectUtils.getData(project).defaultDirectory);
+                            PsiDirectory baseDirectory = FileUtils.getPsiDirectory(project, ProjectUtils.getData(project).defaultDirectory);
                             if (baseDirectory == null) {
                                 Messenger.publishMessage("Directory where task was located is no longer exists",
                                     NotificationType.ERROR);
                                 return;
                             }
-                            task.saveTask(new OutputWriter(baseDirectory.findOrCreateChildData(null, task.name + ".tctask").
+                            task.saveTask(new OutputWriter(baseDirectory.createFile(task.name + ".tctask").getVirtualFile().
                                 getOutputStream(null)));
                             List<String> toCopy = new ArrayList<String>();
                             VirtualFile mainFile = taskFile.getParent().findChild(task.name + ".java");
                             if (mainFile != null)
-                                FileUtils.writeTextFile(baseDirectory, task.name + ".java", FileUtils.readTextFile(mainFile));
+                                FileUtils.writeTextFile(project, baseDirectory, task.name + ".java", FileUtils.readDocumentFile(mainFile));
                             Collections.addAll(toCopy, task.testClasses);
                             for (String className : toCopy) {
                                 int position = className.lastIndexOf('.');
@@ -128,11 +130,11 @@ public class UnarchiveTaskAction extends AnAction {
                                     className = className.substring(position + 1);
                                 VirtualFile file = taskFile.getParent().findChild(className + ".java");
                                 if (file != null)
-                                    FileUtils.writeTextFile(baseDirectory, className + ".java", FileUtils.readTextFile(file));
+                                    FileUtils.writeTextFile(project, baseDirectory, className + ".java", FileUtils.readDocumentFile(file));
                             }
                             ProjectUtils.createConfiguration(project, task, true);
                         }
-                        FileUtils.deleteTaskIfExists(PsiManager.getInstance(project).findFile(taskFile));
+                        FileUtils.deleteTaskIfExists(PsiUtil.getPsiFile(project, taskFile));
                     }
                 } catch (IOException e) {
                     throw new RuntimeException(e);

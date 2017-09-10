@@ -11,6 +11,7 @@ import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.util.PsiUtil;
 import net.egork.chelper.codegeneration.CodeGenerationUtils;
 import net.egork.chelper.codegeneration.MainFileTemplate;
 import net.egork.chelper.task.Task;
@@ -29,9 +30,12 @@ public class FileUtils {
     private FileUtils() {
     }
 
-    public static boolean deleteTaskIfExists(final PsiFile psiFile) {
+    /**
+     * @param psiFile either source or file
+     */
+    public static void deleteTaskIfExists(final PsiFile psiFile) {
         if (psiFile == null) {
-            return false;
+            return;
         }
         ExecuteUtils.executeStrictWriteActionAndWait(new Runnable() {
             @Override
@@ -52,13 +56,15 @@ public class FileUtils {
                     if (_psiFile != null) {
                         _psiFile.delete();
                     }
+                    _psiFile = parentFile.findFile(nameWithOutExtension + ".tctask");
+                    if (_psiFile != null) {
+                        _psiFile.delete();
+                    }
                 }
 //                Messenger.publishMessage("Unable to delete file " + _psiFile.getVirtualFile().getPath(),NotificationType.ERROR);
             }
         });
-        return true;
     }
-
 
     public static Properties loadProperties(VirtualFile file) {
         InputStream is = getInputStream(file);
@@ -87,18 +93,6 @@ public class FileUtils {
         }
     }
 
-    public static PsiDirectory getDirectory(DataContext dataContext) {
-        IdeView view = getView(dataContext);
-        if (view == null) {
-            return null;
-        }
-        PsiDirectory[] directories = view.getDirectories();
-        if (directories.length != 1) {
-            return null;
-        }
-        return directories[0];
-    }
-
     public static IdeView getView(DataContext dataContext) {
         return LangDataKeys.IDE_VIEW.getData(dataContext);
     }
@@ -108,12 +102,12 @@ public class FileUtils {
     }
 
     public static VirtualFile writeTextFile(final VirtualFile location, final String fileName, final String fileContent) {
+        if (location == null) {
+            return null;
+        }
         ExecuteUtils.executeStrictWriteActionAndWait(new Runnable() {
             @Override
             public void run() {
-                if (location == null) {
-                    return;
-                }
                 OutputStream stream = null;
                 try {
                     VirtualFile file = location.findOrCreateChildData(null, fileName);
@@ -133,17 +127,51 @@ public class FileUtils {
         return location.findChild(fileName);
     }
 
+    /**
+     * detectable creation
+     *
+     * @param project
+     * @param location
+     * @param fileName
+     * @return
+     */
+    public static PsiFile writeTextFile(final Project project, final PsiDirectory location, final String fileName, final Document document) {
+        if (location == null) {
+            return null;
+        }
+        ExecuteUtils.executeWriteCommandAction(project, new Runnable() {
+
+//            PsiFileFactory factory = PsiFileFactory.getInstance(project);
+//            PsiFile psiFile = location.createFile(fileName);
+//            writeTextFile(location.getVirtualFile(),fileName,fileContent);
+
+            @Override
+            public void run() {
+                PsiFile docFile = PsiDocumentManager.getInstance(project).getPsiFile(document);
+                if (docFile == null) {
+                    return;
+                }
+                location.add(docFile);
+            }
+        });
+        return location.findFile(fileName);
+    }
+
     public static boolean isValiDirectory(Project project, String location) {
         PsiDirectory directory = FileUtils.getPsiDirectory(project, location);
         return !(directory == null || !directory.isValid());
     }
 
     public static String readTextFile(VirtualFile file) {
-        try {
-            return VfsUtil.loadText(file);
-        } catch (IOException e) {
-            return null;
-        }
+        Document doc = readDocumentFile(file);
+        if (doc == null) return null;
+        return doc.getText();
+    }
+
+    public static Document readDocumentFile(VirtualFile file) {
+        Document doc = FileDocumentManager.getInstance().getDocument(file);
+        if (doc == null) return null;
+        return doc;
     }
 
     public static boolean isValidClass(Project project, String clazz) {
@@ -156,22 +184,6 @@ public class FileUtils {
                 return false;
         }
         return true;
-    }
-
-    public static PsiDirectory getPsiDirectory(Project project, String location) {
-        VirtualFile file = getFile(project, location);
-        if (file == null) {
-            return null;
-        }
-        return PsiManager.getInstance(project).findDirectory(file);
-    }
-
-    public static VirtualFile getFile(Project project, String location) {
-        VirtualFile baseDir = project.getBaseDir();
-        if (baseDir == null) {
-            return null;
-        }
-        return baseDir.findFileByRelativePath(location);
     }
 
     public static String getRelativePath(VirtualFile baseDir, VirtualFile file) {
@@ -211,12 +223,40 @@ public class FileUtils {
         return packageName + "." + name;
     }
 
+    public static VirtualFile getFile(Project project, String location) {
+        VirtualFile baseDir = project.getBaseDir();
+        if (baseDir == null) {
+            return null;
+        }
+        return baseDir.findFileByRelativePath(location);
+    }
+
     public static PsiFile getPsiFile(Project project, String location) {
         VirtualFile file = getFile(project, location);
         if (file == null) {
             return null;
         }
-        return PsiManager.getInstance(project).findFile(file);
+        return PsiUtil.getPsiFile(project, file);
+    }
+
+    public static PsiDirectory getDirectory(DataContext dataContext) {
+        IdeView view = getView(dataContext);
+        if (view == null) {
+            return null;
+        }
+        PsiDirectory[] directories = view.getDirectories();
+        if (directories.length != 1) {
+            return null;
+        }
+        return directories[0];
+    }
+
+    public static PsiDirectory getPsiDirectory(Project project, String location) {
+        VirtualFile file = getFile(project, location);
+        if (file == null) {
+            return null;
+        }
+        return PsiManager.getInstance(project).findDirectory(file);
     }
 
     public static VirtualFile createDirectoryIfMissing(final Project project, final String location) {
@@ -234,6 +274,11 @@ public class FileUtils {
             }
         });
         return getFile(project, location);
+    }
+
+    public static PsiDirectory createPsiDirectoryIfMissing(final Project project, final String location) {
+        createDirectoryIfMissing(project, location);
+        return getPsiDirectory(project, location);
     }
 
     public static void synchronizeFile(VirtualFile file) {
@@ -270,7 +315,7 @@ public class FileUtils {
         if (vFile == null) {
             return null;
         }
-        return Task.loadTask(new InputReader(getInputStream(vFile)));
+        return Task.load(new InputReader(getInputStream(vFile)));
     }
 
     public static TopCoderTask readTopCoderTask(Project project, String fileName) {
@@ -388,7 +433,19 @@ public class FileUtils {
     public static VirtualFile getFileByFQN(Project project, String fqn) {
         if (fqn == null)
             return null;
-        PsiElement main = JavaPsiFacade.getInstance(project).findClass(fqn, GlobalSearchScope.allScope(project));
+        PsiClass main = JavaPsiFacade.getInstance(project).findClass(fqn, GlobalSearchScope.allScope(project));
         return main == null ? null : main.getContainingFile() == null ? null : main.getContainingFile().getVirtualFile();
+    }
+
+    /**
+     * @param project
+     * @param fqn     className
+     * @return
+     */
+    public static PsiFile getPsiFileByFQN(Project project, String fqn) {
+        if (fqn == null)
+            return null;
+        PsiClass main = JavaPsiFacade.getInstance(project).findClass(fqn, GlobalSearchScope.allScope(project));
+        return main == null ? null : main.getContainingFile();
     }
 }

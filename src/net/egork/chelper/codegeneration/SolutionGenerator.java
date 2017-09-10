@@ -7,6 +7,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
+import com.intellij.psi.util.PsiUtil;
 import net.egork.chelper.exception.TaskCorruptException;
 import net.egork.chelper.task.StreamConfiguration;
 import net.egork.chelper.task.Task;
@@ -573,7 +574,7 @@ public class SolutionGenerator {
                 }
 
                 FileUtils.synchronizeFile(file);
-                ReformatCodeProcessor processor = new ReformatCodeProcessor(project, PsiManager.getInstance(project).findFile(file), null, false);
+                ReformatCodeProcessor processor = new ReformatCodeProcessor(project, PsiUtil.getPsiFile(project, file), null, false);
 
                 processor.run();
 

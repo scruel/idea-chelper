@@ -1,6 +1,7 @@
 package net.egork.chelper.codegeneration;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.JavaPsiFacade;
@@ -300,17 +301,22 @@ public class CodeGenerationUtils {
         return builder.toString();
     }
 
-    public static String changePackage(String sourceFile, String packageName) {
-        if (sourceFile.startsWith("package ")) {
-            int index = sourceFile.indexOf(';');
+    public static String changePackage(String source, String packageName) {
+        if (source.startsWith("package ")) {
+            int index = source.indexOf(';');
             if (index == -1)
-                return sourceFile;
-            sourceFile = sourceFile.substring(index + 1);
+                return source;
+            source = source.substring(index + 1);
         }
         if (packageName.length() == 0)
-            return sourceFile;
-        sourceFile = "package " + packageName + ";\n\n" + sourceFile;
-        return sourceFile;
+            return source;
+        source = "package " + packageName + ";\n\n" + source;
+        return source;
+    }
+
+    public static Document changeDocPackage(Document sourceDoc, String packageName) {
+        sourceDoc.setText(changePackage(sourceDoc.getText(), packageName));
+        return sourceDoc;
     }
 
     public static String createTestStub(Project project, Task task, String location, String name) {

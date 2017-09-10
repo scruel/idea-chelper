@@ -40,7 +40,7 @@ public class NewTester {
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
-        Task task = Task.loadTask(input);
+        Task task = Task.load(input);
         if (task == null) {
             throw new TaskCorruptException();
         }

@@ -3,6 +3,7 @@ package net.egork.chelper.util;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
 
 /**
@@ -47,6 +48,20 @@ public class ExecuteUtils {
                 @Override
                 public void run() {
                     application.runWriteAction(runnable);
+                }
+            },
+            ModalityState.NON_MODAL
+        );
+    }
+
+    public static void executeWriteCommandAction(final Project project, final Runnable runnable) {
+        final Application application = ApplicationManager.getApplication();
+
+        application.invokeAndWait(
+            new Runnable() {
+                @Override
+                public void run() {
+                    WriteCommandAction.runWriteCommandAction(project, runnable);
                 }
             },
             ModalityState.NON_MODAL

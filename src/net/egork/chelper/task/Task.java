@@ -125,7 +125,7 @@ public class Task extends TaskBase<Test> {
         out.printBoolean(failOnOverflow);
     }
 
-    public static Task loadTask(InputReader in) {
+    public static Task load(InputReader in) {
         try {
             String name = in.readString();
             TestType testType = in.readEnum(TestType.class);
