@@ -8,6 +8,10 @@ public class Verdict {
     public static final Verdict UNDECIDED = new Verdict(Verdict.VerdictType.UNDECIDED, null);
     public static final Verdict OK = new Verdict(Verdict.VerdictType.OK, null);
     public static final Verdict WA = new Verdict(Verdict.VerdictType.WA, null);
+    // PE - Presentation Error
+    public static final Verdict PE = new Verdict(Verdict.VerdictType.PE, null);
+    // OK but line separator may cause error.
+    public static final Verdict LFOK = new Verdict(Verdict.VerdictType.OK, "LF may cause WA/PE");
 
     public final VerdictType type;
     public final String message;
@@ -34,7 +38,6 @@ public class Verdict {
         private VerdictType(String uiDescription) {
             this.uiDescription = uiDescription;
         }
-
 
         @Override
         public String toString() {

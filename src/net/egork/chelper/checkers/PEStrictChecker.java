@@ -7,16 +7,6 @@ import net.egork.chelper.tester.Verdict;
  * Github : https://github.com/scruel
  */
 public class PEStrictChecker implements Checker {
-    //    public static final Verdict RTE;
-    private static final Verdict PE;
-    //    public static final Verdict PELF;
-    private static final Verdict LFOK;
-
-    static {
-        //        RTE = new Verdict(Verdict.VerdictType.RTE, null);
-        PE = new Verdict(Verdict.VerdictType.PE, null);
-        LFOK = new Verdict(Verdict.VerdictType.OK, "LF may cause WA/PE");
-    }
 
     private TokenChecker tk;
 
@@ -35,11 +25,11 @@ public class PEStrictChecker implements Checker {
             return Verdict.OK;
         }
         if (actualOutput.trim().equals(expectedOutput.trim())) {
-            return LFOK;
+            return Verdict.LFOK;
         }
         Verdict v = tk.check(input, expectedOutput, actualOutput);
         if (v == Verdict.OK) {
-            return PE;
+            return Verdict.PE;
         }
         return Verdict.WA;
     }
