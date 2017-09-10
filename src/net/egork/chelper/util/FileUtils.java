@@ -210,14 +210,16 @@ public class FileUtils {
     }
 
     public static VirtualFile getFile(Project project, String location) {
-        VirtualFile baseDir = project.getBaseDir();
-        if (baseDir == null) {
+        if (location == null) return null;
+        VirtualFile file = project.getBaseDir();
+        if (file == null) {
             return null;
         }
-        return baseDir.findFileByRelativePath(location);
+        return file.findFileByRelativePath(location);
     }
 
     public static PsiFile getPsiFile(Project project, String location) {
+        if (location == null) return null;
         VirtualFile file = getFile(project, location);
         if (file == null) {
             return null;
@@ -238,8 +240,9 @@ public class FileUtils {
     }
 
     public static PsiDirectory getPsiDirectory(Project project, String location) {
+        if (location == null) return null;
         VirtualFile file = getFile(project, location);
-        if (file == null || location == null) {
+        if (file == null) {
             return null;
         }
         return PsiManager.getInstance(project).findDirectory(file);
