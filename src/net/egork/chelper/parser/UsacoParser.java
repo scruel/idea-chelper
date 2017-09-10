@@ -58,7 +58,7 @@ public class UsacoParser implements Parser {
             parser.advance(true, "<pre class=\"out\">");
             String testOutput = parser.advance(false, "</pre>").trim() + "\n";
             return Collections.singleton(new Task(taskName, defaultTestType(), input, output, new Test[]{new Test(testInput, testOutput)},
-                null, "-Xmx1024M", "Main", taskClass, PEStrictChecker.class.getCanonicalName(), "",
+                null, "-Xmx1024M", taskClass, taskClass, PEStrictChecker.class.getCanonicalName(), "",
                 new String[0], null, contestName, true, null, null, false, false));
         } catch (ParseException e) {
             return Collections.emptyList();

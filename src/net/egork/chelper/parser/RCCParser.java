@@ -29,7 +29,7 @@ public class RCCParser implements Parser {
     }
 
     public void getContests(DescriptionReceiver receiver) {
-        int currentRound;
+        int currentRound = -1;
         String currentPage = FileUtils.getWebPageContent("http://russiancodecup.ru/en/championship/", "UTF-8");
         StringParser parser = new StringParser(currentPage);
         List<Integer> championshipIDs = new ArrayList<Integer>();
