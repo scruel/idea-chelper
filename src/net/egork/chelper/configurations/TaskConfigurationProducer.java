@@ -53,6 +53,8 @@ public class TaskConfigurationProducer extends RunConfigurationProducer<TaskConf
 
     private static boolean isAvailable(final Location location, final PsiFile script) {
         if (script == null) return false;
+        if (!FileUtils.isJavaDirectory(script.getParent()))
+            return false;
         final Module module = ModuleUtilCore.findModuleForPsiElement(script);
         return module != null;
     }
