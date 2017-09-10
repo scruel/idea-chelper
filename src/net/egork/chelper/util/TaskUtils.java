@@ -3,9 +3,11 @@ package net.egork.chelper.util;
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.impl.RunManagerImpl;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.text.StringUtilRt;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiManager;
 import net.egork.chelper.actions.ArchiveAction;
 import net.egork.chelper.checkers.PEStrictChecker;
 import net.egork.chelper.codegeneration.MainFileTemplate;
@@ -24,6 +26,11 @@ import java.util.Map;
  * @author Egor Kulikov (egorku@yandex-team.ru)
  */
 public class TaskUtils {
+    //for task map
+    public static final String TASK_KEY = "TASK_KEY";
+    public static final String TASK_SOURCE_KEY = "TASK_SOURCE_KEY";
+    public static final String TASK_DATA_KEY = "TASK_DATA_KEY";
+
     private TaskUtils() {
     }
 
@@ -73,7 +80,7 @@ public class TaskUtils {
      * @param file    .java file
      * @return associated Task
      */
-    private static Map<String, Object> getTaskMapWithSourceFile(Project project, VirtualFile file) {
+    public static Map<String, Object> getTaskMapWithSourceFile(Project project, VirtualFile file) {
         VirtualFile parentFile = file.getParent();
         String fileName = file.getNameWithoutExtension();
         VirtualFile taskFile;
@@ -89,7 +96,7 @@ public class TaskUtils {
             if ("task".equals(virtualFile.getExtension()) || "tctask".equals(virtualFile.getExtension())) {
                 Map<String, Object> map = getTaskMapWithDataFile(project, virtualFile);
                 if (map == null) continue;
-                if (file.equals(map.get(TaskBase.TASK_SOURCE_KEY)))
+                if (file.equals(map.get(TASK_SOURCE_KEY)))
                     return map;
             }
         }
@@ -101,7 +108,7 @@ public class TaskUtils {
      * @param file    .task file
      * @return associated Task
      */
-    private static Map<String, Object> getTaskMapWithDataFile(Project project, VirtualFile file) {
+    public static Map<String, Object> getTaskMapWithDataFile(Project project, VirtualFile file) {
         Map<String, Object> map = new HashMap<String, Object>();
         TaskBase taskBase = FileUtils.readTask(project, FileUtils.getRelativePath(project.getBaseDir(), file));
         if (taskBase == null) {
@@ -109,48 +116,23 @@ public class TaskUtils {
         }
         if (taskBase == null) return null;
 
-        VirtualFile taskDataFile = null;
+        VirtualFile taskSourceFile = null;
         if (taskBase instanceof Task) {
             Task task = (Task) taskBase;
-            taskDataFile = FileUtils.getFileByFQN(project, task.taskClass);
+            String sourceFileName = task.taskClass;
+            int i = StringUtilRt.lastIndexOf(sourceFileName, '.', 0, sourceFileName.length());
+            sourceFileName = i < 0 ? sourceFileName : sourceFileName.substring(i + 1) + ".java";
+            taskSourceFile = file.getParent().findChild(sourceFileName);
         } else if (taskBase instanceof TopCoderTask) {
             TopCoderTask task = (TopCoderTask) taskBase;
-            taskDataFile = TaskUtils.getFile(project, task.name, ProjectUtils.getData(project).defaultDirectory);
+            taskSourceFile = TaskUtils.getFile(project, task.name, ProjectUtils.getData(project).defaultDirectory);
         }
-        if (null == taskDataFile) return null;
+        if (null == taskSourceFile) return null;
 
-        map.put(TaskBase.TASK_KEY, taskBase);
-        map.put(TaskBase.TASK_DATA_KEY, file);
-        map.put(TaskBase.TASK_SOURCE_KEY, taskDataFile);
+        map.put(TASK_KEY, taskBase);
+        map.put(TASK_DATA_KEY, file);
+        map.put(TASK_SOURCE_KEY, taskSourceFile);
         return map;
-    }
-
-    /**
-     * 自动根据传入 VirtualFile 修复 task，防止报错。
-     *
-     * @param project
-     * @param task
-     * @param taskDataFile
-     * @return
-     */
-    public static TaskBase fixedTaskByPath(Project project, TaskBase task, VirtualFile taskDataFile) {
-        TaskBase fixed = null;
-        if (task instanceof Task) {
-            fixed = _fixedTaskByPath(project, (Task) task, taskDataFile);
-        } else if (task instanceof TopCoderTask) {
-            fixed = _fixedTopCoderTaskByPath(project, (TopCoderTask) task, taskDataFile);
-        }
-        if (fixed == null) return null;
-        if (fixed != task) {
-            if (task instanceof Task) {
-                new TaskConfiguration(project, task.name, (Task) task,
-                    TaskConfigurationType.INSTANCE.getConfigurationFactories()[0]);
-            } else if (task instanceof TopCoderTask) {
-                new TopCoderConfiguration(project, task.name, (TopCoderTask) task,
-                    TaskConfigurationType.INSTANCE.getConfigurationFactories()[0]);
-            }
-        }
-        return fixed;
     }
 
     /**
@@ -180,6 +162,37 @@ public class TaskUtils {
         return GetConfSettingsBySourceFile(project, runManager, sourceFile);
     }
 
+    /**
+     * 自动根据传入 VirtualFile 修复 task，防止报错。
+     *
+     * @param project
+     * @param task
+     * @param taskDataFile
+     * @return
+     */
+    public static TaskBase fixedTaskByPath(Project project, TaskBase task, VirtualFile taskDataFile) {
+        if (!FileUtils.isJavaDirectory(PsiManager.getInstance(project).findDirectory(taskDataFile.getParent())))
+            return task;
+
+        TaskBase fixed = null;
+        if (task instanceof Task) {
+            fixed = _fixedTaskByPath(project, (Task) task, taskDataFile);
+        } else if (task instanceof TopCoderTask) {
+            fixed = _fixedTopCoderTaskByPath(project, (TopCoderTask) task, taskDataFile);
+        }
+        if (fixed == null) return null;
+        if (fixed != task) {
+            if (task instanceof Task) {
+                new TaskConfiguration(project, task.name, (Task) task,
+                    TaskConfigurationType.INSTANCE.getConfigurationFactories()[0]);
+            } else if (task instanceof TopCoderTask) {
+                new TopCoderConfiguration(project, task.name, (TopCoderTask) task,
+                    TaskConfigurationType.INSTANCE.getConfigurationFactories()[0]);
+            }
+        }
+        return fixed;
+    }
+
     private static Task _fixedTaskByPath(Project project, Task task, VirtualFile taskDataFile) {
         if (task == null || taskDataFile == null) return null;
         PsiClass aClass = MainFileTemplate.getClass(project, task.checkerClass);
@@ -197,9 +210,9 @@ public class TaskUtils {
 
         // check task move
         String location = FileUtils.getRelativePath(project.getBaseDir(), taskDataFile.getParent());
-        if (location.equals(task.location))
-            return task;
+        if (location.equals(task.location)) return task;
         String aPackage = FileUtils.getPackage(FileUtils.getPsiDirectory(project, location));
+        if (aPackage == null) return task;
         task = task.setTaskClass(aPackage + "." + task.name);
         task = task.setLocation(location);
         return task;

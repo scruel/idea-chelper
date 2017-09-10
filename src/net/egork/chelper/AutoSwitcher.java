@@ -115,7 +115,7 @@ public class AutoSwitcher implements ProjectComponent {
                         if (null == (taskMap = TaskUtils.getTaskMapWitFile(project, file))) return;
 
                         RunConfiguration configuration = TaskUtils.GetConfSettingsBySourceFile(project, runManager,
-                            (VirtualFile) taskMap.get(TaskBase.TASK_SOURCE_KEY));
+                            (VirtualFile) taskMap.get(TaskUtils.TASK_SOURCE_KEY));
                         if (configuration != null) {
                             busy = true;
                             if (configuration instanceof TopCoderConfiguration) {
@@ -133,8 +133,8 @@ public class AutoSwitcher implements ProjectComponent {
                     }
 
                     private void repairAndConfigureTask(Map<String, Object> taskMap) {
-                        TaskBase task = (TaskBase) taskMap.get(TaskBase.TASK_KEY);
-                        VirtualFile taskFile = (VirtualFile) taskMap.get(TaskBase.TASK_SOURCE_KEY);
+                        TaskBase task = (TaskBase) taskMap.get(TaskUtils.TASK_KEY);
+                        VirtualFile taskFile = (VirtualFile) taskMap.get(TaskUtils.TASK_SOURCE_KEY);
                         task = TaskUtils.fixedTaskByPath(project, task, taskFile);
                         busy = true;
                         ProjectUtils.createConfiguration(project, task, true);

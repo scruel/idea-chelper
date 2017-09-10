@@ -29,7 +29,7 @@ public class NewTaskAction extends CreateElementActionBase {
 
         PsiElement main = ProjectUtils.getPsiElement(psiDirectory.getProject(), task.taskClass);
         if (main == null) {
-            FileUtils.deleteTaskIfExists(FileUtils.getPsiFile(psiDirectory.getProject(), task.location + "/" + ArchiveAction.canonize(task.name) + ".java"));
+            FileUtils.deleteTaskIfExists(psiDirectory.getProject(), FileUtils.getPsiFile(psiDirectory.getProject(), task.location + "/" + ArchiveAction.canonize(task.name) + ".java"), true);
             return PsiElement.EMPTY_ARRAY;
         }
 

@@ -104,7 +104,7 @@ public class ProjectUtils {
                                         if (vFile == null) return;
                                         if ("java".equals(vFile.getExtension()) || "task".equals(vFile.getExtension())) {
                                             RunConfiguration runConfiguration = TaskUtils.GetConfSettingsBySourceFile(project, vFile);
-                                            ProjectUtils.removeConfiguration(runConfiguration);
+                                            ProjectUtils.removeConfigurationIfExists(runConfiguration);
                                         }
                                     }
                                 });
@@ -252,13 +252,13 @@ public class ProjectUtils {
         return configuration;
     }
 
-    public static boolean removeConfiguration(RunConfiguration taskConfiguration) {
+    public static boolean removeConfigurationIfExists(RunConfiguration taskConfiguration) {
         if (taskConfiguration == null) return true;
         RunManagerImpl manager = RunManagerImpl.getInstanceImpl(taskConfiguration.getProject());
-        RunnerAndConfigurationSettings old = manager.findConfigurationByName(taskConfiguration.getName());
-        if (old != null) {
+        RunnerAndConfigurationSettings configuration = manager.findConfigurationByName(taskConfiguration.getName());
+        if (configuration != null) {
             //TODO auto refresh Run/Debug Configuration panel when remove configuration.
-            manager.removeConfiguration(old);
+            manager.removeConfiguration(configuration);
             setOtherConfiguration(manager, null);
         }
         return true;

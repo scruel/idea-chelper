@@ -8,11 +8,6 @@ import net.egork.chelper.util.OutputWriter;
  * Github : https://github.com/scruel
  */
 public abstract class TaskBase<E extends TestBase> {
-    //for task map
-    public static final String TASK_KEY = "TASK_KEY";
-    public static final String TASK_SOURCE_KEY = "TASK_SOURCE_KEY";
-    public static final String TASK_DATA_KEY = "TASK_DATA_KEY";
-
     //Basic
     public final String name;
     public final E[] tests;

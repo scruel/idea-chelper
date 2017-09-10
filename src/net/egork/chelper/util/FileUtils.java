@@ -1,12 +1,12 @@
 package net.egork.chelper.util;
 
 import com.intellij.ide.IdeView;
+import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.text.StringUtilRt;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
@@ -21,6 +21,7 @@ import net.egork.chelper.task.TopCoderTask;
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -33,35 +34,28 @@ public class FileUtils {
     /**
      * @param psiFile either source or file
      */
-    public static void deleteTaskIfExists(final PsiFile psiFile) {
+    public static void deleteTaskIfExists(final Project project, final PsiFile psiFile, final boolean removeConf) {
         if (psiFile == null) {
             return;
         }
         ExecuteUtils.executeStrictWriteActionAndWait(new Runnable() {
             @Override
             public void run() {
-                PsiFile _psiFile = psiFile;
-//            res = Files.deleteIfExists(file.toPath());
-                String nameWithOutExtension = _psiFile.getName();
-                int i = StringUtilRt.lastIndexOf(nameWithOutExtension, '.', 0, nameWithOutExtension.length());
-                nameWithOutExtension = i < 0 ? nameWithOutExtension : nameWithOutExtension.substring(0, i);
-                PsiDirectory parentFile = _psiFile.getParent();
-                if (parentFile != null) {
-                    _psiFile = parentFile.findFile(nameWithOutExtension + ".java");
-                    if (_psiFile != null) {
-                        ProjectUtils.removeConfiguration(TaskUtils.GetConfSettingsBySourceFile(psiFile.getProject(), _psiFile.getVirtualFile()));
-                        _psiFile.delete();
-                    }
-                    _psiFile = parentFile.findFile(nameWithOutExtension + ".task");
-                    if (_psiFile != null) {
-                        _psiFile.delete();
-                    }
-                    _psiFile = parentFile.findFile(nameWithOutExtension + ".tctask");
-                    if (_psiFile != null) {
-                        _psiFile.delete();
-                    }
+                VirtualFile vFile = psiFile.getVirtualFile();
+                Map<String, Object> taskMap = TaskUtils.getTaskMapWitFile(project, vFile);
+                if (taskMap == null) {
+                    return;
                 }
-//                Messenger.publishMessage("Unable to delete file " + _psiFile.getVirtualFile().getPath(),NotificationType.ERROR);
+                VirtualFile sourceFile = (VirtualFile) taskMap.get(TaskUtils.TASK_SOURCE_KEY);
+                VirtualFile dataFile = (VirtualFile) taskMap.get(TaskUtils.TASK_DATA_KEY);
+                if (removeConf)
+                    ProjectUtils.removeConfigurationIfExists(TaskUtils.GetConfSettingsBySourceFile(psiFile.getProject(), sourceFile));
+                try {
+                    sourceFile.delete(null);
+                    dataFile.delete(null);
+                } catch (IOException e) {
+                    Messenger.publishMessage("Unable to delete file: " + e, NotificationType.ERROR);
+                }
             }
         });
     }

@@ -12,6 +12,7 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.util.PsiUtil;
 import net.egork.chelper.codegeneration.CodeGenerationUtils;
 import net.egork.chelper.configurations.TaskConfiguration;
 import net.egork.chelper.configurations.TopCoderConfiguration;
@@ -58,22 +59,24 @@ public class ArchiveAction extends AnAction {
         ExecuteUtils.executeStrictWriteActionAndWait(new Runnable() {
             @Override
             public void run() {
-                PsiFile mainFile;
+                PsiFile sourceFile;
                 if (configuration instanceof TaskConfiguration) {
-                    mainFile = FileUtils.getPsiFileByFQN(project, ((Task) taskBase).taskClass);
+                    sourceFile = FileUtils.getPsiFileByFQN(project, ((Task) taskBase).taskClass);
                 } else {
-                    mainFile = FileUtils.getPsiFile(project,
+                    sourceFile = FileUtils.getPsiFile(project,
                         ProjectUtils.getData(project).defaultDirectory
                             + "/" + taskBase.name + ".java");
                 }
-                if (mainFile != null) {
-                    directory.copyFileFrom(mainFile.getName(), mainFile);
-                    mainFile.delete();
+                if (sourceFile == null) {
+                    Messenger.publishMessage("SourceFile where task was located is no longer exists",
+                        NotificationType.ERROR);
+                    return;
                 }
+                directory.copyFileFrom(sourceFile.getName(), sourceFile);
                 if (configuration instanceof TaskConfiguration) {
                     PsiElement checker = JavaPsiFacade.getInstance(project).findClass(((Task) taskBase).checkerClass, GlobalSearchScope.allScope(project));
                     PsiFile checkerFile = checker == null ? null : checker.getContainingFile();
-                    if (checkerFile != null && checkerFile.getParent().equals(mainFile.getParent())) {
+                    if (checkerFile != null && checkerFile.getParent().equals(sourceFile.getParent())) {
                         directory.copyFileFrom(checkerFile.getName(), checkerFile);
                         checkerFile.delete();
                     }
@@ -91,13 +94,11 @@ public class ArchiveAction extends AnAction {
                     taskFile = FileUtils.getPsiFile(project, ((Task) taskBase).location + "/" + canonize(taskBase.name) + ".task");
                 } else {
                     taskFile = FileUtils.getPsiFile(project, ProjectUtils.getData(project).defaultDirectory + "/" + taskBase.name + ".tctask");
-
                 }
                 if (taskFile != null) {
                     directory.copyFileFrom(taskFile.getName(), taskFile);
-                    taskFile.delete();
                 }
-                manager.removeConfiguration(manager.getSelectedConfiguration());
+                FileUtils.deleteTaskIfExists(project, PsiUtil.getPsiFile(project, sourceFile.getVirtualFile()), false);
                 ProjectUtils.setOtherConfiguration(manager, taskBase);
                 Messenger.publishMessage("Configuration '" + configuration.getName() + "' successfully archived",
                     NotificationType.INFORMATION);

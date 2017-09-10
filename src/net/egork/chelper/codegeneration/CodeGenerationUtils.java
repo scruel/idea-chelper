@@ -182,15 +182,15 @@ public class CodeGenerationUtils {
         }
         if (task instanceof Task) {
             PsiElement main = JavaPsiFacade.getInstance(project).findClass(((Task) task).taskClass, GlobalSearchScope.allScope(project));
-            VirtualFile mainFile = main == null ? null : main.getContainingFile() == null ? null : main.getContainingFile().getVirtualFile();
-            String mainContent = FileUtils.readTextFile(mainFile);
+            VirtualFile sourceFile = main == null ? null : main.getContainingFile() == null ? null : main.getContainingFile().getVirtualFile();
+            String mainContent = FileUtils.readTextFile(sourceFile);
             mainContent = changePackage(mainContent, packageName);
             String taskClassSimple = getSimpleName(((Task) task).taskClass);
             FileUtils.writeTextFile(directory, taskClassSimple + ".java", mainContent);
             task = ((Task) task).setTaskClass(packageName + "." + taskClassSimple);
             PsiElement checker = JavaPsiFacade.getInstance(project).findClass(((Task) task).checkerClass, GlobalSearchScope.allScope(project));
             VirtualFile checkerFile = checker == null ? null : checker.getContainingFile() == null ? null : checker.getContainingFile().getVirtualFile();
-            if (checkerFile != null && mainFile != null && checkerFile.getParent().equals(mainFile.getParent())) {
+            if (checkerFile != null && sourceFile != null && checkerFile.getParent().equals(sourceFile.getParent())) {
                 String checkerContent = FileUtils.readTextFile(checkerFile);
                 checkerContent = changePackage(checkerContent, packageName);
                 String checkerClassSimple = getSimpleName(((Task) task).checkerClass);
@@ -199,8 +199,8 @@ public class CodeGenerationUtils {
             }
 
         } else if (task instanceof TopCoderTask) {
-            VirtualFile mainFile = FileUtils.getFile(project, ProjectUtils.getData(project).defaultDirectory + "/" + task.name + ".java");
-            String mainContent = FileUtils.readTextFile(mainFile);
+            VirtualFile sourceFile = FileUtils.getFile(project, ProjectUtils.getData(project).defaultDirectory + "/" + task.name + ".java");
+            String mainContent = FileUtils.readTextFile(sourceFile);
             mainContent = changePackage(mainContent, packageName);
             String taskClassSimple = task.name;
             FileUtils.writeTextFile(directory, taskClassSimple + ".java", mainContent);

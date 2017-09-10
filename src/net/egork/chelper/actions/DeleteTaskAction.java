@@ -46,12 +46,12 @@ public class DeleteTaskAction extends AnAction {
                 public void run() {
                     try {
                         PsiElement main = JavaPsiFacade.getInstance(project).findClass(task.taskClass, GlobalSearchScope.allScope(project));
-                        VirtualFile mainFile = main == null ? null : main.getContainingFile() == null ? null : main.getContainingFile().getVirtualFile();
-                        if (mainFile != null)
-                            mainFile.delete(this);
+                        VirtualFile sourceFile = main == null ? null : main.getContainingFile() == null ? null : main.getContainingFile().getVirtualFile();
+                        if (sourceFile != null)
+                            sourceFile.delete(this);
                         PsiElement checker = JavaPsiFacade.getInstance(project).findClass(task.checkerClass, GlobalSearchScope.allScope(project));
                         VirtualFile checkerFile = checker == null ? null : checker.getContainingFile() == null ? null : checker.getContainingFile().getVirtualFile();
-                        if (checkerFile != null && mainFile != null && checkerFile.getParent().equals(mainFile.getParent()))
+                        if (checkerFile != null && sourceFile != null && checkerFile.getParent().equals(sourceFile.getParent()))
                             checkerFile.delete(this);
                         for (String testClass : task.testClasses) {
                             PsiElement test = JavaPsiFacade.getInstance(project).findClass(testClass, GlobalSearchScope.allScope(project));
@@ -74,10 +74,10 @@ public class DeleteTaskAction extends AnAction {
             ApplicationManager.getApplication().runWriteAction(new Runnable() {
                 public void run() {
                     try {
-                        VirtualFile mainFile = FileUtils.getFile(project, ProjectUtils.getData(project).defaultDirectory
+                        VirtualFile sourceFile = FileUtils.getFile(project, ProjectUtils.getData(project).defaultDirectory
                             + "/" + task.name + ".java");
-                        if (mainFile != null)
-                            mainFile.delete(this);
+                        if (sourceFile != null)
+                            sourceFile.delete(this);
                         for (String testClass : task.testClasses) {
                             PsiElement test = JavaPsiFacade.getInstance(project).findClass(testClass, GlobalSearchScope.allScope(project));
                             VirtualFile testFile = test == null ? null : test.getContainingFile() == null ? null : test.getContainingFile().getVirtualFile();
