@@ -6,6 +6,9 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.openapi.fileTypes.FileTypeRegistry;
+import com.intellij.openapi.fileTypes.UnknownFileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -134,18 +137,20 @@ public class FileUtils {
             return null;
         }
         ExecuteUtils.executeWriteCommandAction(project, new Runnable() {
-
-//            PsiFileFactory factory = PsiFileFactory.getInstance(project);
-//            PsiFile psiFile = location.createFile(fileName);
-//            writeTextFile(location.getVirtualFile(),fileName,fileContent);
-
             @Override
             public void run() {
                 PsiFile docFile = PsiDocumentManager.getInstance(project).getPsiFile(document);
-                if (docFile == null) {
+                if (docFile != null) {
+                    location.add(docFile);
                     return;
                 }
-                location.add(docFile);
+                PsiFileFactory factory = PsiFileFactory.getInstance(project);
+                FileType type = FileTypeRegistry.getInstance().getFileTypeByFileName(fileName);
+                if (type.isBinary()) {
+                    type = UnknownFileType.INSTANCE;
+                }
+                PsiFile psiFile = factory.createFileFromText(fileName, type, document.getText());
+                location.add(psiFile);
             }
         });
         return location.findFile(fileName);

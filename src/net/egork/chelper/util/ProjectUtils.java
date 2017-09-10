@@ -82,11 +82,7 @@ public class ProjectUtils {
                     eligibleProjects.put(project, configuration);
                     TopCoderAction.start(project);
                     ensureLibraryAndData(project);
-                    CodeGenerationUtils.createTaskClassTemplateIfNeeded(project, null);
-                    CodeGenerationUtils.createCheckerClassTemplateIfNeeded(project);
-                    CodeGenerationUtils.createTestCaseClassTemplateIfNeeded(project);
-                    CodeGenerationUtils.createTopCoderTaskTemplateIfNeeded(project);
-                    CodeGenerationUtils.createTopCoderTestCaseClassTemplateIfNeeded(project);
+                    CodeGenerationUtils.createTemplatesIfNeeded(project);
                     ChromeParser.checkInstalled(project, configuration);
 
                     PsiManagerImpl.getInstance(project).addPsiTreeChangeListener(

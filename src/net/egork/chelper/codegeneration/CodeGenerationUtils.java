@@ -2,11 +2,14 @@ package net.egork.chelper.codegeneration;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.editor.EditorFactory;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.GlobalSearchScope;
 import net.egork.chelper.actions.ArchiveAction;
 import net.egork.chelper.task.Task;
@@ -21,6 +24,8 @@ import javax.swing.*;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Egor Kulikov (kulikov@devexperts.com)
@@ -53,43 +58,63 @@ public class CodeGenerationUtils {
             inputClass, "OutputClass", outputClassShort, "OutputClassFQN", outputClass, "TaskClass", name);
     }
 
-    public static String createTaskClassTemplateIfNeeded(Project project, String templateName) {
-        VirtualFile file = FileUtils.getFile(project, templateName == null ? "TaskClass.template" : templateName);
+    public static String createTaskClassTemplateIfNeeded(Project project, String templateName, String inputTemplate) {
+        String taskClassFileName = "TaskClass.template";
+        VirtualFile file = FileUtils.getFile(project, templateName == null ? taskClassFileName : templateName);
         String result = null;
         if (file != null) {
             result = FileUtils.readTextFile(file);
         }
         if (result == null && templateName != null) {
-            file = FileUtils.getFile(project, "TaskClass.template");
+            file = FileUtils.getFile(project, taskClassFileName);
             if (file != null) {
                 result = FileUtils.readTextFile(file);
             }
         }
-        if (result != null) {
+        if (inputTemplate == null && result != null) {
             return result;
         }
-        String template = "package %package%;\n" +
+        String author = ProjectUtils.getData(project).author;
+        if (author.isEmpty()) {
+            author = "unknow";
+        }
+        String template = inputTemplate != null ? inputTemplate : "package %package%;\n" +
             "\n" +
             "import %InputClassFQN%;\n" +
             "import %OutputClassFQN%;\n" +
             "\n" +
+            "/**\n" +
+            " * Created by " + author + " on %date%.\n" +
+            " */\n" +
             "public class %TaskClass% {\n" +
             "    public void solve(int testNumber, %InputClass% in, %OutputClass% out) {\n" +
             "    }\n" +
             "}\n";
-        FileUtils.writeTextFile(project.getBaseDir(), "TaskClass.template", template);
+        FileUtils.writeTextFile(project, PsiManager.getInstance(project).findDirectory(project.getBaseDir()), taskClassFileName, EditorFactory.getInstance().createDocument(template));
         return template;
     }
 
-    public static String createCheckerClassTemplateIfNeeded(Project project) {
-        VirtualFile file = FileUtils.getFile(project, "CheckerClass.template");
-        if (file != null)
+    public static String createTaskClassTemplateIfNeeded(Project project, String templateName) {
+        return createTaskClassTemplateIfNeeded(project, templateName, null);
+    }
+
+    public static String createCheckerClassTemplateIfNeeded(Project project, String inputTemplate) {
+        String checkerClassFileName = "CheckerClass.template";
+        VirtualFile file = FileUtils.getFile(project, checkerClassFileName);
+        if (inputTemplate == null && file != null)
             return FileUtils.readTextFile(file);
-        String template = "package %package%;\n" +
+        String author = ProjectUtils.getData(project).author;
+        if (author.isEmpty()) {
+            author = "unknow";
+        }
+        String template = inputTemplate != null ? inputTemplate : "package %package%;\n" +
             "\n" +
             "import net.egork.chelper.tester.Verdict;\n" +
             "import net.egork.chelper.checkers.Checker;\n" +
             "\n" +
+            "/**\n" +
+            " * Created by " + author + " on %date%.\n" +
+            " */\n" +
             "public class %CheckerClass% implements Checker {\n" +
             "    public %CheckerClass%(String parameters) {\n" +
             "    }\n" +
@@ -98,15 +123,25 @@ public class CodeGenerationUtils {
             "        return Verdict.UNDECIDED;\n" +
             "    }\n" +
             "}\n";
-        FileUtils.writeTextFile(project.getBaseDir(), "CheckerClass.template", template);
+        FileUtils.writeTextFile(project, PsiManager.getInstance(project).findDirectory(project.getBaseDir()), checkerClassFileName, EditorFactory.getInstance().createDocument(template));
         return template;
     }
 
-    public static String createTestCaseClassTemplateIfNeeded(Project project) {
-        VirtualFile file = FileUtils.getFile(project, "TestCaseClass.template");
-        if (file != null)
+    public static String createCheckerClassTemplateIfNeeded(Project project) {
+        return createCheckerClassTemplateIfNeeded(project, null);
+    }
+
+    public static String createTestCaseClassTemplateIfNeeded(Project project, String inputTemplate) {
+
+        String testCaseClassFileName = "TestCaseClass.template";
+        VirtualFile file = FileUtils.getFile(project, testCaseClassFileName);
+        if (inputTemplate == null && file != null)
             return FileUtils.readTextFile(file);
-        String template = "package %package%;\n" +
+        String author = ProjectUtils.getData(project).author;
+        if (author.isEmpty()) {
+            author = "unknow";
+        }
+        String template = inputTemplate != null ? inputTemplate : "package %package%;\n" +
             "\n" +
             "import net.egork.chelper.task.test.Test;\n" +
             "import net.egork.chelper.tester.TestCase;\n" +
@@ -114,21 +149,33 @@ public class CodeGenerationUtils {
             "import java.util.Collection;\n" +
             "import java.util.Collections;\n" +
             "\n" +
+            "/**\n" +
+            " * Created by " + author + " on %date%.\n" +
+            " */\n" +
             "public class %TestCaseClass% {\n" +
             "    @TestCase\n" +
             "    public Collection<Test> createTests() {\n" +
             "        return Collections.emptyList();\n" +
             "    }\n" +
             "}\n";
-        FileUtils.writeTextFile(project.getBaseDir(), "TestCaseClass.template", template);
+        FileUtils.writeTextFile(project, PsiManager.getInstance(project).findDirectory(project.getBaseDir()), testCaseClassFileName, EditorFactory.getInstance().createDocument(template));
         return template;
     }
 
-    public static String createTopCoderTestCaseClassTemplateIfNeeded(Project project) {
-        VirtualFile file = FileUtils.getFile(project, "TopCoderTestCaseClass.template");
-        if (file != null)
+    public static String createTestCaseClassTemplateIfNeeded(Project project) {
+        return createTestCaseClassTemplateIfNeeded(project, null);
+    }
+
+    public static String createTopCoderTestCaseClassTemplateIfNeeded(Project project, String inputTemplate) {
+        String topCoderTestCaseClassFileName = "TopCoderTestCaseClass.template";
+        VirtualFile file = FileUtils.getFile(project, topCoderTestCaseClassFileName);
+        if (inputTemplate == null && file != null)
             return FileUtils.readTextFile(file);
-        String template = "package %package%;\n" +
+        String author = ProjectUtils.getData(project).author;
+        if (author.isEmpty()) {
+            author = "unknow";
+        }
+        String template = inputTemplate != null ? inputTemplate : "package %package%;\n" +
             "\n" +
             "import net.egork.chelper.task.test.NewTopCoderTest;\n" +
             "import net.egork.chelper.tester.TestCase;\n" +
@@ -136,29 +183,131 @@ public class CodeGenerationUtils {
             "import java.util.Collection;\n" +
             "import java.util.Collections;\n" +
             "\n" +
+            "/**\n" +
+            " * Created by " + author + " on %date%.\n" +
+            " */\n" +
             "public class %TestCaseClass% {\n" +
             "    @TestCase\n" +
             "    public Collection<NewTopCoderTest> createTests() {\n" +
             "        return Collections.emptyList();\n" +
             "    }\n" +
             "}\n";
-        FileUtils.writeTextFile(project.getBaseDir(), "TopCoderTestCaseClass.template", template);
+        FileUtils.writeTextFile(project, PsiManager.getInstance(project).findDirectory(project.getBaseDir()), topCoderTestCaseClassFileName, EditorFactory.getInstance().createDocument(template));
         return template;
     }
 
-    public static String createTopCoderTaskTemplateIfNeeded(Project project) {
-        VirtualFile file = FileUtils.getFile(project, "TopCoderTaskClass.template");
-        if (file != null)
+    public static String createTopCoderTestCaseClassTemplateIfNeeded(Project project) {
+        return createTopCoderTestCaseClassTemplateIfNeeded(project, null);
+    }
+
+    public static String createTopCoderTaskTemplateIfNeeded(Project project, String inputTemplate) {
+
+        String topCoderTaskClass = "TopCoderTaskClass.template";
+        VirtualFile file = FileUtils.getFile(project, topCoderTaskClass);
+        if (inputTemplate == null && file != null)
             return FileUtils.readTextFile(file);
-        String template = "package %package%;\n" +
+        String author = ProjectUtils.getData(project).author;
+        if (author.isEmpty()) {
+            author = "unknow";
+        }
+        String template = inputTemplate != null ? inputTemplate : "package %package%;\n" +
             "\n" +
+            "/**\n" +
+            " * Created by " + author + " on %date%.\n" +
+            " */\n" +
             "public class %TaskClass% {\n" +
             "    public %Signature% {\n" +
             "        return %DefaultValue%;\n" +
             "    }\n" +
             "}\n";
-        FileUtils.writeTextFile(project.getBaseDir(), "TopCoderTaskClass.template", template);
+        FileUtils.writeTextFile(project, PsiManager.getInstance(project).findDirectory(project.getBaseDir()), topCoderTaskClass, EditorFactory.getInstance().createDocument(template));
         return template;
+    }
+
+    public static String createTopCoderTaskTemplateIfNeeded(Project project) {
+        return createTopCoderTaskTemplateIfNeeded(project, null);
+    }
+
+    public static void createTemplatesIfNeeded(final Project project) {
+        DumbService.getInstance(project).runWhenSmart(new Runnable() {
+            @Override
+            public void run() {
+                createTaskClassTemplateIfNeeded(project, null);
+                createCheckerClassTemplateIfNeeded(project);
+                createTestCaseClassTemplateIfNeeded(project);
+                createTopCoderTaskTemplateIfNeeded(project);
+                createTopCoderTestCaseClassTemplateIfNeeded(project);
+            }
+        });
+    }
+
+    enum TemplateType {
+        TASK_CLASS(0),
+        CHECKER_CLASS(1),
+        TOP_CODER_TASK_CLASS(2),
+        TEST_CASE_CLASS(3),
+        TOP_CODER_TEST_CASE_CLASS(4);
+
+        TemplateType(int i) {
+        }
+    }
+
+    /**
+     * get all template in a Map, use this method to change all template with same pattern.
+     *
+     * @param project
+     * @return
+     */
+    public static Map<TemplateType, String> getAllTemplate(Project project) {
+        Map<TemplateType, String> allTemplates = new HashMap<TemplateType, String>();
+        allTemplates.put(TemplateType.TASK_CLASS, createTaskClassTemplateIfNeeded(project, null));
+        allTemplates.put(TemplateType.CHECKER_CLASS, createCheckerClassTemplateIfNeeded(project));
+        allTemplates.put(TemplateType.TEST_CASE_CLASS, createTestCaseClassTemplateIfNeeded(project));
+        allTemplates.put(TemplateType.TOP_CODER_TASK_CLASS, createTopCoderTaskTemplateIfNeeded(project));
+        allTemplates.put(TemplateType.TOP_CODER_TEST_CASE_CLASS, createTopCoderTestCaseClassTemplateIfNeeded(project));
+        return allTemplates;
+    }
+
+    /**
+     * @param args target string, replacement string.
+     */
+    public static void refreshAllTemplate(Project project, String... args) {
+        // if ((args.length & 2) != 0) {
+        //   return;
+        // }
+        Map<TemplateType, String> allTemplates = getAllTemplate(project);
+        for (int i = 0; i < args.length; i += 2) {
+            // if (args[i] == "author")
+            if (args[i + 1].isEmpty()) {
+                continue;
+            }
+            for (Map.Entry<TemplateType, String> entry : allTemplates.entrySet()) {
+                String tmp = entry.getValue().replaceAll("Created by (.*)+ on", "Created by " + args[i + 1] + " on");
+                // String tmp = entry.getValue().replaceAll("Created by " + args[i] + " on", "Created by " + args[i + 1] + " on");
+                allTemplates.put(entry.getKey(), tmp);
+            }
+        }
+        writeAllTemplate(project, allTemplates);
+    }
+
+    private static void writeAllTemplate(Project project, Map<TemplateType, String> allTemplates) {
+        for (Map.Entry<TemplateType, String> entry : allTemplates.entrySet()) {
+            if (entry.getKey().equals(TemplateType.TASK_CLASS)) {
+                createTaskClassTemplateIfNeeded(project, null, entry.getValue());
+            }
+            if (entry.getKey().equals(TemplateType.CHECKER_CLASS)) {
+                createCheckerClassTemplateIfNeeded(project, entry.getValue());
+            }
+            if (entry.getKey().equals(TemplateType.TEST_CASE_CLASS)) {
+                createTestCaseClassTemplateIfNeeded(project, entry.getValue());
+            }
+            if (entry.getKey().equals(TemplateType.TOP_CODER_TASK_CLASS)) {
+                createTopCoderTaskTemplateIfNeeded(project, entry.getValue());
+            }
+            if (entry.getKey().equals(TemplateType.TOP_CODER_TEST_CASE_CLASS)) {
+                createTopCoderTestCaseClassTemplateIfNeeded(project, entry.getValue());
+            }
+        }
     }
 
     public static void createUnitTest(final Project project, TaskBase task) {
