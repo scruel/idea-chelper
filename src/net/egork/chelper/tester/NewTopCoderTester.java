@@ -16,7 +16,7 @@ import java.util.*;
 /**
  * @author Egor Kulikov (kulikov@devexperts.com)
  */
-@SuppressWarnings("unckecked")
+@SuppressWarnings("unchecked")
 public class NewTopCoderTester {
     public static void main(String[] args)
         throws InterruptedException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException,

@@ -14,7 +14,7 @@ import java.util.*;
 /**
  * @author Egor Kulikov (kulikov@devexperts.com)
  */
-@SuppressWarnings("unckecked")
+@SuppressWarnings("unchecked")
 public class Tester {
     public static void main(String[] args) throws InterruptedException, InvocationTargetException,
         ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException {
