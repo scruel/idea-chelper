@@ -55,7 +55,9 @@ public class UnarchiveTaskAction extends AnAction {
                             if ("task".equals(taskFile.getExtension())) {
                                 Task task = Task.load(new InputReader(taskFile.getInputStream()));
                                 if (task == null) {
-                                    throw new TaskCorruptException();
+                                    Messenger.publishMessage(TaskCorruptException.defauleMessage + " " + taskFile.getName(),
+                                        NotificationType.ERROR);
+                                    continue;
                                 }
                                 PsiDirectory baseDirectory = FileUtils.getPsiDirectory(project, task.location);
                                 if (baseDirectory == null) {

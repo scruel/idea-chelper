@@ -63,8 +63,7 @@ public class AutoSwitcher implements ProjectComponent {
                 if (!ProjectUtils.isValidConfigurationOrDeleteIfNot(configuration)) {
                     return;
                 }
-                if (busy
-                    || !(configuration instanceof TopCoderConfiguration || configuration instanceof TaskConfiguration)) {
+                if (busy || !ProjectUtils.isSupported(configuration)) {
                     return;
                 }
                 busy = true;

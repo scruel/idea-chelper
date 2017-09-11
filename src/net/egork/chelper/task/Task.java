@@ -9,6 +9,8 @@ import java.util.Calendar;
 import java.util.InputMismatchException;
 
 /**
+ * 这部分的重构实在是有心无力。。。
+ *
  * @author Egor Kulikov (kulikov@devexperts.com)
  */
 public class Task extends TaskBase<Test> {

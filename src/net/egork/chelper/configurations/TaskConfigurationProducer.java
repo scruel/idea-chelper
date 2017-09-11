@@ -26,7 +26,6 @@ public class TaskConfigurationProducer extends RunConfigurationProducer<TaskConf
         super(configurationType);
     }
 
-
     @Override
     protected boolean setupConfigurationFromContext(TaskConfiguration configuration, ConfigurationContext context, Ref sourceElement) {
         final Location location = context.getLocation();
@@ -42,12 +41,12 @@ public class TaskConfigurationProducer extends RunConfigurationProducer<TaskConf
         if (null == (dataFile = (VirtualFile) map.get(TaskUtils.TASK_DATA_KEY)))
             return false;
         Task task = FileUtils.readTask(project, FileUtils.getRelativePath(project.getBaseDir(), dataFile));
+        if (task == null) return false;
         task = (Task) TaskUtils.fixedTaskByPath(project, task, dataFile);
         if (task == null) return false;
-        // configuration = new TaskConfiguration(task.name, project, task,
-        //     TaskConfigurationType.INSTANCE.getConfigurationFactories()[0]);
         configuration.setName(task.name);
         configuration.setConfiguration(task);
+        ProjectUtils.createConfiguration(project, task, true);
         return true;
     }
 
@@ -61,6 +60,7 @@ public class TaskConfigurationProducer extends RunConfigurationProducer<TaskConf
 
     @Override
     public boolean isConfigurationFromContext(TaskConfiguration configuration, ConfigurationContext context) {
+        if (!ProjectUtils.isValidConfigurationOrDeleteIfNot(configuration)) return false;
         final Location location = context.getLocation();
         if (location == null) return false;
         final PsiFile script = location.getPsiElement().getContainingFile();
@@ -74,7 +74,6 @@ public class TaskConfigurationProducer extends RunConfigurationProducer<TaskConf
         if (map == null) return false;
         if (null == (map.get(TaskUtils.TASK_DATA_KEY))) return false;
 
-        if (!ProjectUtils.isValidConfigurationOrDeleteIfNot(configuration)) return false;
         final String taskLocation = configuration.getConfiguration().location;
         final String scriptName = configuration.getConfiguration().name;
         final String path = FileUtils.getRelativePath(context.getProject().getBaseDir(), vFile);
