@@ -169,21 +169,10 @@ public class FileUtils {
 
     public static String readTextFile(VirtualFile file) {
         try {
-            return reformatLineSeparator(VfsUtil.loadText(file));
+            return EncodingUtils.reformatLineSeparator(VfsUtil.loadText(file));
         } catch (IOException e) {
             return null;
         }
-    }
-
-    public static String reformatLineSeparator(String original) {
-        String OSLS = System.getProperty("line.separator");
-        if (!"\n".equals(OSLS)) {
-            original = original.replaceAll(OSLS, "\n");
-        }
-        if (!"\r\n".equals(OSLS)) {
-            original = original.replaceAll("\\r\\n", "\n");
-        }
-        return original;
     }
 
     public static boolean isValidClass(Project project, String clazz) {

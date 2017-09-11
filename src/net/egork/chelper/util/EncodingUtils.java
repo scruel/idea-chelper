@@ -9,8 +9,16 @@ import net.egork.chelper.task.test.TopCoderTest;
 public class EncodingUtils {
     private EncodingUtils() {
     }
+
     public static final String TOKEN_SEPARATOR = "::";
     public static final String TEST_SEPARATOR = ";;";
+
+    public static String trim(String s) {
+        if (s == null) {
+            return null;
+        }
+        return s.trim();
+    }
 
     public static String encode(String s) {
         return s.replace(":", "/:").replace(";", "/;").replace("_", "/_").replace("\n", "/__").replace("\r", "");
@@ -60,6 +68,17 @@ public class EncodingUtils {
             builder.append(encode(argument)).append(TEST_SEPARATOR);
         builder.append(encode(test.getResult())).append(TEST_SEPARATOR).append(test.isActive());
         return builder.toString();
+    }
+
+    public static String reformatLineSeparator(String original) {
+        String OSLS = System.getProperty("line.separator");
+        if (!"\n".equals(OSLS)) {
+            original = original.replaceAll(OSLS, "\n");
+        }
+        if (!"\r\n".equals(OSLS)) {
+            original = original.replaceAll("\\r\\n", "\n");
+        }
+        return original;
     }
 
     public static String encodeTests(TopCoderTest[] tests) {
