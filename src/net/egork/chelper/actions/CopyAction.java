@@ -13,6 +13,7 @@ import net.egork.chelper.util.FileUtils;
 import net.egork.chelper.util.ProjectUtils;
 
 import java.awt.*;
+import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 
 /**
@@ -40,7 +41,20 @@ public class CopyAction extends AnAction {
             if (content == null)
                 return;
             StringSelection selection = new StringSelection(content);
-            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(selection, selection);
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+
+            while (true) {
+                Throwable throwable = null;
+                try {
+                    clipboard.setContents(selection, selection);
+                } catch (IllegalStateException ignore) {
+                    throwable = ignore;
+                }
+                if (throwable == null) {
+                    break;
+                }
+            }
+
         }
     }
 }
