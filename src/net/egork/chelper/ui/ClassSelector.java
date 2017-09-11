@@ -10,6 +10,6 @@ import com.intellij.ui.JavaReferenceEditorUtil;
  */
 public class ClassSelector extends EditorTextField {
     public ClassSelector(Project project, String text) {
-        super(JavaReferenceEditorUtil.createDocument(text, project, true), project, StdFileTypes.JAVA);
+        super(JavaReferenceEditorUtil.createDocument(text == null ? "" : text, project, true), project, StdFileTypes.JAVA);
     }
 }
