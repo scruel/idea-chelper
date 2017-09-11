@@ -139,7 +139,7 @@ public class EditTestsDialog extends JDialog {
                 int size = EditTestsDialog.this.tests.size();
                 for (int i = currentTest; i < size; i++) {
                     Test test = EditTestsDialog.this.tests.get(i);
-                    test = new Test(test.input, test.output, i, test.active);
+                    test = new Test(test.getInput(), test.getOutput(), i, test.isActive());
                     EditTestsDialog.this.tests.set(i, test);
                     checkBoxesPanel.add(createCheckBox(test));
                 }
@@ -212,14 +212,14 @@ public class EditTestsDialog extends JDialog {
     }
 
     private JCheckBox createCheckBox(final Test test) {
-        final JCheckBox checkBox = new JCheckBox("", test.active);
+        final JCheckBox checkBox = new JCheckBox("", test.isActive());
         Dimension preferredSize = new Dimension(checkBox.getPreferredSize().width, HEIGHT);
         checkBox.setPreferredSize(preferredSize);
         checkBox.setMaximumSize(preferredSize);
         checkBox.setMinimumSize(preferredSize);
         checkBox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                tests.set(test.index, tests.get(test.index).setActive(checkBox.isSelected()));
+                tests.set(test.getIndex(), tests.get(test.getIndex()).setActive(checkBox.isSelected()));
                 setSelectedTest(currentTest);
             }
         });
@@ -236,9 +236,9 @@ public class EditTestsDialog extends JDialog {
         } else {
             input.setVisible(true);
             output.setVisible(true);
-            input.setText(tests.get(index).input);
-            knowAnswer.setSelected(tests.get(index).output != null);
-            output.setText(knowAnswer.isSelected() ? tests.get(index).output : "");
+            input.setText(tests.get(index).getInput());
+            knowAnswer.setSelected(tests.get(index).getOutput() != null);
+            output.setText(knowAnswer.isSelected() ? tests.get(index).getOutput() : "");
             outputPanel.setVisible(knowAnswer.isSelected());
         }
         currentTest = index;

@@ -3,14 +3,16 @@ package net.egork.chelper.task.test;
 
 import net.egork.chelper.util.InputReader;
 import net.egork.chelper.util.OutputWriter;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Egor Kulikov (kulikov@devexperts.com)
  */
-public class Test extends TestBase {
-    public final String input;
-    public final String output;
-    public final boolean active;
+public class Test implements TestBase {
+    private final int index;
+    private final String input;
+    private final String output;
+    private final boolean active;
 
     public Test(String input) {
         this(input, null);
@@ -25,24 +27,44 @@ public class Test extends TestBase {
     }
 
     public Test(String input, String output, int index, boolean active) {
-        super(index);
         this.input = input;
         this.output = output;
         this.active = active;
+        this.index = index;
+    }
+
+    public Test(InputReader in) {
+        this.index = in.readInt();
+        this.input = in.readString();
+        this.output = in.readString();
+        this.active = in.readBoolean();
     }
 
     @Override
-    public String toString() {
-        String inputRepresentation = input.replace('\n', ' ');
-        inputRepresentation = inputRepresentation.length() > 15 ? inputRepresentation.substring(0, 12) + "..." :
-            inputRepresentation;
-        return "Test #" + index + ": " + inputRepresentation;
+    public int getIndex() {
+        return index;
     }
 
+    @NotNull
+    @Override
     public Test setIndex(int index) {
         return new Test(input, output, index, active);
     }
 
+    public String getInput() {
+        return input;
+    }
+
+    public String getOutput() {
+        return output;
+    }
+
+    @Override
+    public boolean isActive() {
+        return active;
+    }
+
+    @NotNull
     @Override
     public Test setActive(boolean active) {
         return new Test(input, output, index, active);
@@ -55,11 +77,11 @@ public class Test extends TestBase {
         out.printBoolean(active);
     }
 
-    public static Test loadTest(InputReader in) {
-        int index = in.readInt();
-        String input = in.readString();
-        String output = in.readString();
-        boolean active = in.readBoolean();
-        return new Test(input, output, index, active);
+    @Override
+    public String toString() {
+        String inputRepresentation = input.replace('\n', ' ');
+        inputRepresentation = inputRepresentation.length() > 15 ? inputRepresentation.substring(0, 12) + "..." :
+            inputRepresentation;
+        return "Test #" + index + ": " + inputRepresentation;
     }
 }

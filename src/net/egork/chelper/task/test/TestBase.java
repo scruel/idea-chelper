@@ -1,16 +1,45 @@
 package net.egork.chelper.task.test;
 
+import net.egork.chelper.util.OutputWriter;
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Created by Scruel on 2017/9/8.
  * Github : https://github.com/scruel
  */
-public abstract class TestBase {
-    public final int index;
+public interface TestBase {
+    /**
+     * Checks if current element is active.
+     *
+     * @return is active
+     */
+    boolean isActive();
 
-    public TestBase(int index) {
-        this.index = index;
-    }
+    /**
+     * Returns new element with expected active status.
+     *
+     * @return {@link TestBase} instance.
+     */
+    @NotNull
+    TestBase setActive(boolean active);
 
-    public abstract TestBase setActive(boolean active);
+    /**
+     * Returns current index of the element.
+     *
+     * @return index
+     */
+    int getIndex();
 
+    /**
+     * Returns new element with expected index.
+     *
+     * @return {@link TestBase} instance.
+     */
+    @NotNull
+    TestBase setIndex(int index);
+
+    /**
+     * save this test instance into stream.
+     */
+    void saveTest(OutputWriter out);
 }

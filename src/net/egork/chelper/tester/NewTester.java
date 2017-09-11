@@ -54,12 +54,12 @@ public class NewTester {
                 if (method.getAnnotation(TestCase.class) != null) {
                     Collection<Test> providedTests = (Collection<Test>) method.invoke(provider);
                     for (Test testCase : providedTests)
-                        tests.add(new Test(testCase.input, testCase.output, tests.size(), testCase.active));
+                        tests.add(new Test(testCase.getInput(), testCase.getOutput(), tests.size(), testCase.isActive()));
                 }
             }
             if (provider instanceof TestProvider) {
                 for (Test testCase : ((TestProvider) provider).createTests())
-                    tests.add(new Test(testCase.input, testCase.output, tests.size(), testCase.active));
+                    tests.add(new Test(testCase.getInput(), testCase.getOutput(), tests.size(), testCase.isActive()));
             }
         }
         String writerFQN = task.outputClass;
@@ -76,20 +76,20 @@ public class NewTester {
         System.out.println("------------------------------------------------------------------");
         int testNumber = 0;
         for (Test test : tests) {
-            if (singleTest != -1 && testNumber++ != singleTest || !test.active) {
+            if (singleTest != -1 && testNumber++ != singleTest || !test.isActive()) {
                 verdicts.add(Verdict.SKIPPED);
-                System.out.println("Test #" + test.index + ": SKIPPED");
+                System.out.println("Test #" + test.getIndex() + ": SKIPPED");
                 System.out.println("------------------------------------------------------------------");
                 continue;
             }
-            System.out.println("Test #" + test.index + ":");
-            Object in = readerClass.getConstructor(InputStream.class).newInstance(new StringInputStream(test.input));
-            StringWriter writer = new StringWriter(test.output == null ? 16 : test.output.length());
+            System.out.println("Test #" + test.getIndex() + ":");
+            Object in = readerClass.getConstructor(InputStream.class).newInstance(new StringInputStream(test.getInput()));
+            StringWriter writer = new StringWriter(test.getOutput() == null ? 16 : test.getOutput().length());
             Object out = writerClass.getConstructor(Writer.class).newInstance(writer);
             System.out.println("Input:");
-            print(test.input, truncate);
+            print(test.getInput(), truncate);
             System.out.println("Expected output:");
-            print(test.output, truncate);
+            print(test.getOutput(), truncate);
             System.out.println("Execution result:");
             long time = System.currentTimeMillis();
             try {
@@ -99,7 +99,7 @@ public class NewTester {
                 String result = writer.getBuffer().toString();
                 print(result, truncate);
                 System.out.print("Verdict: ");
-                Verdict checkResult = check(checkerClass, test.input, test.output, result, task.checkerParameters);
+                Verdict checkResult = check(checkerClass, test.getInput(), test.getOutput(), result, task.checkerParameters);
                 verdicts.add(checkResult);
                 System.out.print(checkResult);
                 System.out.printf(" in %.3f s.%n", time / 1000.);

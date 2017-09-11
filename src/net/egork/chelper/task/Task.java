@@ -66,8 +66,8 @@ public class Task extends TaskBase<Test> {
         this.template = template;
         if (tests != null) {
             for (int i = 0; i < tests.length; i++) {
-                if (tests[i].index != i)
-                    tests[i] = new Test(tests[i].input, tests[i].output, i, tests[i].active);
+                if (tests[i].getIndex() != i)
+                    tests[i] = new Test(tests[i].getInput(), tests[i].getOutput(), i, tests[i].isActive());
             }
         }
     }
@@ -110,7 +110,6 @@ public class Task extends TaskBase<Test> {
         out.printLine(tests.length);
         for (Test test : tests)
             test.saveTest(out);
-
         out.printString(location);
         out.printString(vmArgs);
         out.printString(mainClass);
@@ -140,7 +139,7 @@ public class Task extends TaskBase<Test> {
             int testCount = in.readInt();
             Test[] tests = new Test[testCount];
             for (int i = 0; i < testCount; i++)
-                tests[i] = Test.loadTest(in);
+                tests[i] = new Test(in);
 
             String location = in.readString();
             String vmArgs = in.readString();

@@ -2,6 +2,7 @@ package net.egork.chelper.task.test;
 
 import net.egork.chelper.util.InputReader;
 import net.egork.chelper.util.OutputWriter;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,10 +10,21 @@ import java.util.List;
 /**
  * @author Egor Kulikov (egorku@yandex-team.ru)
  */
-public class NewTopCoderTest extends TestBase {
-    public final Object[] arguments;
-    public final Object result;
-    public final boolean active;
+public class NewTopCoderTest implements TestBase {
+    private final Object[] arguments;
+    private final Object result;
+    private final boolean active;
+    private final int index;
+
+    public NewTopCoderTest(InputReader in) {
+        this.index = in.readInt();
+        int argumentCount = in.readInt();
+        this.arguments = new Object[argumentCount];
+        for (int i = 0; i < argumentCount; i++)
+            arguments[i] = in.readTopCoder();
+        this.result = in.readTopCoder();
+        this.active = in.readBoolean();
+    }
 
     public NewTopCoderTest(Object[] arguments) {
         this(arguments, null);
@@ -27,7 +39,7 @@ public class NewTopCoderTest extends TestBase {
     }
 
     public NewTopCoderTest(Object[] arguments, Object result, int index, boolean active) {
-        super(index);
+        this.index = index;
         this.arguments = arguments;
         this.result = result;
         this.active = active;
@@ -118,6 +130,7 @@ public class NewTopCoderTest extends TestBase {
         return trimmed;
     }
 
+    @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
         for (Object argument : arguments) {
@@ -146,13 +159,26 @@ public class NewTopCoderTest extends TestBase {
         return "Test #" + index + ": " + representation;
     }
 
+    @NotNull
+    @Override
     public NewTopCoderTest setIndex(int index) {
         return new NewTopCoderTest(arguments, result, index, active);
     }
 
     @Override
+    public boolean isActive() {
+        return false;
+    }
+
+    @NotNull
+    @Override
     public NewTopCoderTest setActive(boolean active) {
         return new NewTopCoderTest(arguments, result, index, active);
+    }
+
+    @Override
+    public int getIndex() {
+        return 0;
     }
 
     public void saveTest(OutputWriter out) {
@@ -162,17 +188,6 @@ public class NewTopCoderTest extends TestBase {
             out.printTopCoder(argument);
         out.printTopCoder(result);
         out.printBoolean(active);
-    }
-
-    public static NewTopCoderTest loadTest(InputReader in) {
-        int index = in.readInt();
-        int argumentCount = in.readInt();
-        Object[] arguments = new Object[argumentCount];
-        for (int i = 0; i < argumentCount; i++)
-            arguments[i] = in.readTopCoder();
-        Object result = in.readTopCoder();
-        boolean active = in.readBoolean();
-        return new NewTopCoderTest(arguments, result, index, active);
     }
 
     public static String toString(Object value, Class aClass) {
@@ -231,5 +246,13 @@ public class NewTopCoderTest extends TestBase {
             return result.toString();
         }
         return null;
+    }
+
+    public Object[] getArguments() {
+        return arguments;
+    }
+
+    public Object getResult() {
+        return result;
     }
 }

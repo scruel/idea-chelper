@@ -50,12 +50,12 @@ public class NewTopCoderTester {
                 if (method.getAnnotation(TestCase.class) != null) {
                     Collection<NewTopCoderTest> providedTests = (Collection<NewTopCoderTest>) method.invoke(provider);
                     for (NewTopCoderTest testCase : providedTests)
-                        tests.add(new NewTopCoderTest(testCase.arguments, testCase.result, tests.size(), testCase.active));
+                        tests.add(new NewTopCoderTest(testCase.getArguments(), testCase.getResult(), tests.size(), testCase.isActive()));
                 }
             }
             if (provider instanceof TopCoderTestProvider) {
                 for (NewTopCoderTest testCase : ((TopCoderTestProvider) provider).createTests())
-                    tests.add(new NewTopCoderTest(testCase.arguments, testCase.result, tests.size(), testCase.active));
+                    tests.add(new NewTopCoderTest(testCase.getArguments(), testCase.getResult(), tests.size(), testCase.isActive()));
             }
         }
         Class taskClass = Class.forName(task.fqn);
@@ -63,21 +63,21 @@ public class NewTopCoderTester {
         System.out.println("------------------------------------------------------------------");
         int testNumber = 0;
         for (NewTopCoderTest test : tests) {
-            if (singleTest != -1 && testNumber++ != singleTest || !test.active) {
+            if (singleTest != -1 && testNumber++ != singleTest || !test.isActive()) {
                 verdicts.add(Verdict.SKIPPED);
-                System.out.println("Test #" + test.index + ": SKIPPED");
+                System.out.println("Test #" + test.getIndex() + ": SKIPPED");
                 System.out.println("------------------------------------------------------------------");
                 continue;
             }
-            System.out.println("Test #" + test.index + ":");
+            System.out.println("Test #" + test.getIndex() + ":");
             System.out.println("Input:");
-            Object[] arguments = test.arguments;
+            Object[] arguments = test.getArguments();
             for (int i = 0, argumentsLength = arguments.length; i < argumentsLength; i++) {
                 Object argument = arguments[i];
                 System.out.println(NewTopCoderTest.toString(argument, task.signature.arguments[i]));
             }
             System.out.println("Expected output:");
-            System.out.println(NewTopCoderTest.toString(test.result, task.signature.result));
+            System.out.println(NewTopCoderTest.toString(test.getResult(), task.signature.result));
             System.out.println("Execution result:");
             long time = System.currentTimeMillis();
             try {
@@ -86,7 +86,7 @@ public class NewTopCoderTester {
                 maximalTime = Math.max(time, maximalTime);
                 System.out.println(NewTopCoderTest.toString(actual, task.signature.result));
                 System.out.print("Verdict: ");
-                Verdict checkResult = check(actual, test.result, task.signature.result);
+                Verdict checkResult = check(actual, test.getResult(), task.signature.result);
                 verdicts.add(checkResult);
                 System.out.print(checkResult);
                 System.out.printf(" in %.3f s.%n", time / 1000.);
@@ -180,7 +180,7 @@ public class NewTopCoderTester {
         throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException {
         Object solver = taskClass.getConstructor().newInstance();
         Method solve = taskClass.getMethod(signature.name, signature.arguments);
-        return solve.invoke(solver, test.arguments);
+        return solve.invoke(solver, test.getArguments());
     }
 
 }

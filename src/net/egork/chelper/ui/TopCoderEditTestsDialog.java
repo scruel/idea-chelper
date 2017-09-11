@@ -134,7 +134,7 @@ public class TopCoderEditTestsDialog extends JDialog {
                 int size = TopCoderEditTestsDialog.this.tests.size();
                 for (int i = currentTest; i < size; i++) {
                     NewTopCoderTest test = TopCoderEditTestsDialog.this.tests.get(i);
-                    test = new NewTopCoderTest(test.arguments, test.result, i, test.active);
+                    test = new NewTopCoderTest(test.getArguments(), test.getResult(), i, test.isActive());
                     TopCoderEditTestsDialog.this.tests.set(i, test);
                     checkBoxesPanel.add(createCheckBox(test));
                 }
@@ -253,14 +253,14 @@ public class TopCoderEditTestsDialog extends JDialog {
     }
 
     private JCheckBox createCheckBox(final NewTopCoderTest test) {
-        final JCheckBox checkBox = new JCheckBox("", test.active);
+        final JCheckBox checkBox = new JCheckBox("", test.isActive());
         Dimension preferredSize = new Dimension(checkBox.getPreferredSize().width, HEIGHT);
         checkBox.setPreferredSize(preferredSize);
         checkBox.setMaximumSize(preferredSize);
         checkBox.setMinimumSize(preferredSize);
         checkBox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                tests.set(test.index, tests.get(test.index).setActive(checkBox.isSelected()));
+                tests.set(test.getIndex(), tests.get(test.getIndex()).setActive(checkBox.isSelected()));
                 setSelectedTest(currentTest);
             }
         });
@@ -276,15 +276,15 @@ public class TopCoderEditTestsDialog extends JDialog {
         else {
             testPanel.setVisible(true);
             for (int i = 0; i < arguments.length; i++) {
-                if (tests.get(index).arguments[i] == null)
+                if (tests.get(index).getArguments()[i] == null)
                     arguments[i].setText("");
                 else
-                    arguments[i].setText(NewTopCoderTest.toString(tests.get(index).arguments[i], task.signature.arguments[i]));
+                    arguments[i].setText(NewTopCoderTest.toString(tests.get(index).getArguments()[i], task.signature.arguments[i]));
             }
-            knowAnswer.setSelected(tests.get(index).result != null);
+            knowAnswer.setSelected(tests.get(index).getResult() != null);
             result.setEnabled(knowAnswer.isSelected());
-            if (tests.get(index).result != null)
-                result.setText(NewTopCoderTest.toString(tests.get(index).result, task.signature.result));
+            if (tests.get(index).getResult() != null)
+                result.setText(NewTopCoderTest.toString(tests.get(index).getArguments(), task.signature.result));
             else
                 result.setText("");
         }

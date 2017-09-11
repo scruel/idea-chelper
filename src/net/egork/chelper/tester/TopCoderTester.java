@@ -37,18 +37,18 @@ public class TopCoderTester {
         tests.addAll(Arrays.asList(decode(args[argumentIndex], methodSignature)));
         Class taskClass = Class.forName(fqn);
         for (TopCoderTest test : tests) {
-            if (!test.active) {
+            if (!test.isActive()) {
                 verdicts.add(Verdict.SKIPPED);
-                System.out.println("Test #" + test.index + ": SKIPPED");
+                System.out.println("Test #" + test.getIndex() + ": SKIPPED");
                 System.out.println("------------------------------------------------------------------");
                 continue;
             }
-            System.out.println("Test #" + test.index + ":");
+            System.out.println("Test #" + test.getIndex() + ":");
             System.out.println("Input:");
-            for (String argument : test.arguments)
+            for (String argument : test.getArguments())
                 System.out.println(argument);
             System.out.println("Expected output:");
-            System.out.println(test.result);
+            System.out.println(test.getResult());
             System.out.println("Execution result:");
             long time = System.currentTimeMillis();
             try {
@@ -57,7 +57,7 @@ public class TopCoderTester {
                 maximalTime = Math.max(time, maximalTime);
                 System.out.println(print(methodSignature.result, actual));
                 System.out.print("Verdict: ");
-                Verdict checkResult = check(actual, test.result, methodSignature.result);
+                Verdict checkResult = check(actual, test.getResult(), methodSignature.result);
                 verdicts.add(checkResult);
                 System.out.print(checkResult);
                 System.out.printf(" in %.3f s.%n", time / 1000.);

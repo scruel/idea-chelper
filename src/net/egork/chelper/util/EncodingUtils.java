@@ -36,8 +36,8 @@ public class EncodingUtils {
     }
 
     public static String encode(Test test) {
-        return encode(test.input) + TEST_SEPARATOR + encode(test.output) + TEST_SEPARATOR + Boolean.toString(
-            test.active);
+        return encode(test.getInput()) + TEST_SEPARATOR + encode(test.getOutput()) + TEST_SEPARATOR + Boolean.toString(
+            test.isActive());
     }
 
     public static Test decodeTest(int index, String test) {
@@ -56,9 +56,9 @@ public class EncodingUtils {
 
     public static String encode(TopCoderTest test) {
         StringBuilder builder = new StringBuilder();
-        for (String argument : test.arguments)
+        for (String argument : test.getArguments())
             builder.append(encode(argument)).append(TEST_SEPARATOR);
-        builder.append(encode(test.result)).append(TEST_SEPARATOR).append(test.active);
+        builder.append(encode(test.getResult())).append(TEST_SEPARATOR).append(test.isActive());
         return builder.toString();
     }
 

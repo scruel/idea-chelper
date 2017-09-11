@@ -80,7 +80,7 @@ public class MethodSignature {
     public Object[] generateArguments(TopCoderTest test) {
         Object[] arguments = new Object[this.arguments.length];
         for (int i = 0; i < arguments.length; i++) {
-            arguments[i] = resolve(this.arguments[i], test.arguments[i]);
+            arguments[i] = resolve(this.arguments[i], test.getArguments()[i]);
         }
         return arguments;
     }

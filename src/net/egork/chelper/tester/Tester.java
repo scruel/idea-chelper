@@ -47,20 +47,20 @@ public class Tester {
         Class taskClass = Class.forName(fqn);
         Class checkerClass = Class.forName(fqn + "Checker");
         for (Test test : tests) {
-            if (!test.active) {
+            if (!test.isActive()) {
                 verdicts.add(Verdict.SKIPPED);
-                System.out.println("Test #" + test.index + ": SKIPPED");
+                System.out.println("Test #" + test.getIndex() + ": SKIPPED");
                 System.out.println("------------------------------------------------------------------");
                 continue;
             }
-            System.out.println("Test #" + test.index + ":");
-            Object in = readerClass.getConstructor(InputStream.class).newInstance(new StringInputStream(test.input));
-            StringWriter writer = new StringWriter(test.output.length());
+            System.out.println("Test #" + test.getIndex() + ":");
+            Object in = readerClass.getConstructor(InputStream.class).newInstance(new StringInputStream(test.getInput()));
+            StringWriter writer = new StringWriter(test.getOutput().length());
             Object out = writerClass.getConstructor(Writer.class).newInstance(writer);
             System.out.println("Input:");
-            print(test.input, truncate);
+            print(test.getInput(), truncate);
             System.out.println("Expected output:");
-            print(test.output, truncate);
+            print(test.getOutput(), truncate);
             System.out.println("Execution result:");
             long time = System.currentTimeMillis();
             try {
@@ -71,8 +71,8 @@ public class Tester {
                 print(result, truncate);
                 System.out.print("Verdict: ");
                 Verdict checkResult = check(checkerClass, readerClass,
-                    readerClass.getConstructor(InputStream.class).newInstance(new StringInputStream(test.input)),
-                    readerClass.getConstructor(InputStream.class).newInstance(new StringInputStream(test.output)),
+                    readerClass.getConstructor(InputStream.class).newInstance(new StringInputStream(test.getInput())),
+                    readerClass.getConstructor(InputStream.class).newInstance(new StringInputStream(test.getOutput())),
                     readerClass.getConstructor(InputStream.class).newInstance(new StringInputStream(result)));
                 verdicts.add(checkResult);
                 System.out.print(checkResult);

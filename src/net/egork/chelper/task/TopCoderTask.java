@@ -2,6 +2,7 @@ package net.egork.chelper.task;
 
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiMethod;
 import net.egork.chelper.codegeneration.MainFileTemplate;
 import net.egork.chelper.task.test.NewTopCoderTest;
@@ -69,7 +70,7 @@ public class TopCoderTask extends TaskBase<NewTopCoderTest> {
             int testCount = in.readInt();
             NewTopCoderTest[] tests = new NewTopCoderTest[testCount];
             for (int i = 0; i < testCount; i++)
-                tests[i] = NewTopCoderTest.loadTest(in);
+                tests[i] = new NewTopCoderTest(in);
             String date = in.readString();
             String contestName = in.readString();
             int testClassCount = in.readInt();
@@ -133,6 +134,14 @@ public class TopCoderTask extends TaskBase<NewTopCoderTest> {
         if ("java.lang.String[]".equals(s))
             return String[].class;
         throw new ClassNotFoundException(s);
+    }
+
+    public PsiFile getTaskDataPsiFile() {
+        return null;
+    }
+
+    public PsiFile getTaskSourcePsiFile() {
+        return null;
     }
 
     public TopCoderTask setFQN(String fqn) {
