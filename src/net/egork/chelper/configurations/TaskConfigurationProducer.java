@@ -31,18 +31,20 @@ public class TaskConfigurationProducer extends RunConfigurationProducer<TaskConf
         final Location location = context.getLocation();
         if (location == null) return false;
         final PsiFile script = location.getPsiElement().getContainingFile();
-        if (!isAvailable(location, script)) return false;
-        final VirtualFile vFile = script.getVirtualFile();
-        if (vFile == null) return false;
+        if (!isAvailable(script)) return false;
+        final VirtualFile file = script.getVirtualFile();
+        if (file == null) return false;
+
         Project project = context.getProject();
-        Map<String, Object> map = TaskUtils.getTaskMapWitFile(project, vFile);
+        Map<String, Object> map = TaskUtils.getTaskMapWitFile(project, file);
         if (map == null) return false;
         VirtualFile dataFile;
         if (null == (dataFile = (VirtualFile) map.get(TaskUtils.TASK_DATA_KEY)))
             return false;
+
         Task task = FileUtils.readTask(project, FileUtils.getRelativePath(project.getBaseDir(), dataFile));
         if (task == null) return false;
-        task = (Task) TaskUtils.fixedTaskByPath(project, task, dataFile);
+        task = (Task) TaskUtils.fixedTaskByTaskFile(project, task, dataFile);
         if (task == null) return false;
         configuration.setName(task.name);
         configuration.setConfiguration(task);
@@ -50,7 +52,7 @@ public class TaskConfigurationProducer extends RunConfigurationProducer<TaskConf
         return true;
     }
 
-    private static boolean isAvailable(final Location location, final PsiFile script) {
+    private static boolean isAvailable(final PsiFile script) {
         if (script == null) return false;
         if (!FileUtils.isJavaDirectory(script.getParent()))
             return false;
@@ -64,19 +66,20 @@ public class TaskConfigurationProducer extends RunConfigurationProducer<TaskConf
         final Location location = context.getLocation();
         if (location == null) return false;
         final PsiFile script = location.getPsiElement().getContainingFile();
-        if (!isAvailable(location, script)) return false;
-        final VirtualFile vFile = script.getVirtualFile();
-        if (vFile == null) return false;
-        if (vFile instanceof LightVirtualFile) return false;
+        if (!isAvailable(script)) return false;
+        VirtualFile file = script.getVirtualFile();
+        if (file == null) return false;
+        if (file instanceof LightVirtualFile) return false;
 
         Project project = context.getProject();
-        Map<String, Object> map = TaskUtils.getTaskMapWitFile(project, vFile);
+        Map<String, Object> map = TaskUtils.getTaskMapWitFile(project, file);
         if (map == null) return false;
-        if (null == (map.get(TaskUtils.TASK_DATA_KEY))) return false;
+        if (null == (file = (VirtualFile) map.get(TaskUtils.TASK_SOURCE_KEY)))
+            return false;
 
         final String taskLocation = configuration.getConfiguration().location;
         final String scriptName = configuration.getConfiguration().name;
-        final String path = FileUtils.getRelativePath(context.getProject().getBaseDir(), vFile);
-        return path.equals(taskLocation + "/" + scriptName + ".java") || path.equals(taskLocation + "/" + scriptName + ".task");
+        final String path = FileUtils.getRelativePath(context.getProject().getBaseDir(), file);
+        return path.equals(taskLocation + "/" + scriptName + ".java");
     }
 }

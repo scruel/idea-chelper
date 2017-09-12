@@ -134,8 +134,8 @@ public class AutoSwitcher implements ProjectComponent {
 
                     private void repairAndConfigureTask(Map<String, Object> taskMap) {
                         TaskBase task = (TaskBase) taskMap.get(TaskUtils.TASK_KEY);
-                        VirtualFile taskFile = (VirtualFile) taskMap.get(TaskUtils.TASK_SOURCE_KEY);
-                        task = TaskUtils.fixedTaskByPath(project, task, taskFile);
+                        VirtualFile file = (VirtualFile) taskMap.get(TaskUtils.TASK_SOURCE_KEY);
+                        task = TaskUtils.fixedTaskByTaskFile(project, task, file);
                         busy = true;
                         ProjectUtils.createConfiguration(project, task, true);
                         busy = false;

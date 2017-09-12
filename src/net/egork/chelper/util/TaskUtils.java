@@ -13,7 +13,6 @@ import net.egork.chelper.checkers.PEStrictChecker;
 import net.egork.chelper.codegeneration.MainFileTemplate;
 import net.egork.chelper.codegeneration.SolutionGenerator;
 import net.egork.chelper.configurations.TaskConfiguration;
-import net.egork.chelper.configurations.TaskConfigurationType;
 import net.egork.chelper.configurations.TopCoderConfiguration;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.task.TaskBase;
@@ -169,39 +168,40 @@ public class TaskUtils {
 
     /**
      * 自动根据传入 VirtualFile 修复 task，防止报错。
+     * When invoke this method, must be sure about task is valid(both source and data file exits).
+     * return the fixed {@link TaskBase} by file(avoid error or exception), return original if it can't be fixed.
      *
      * @param project
      * @param task
-     * @param taskDataFile
+     * @param taskFile either dataFile or taskFile.
      * @return
      */
-    public static TaskBase fixedTaskByPath(Project project, TaskBase task, VirtualFile taskDataFile) {
-        if (!FileUtils.isJavaDirectory(PsiManager.getInstance(project).findDirectory(taskDataFile.getParent())))
+    public static TaskBase fixedTaskByTaskFile(Project project, TaskBase task, VirtualFile taskFile) {
+        if (!FileUtils.isJavaDirectory(PsiManager.getInstance(project).findDirectory(taskFile.getParent())))
             return task;
 
         TaskBase fixed = null;
         if (task instanceof Task) {
-            fixed = _fixedTaskByPath(project, (Task) task, taskDataFile);
+            fixed = _fixedTaskByTaskFile(project, (Task) task, taskFile);
         } else if (task instanceof TopCoderTask) {
-            fixed = _fixedTopCoderTaskByPath(project, (TopCoderTask) task, taskDataFile);
+            fixed = _fixedTopCoderTaskByTaskFile(project, (TopCoderTask) task, taskFile);
         }
         if (fixed == null) return null;
-        if (fixed != task) {
-            if (task instanceof Task) {
-                new TaskConfiguration(project, task.name, (Task) task,
-                    TaskConfigurationType.INSTANCE.getConfigurationFactories()[0]);
-            } else if (task instanceof TopCoderTask) {
-                new TopCoderConfiguration(project, task.name, (TopCoderTask) task,
-                    TaskConfigurationType.INSTANCE.getConfigurationFactories()[0]);
-            }
-        }
         return fixed;
     }
 
-    private static Task _fixedTaskByPath(Project project, Task task, VirtualFile taskDataFile) {
-        if (task == null || taskDataFile == null) return null;
-        PsiClass aClass = MainFileTemplate.getClass(project, task.checkerClass);
-        if (aClass == null) {
+    /**
+     * return the fixed {@link Task} , return original if it can't be fixed.
+     *
+     * @param project
+     * @param task
+     * @param taskFile
+     * @return
+     */
+    private static Task _fixedTaskByTaskFile(Project project, Task task, VirtualFile taskFile) {
+        if (task == null || taskFile == null) return task;
+        PsiClass checkerClazz = MainFileTemplate.getClass(project, task.checkerClass);
+        if (checkerClazz == null) {
             task = task.setCheckerClass(PEStrictChecker.class.getCanonicalName());
         }
 //        aClass = MainFileTemplate.getClass(project, task.inputClass);
@@ -214,7 +214,7 @@ public class TaskUtils {
 //        }
 
         // check task move
-        String location = FileUtils.getRelativePath(project.getBaseDir(), taskDataFile.getParent());
+        String location = FileUtils.getRelativePath(project.getBaseDir(), taskFile.getParent());
         if (location.equals(task.location)) return task;
         String aPackage = FileUtils.getPackage(FileUtils.getPsiDirectory(project, location));
         if (aPackage == null) return task;
@@ -223,9 +223,18 @@ public class TaskUtils {
         return task;
     }
 
-    private static TopCoderTask _fixedTopCoderTaskByPath(Project project, TopCoderTask task, VirtualFile taskDataFile) {
+
+    /**
+     * return the fixed {@link TopCoderTask} , return original if it can't be fixed.
+     *
+     * @param project
+     * @param task
+     * @param taskFile
+     * @return
+     */
+    private static TopCoderTask _fixedTopCoderTaskByTaskFile(Project project, TopCoderTask task, VirtualFile taskFile) {
         //TODO haven't try topcoder.
-        if (task == null || taskDataFile == null) return null;
+        if (task == null || taskFile == null) return task;
         return task;
     }
 }
