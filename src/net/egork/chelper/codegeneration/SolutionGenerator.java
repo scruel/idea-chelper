@@ -7,13 +7,13 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
-import com.intellij.psi.util.PsiUtil;
 import net.egork.chelper.exception.TaskCorruptException;
 import net.egork.chelper.task.StreamConfiguration;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.task.TaskBase;
 import net.egork.chelper.task.TopCoderTask;
 import net.egork.chelper.task.test.TestType;
+import net.egork.chelper.util.CompatibilityUtils;
 import net.egork.chelper.util.FileUtils;
 import net.egork.chelper.util.Messenger;
 import net.egork.chelper.util.ProjectUtils;
@@ -578,7 +578,7 @@ public class SolutionGenerator {
                 }
 
                 FileUtils.synchronizeFile(file);
-                ReformatCodeProcessor processor = new ReformatCodeProcessor(project, PsiUtil.getPsiFile(project, file), null, false);
+                ReformatCodeProcessor processor = new ReformatCodeProcessor(project, CompatibilityUtils.getPsiFile(project, file), null, false);
 
                 processor.run();
 

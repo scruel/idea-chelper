@@ -12,16 +12,12 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.util.PsiUtil;
 import net.egork.chelper.codegeneration.CodeGenerationUtils;
 import net.egork.chelper.configurations.TaskConfiguration;
 import net.egork.chelper.configurations.TopCoderConfiguration;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.task.TaskBase;
-import net.egork.chelper.util.ExecuteUtils;
-import net.egork.chelper.util.FileUtils;
-import net.egork.chelper.util.Messenger;
-import net.egork.chelper.util.ProjectUtils;
+import net.egork.chelper.util.*;
 
 /**
  * @author Egor Kulikov (kulikov@devexperts.com)
@@ -101,7 +97,7 @@ public class ArchiveAction extends AnAction {
                 if (taskFile != null) {
                     directory.copyFileFrom(taskFile.getName(), taskFile);
                 }
-                FileUtils.deleteTaskIfExists(project, PsiUtil.getPsiFile(project, sourceFile.getVirtualFile()), true);
+                FileUtils.deleteTaskIfExists(project, CompatibilityUtils.getPsiFile(project, sourceFile.getVirtualFile()), true);
                 ProjectUtils.setOtherConfiguration(manager, taskBase);
                 Messenger.publishMessage("Configuration '" + configuration.getName() + "' successfully archived",
                     NotificationType.INFORMATION);

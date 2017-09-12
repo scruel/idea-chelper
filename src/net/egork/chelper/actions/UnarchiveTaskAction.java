@@ -10,7 +10,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.util.PsiUtil;
 import com.intellij.util.IncorrectOperationException;
 import net.egork.chelper.codegeneration.CodeGenerationUtils;
 import net.egork.chelper.exception.TaskCorruptException;
@@ -136,7 +135,7 @@ public class UnarchiveTaskAction extends AnAction {
                                 }
                                 ProjectUtils.createConfiguration(project, task, true);
                             }
-                            FileUtils.deleteTaskIfExists(project, PsiUtil.getPsiFile(project, taskFile), false);
+                            FileUtils.deleteTaskIfExists(project, CompatibilityUtils.getPsiFile(project, taskFile), false);
                         } catch (IncorrectOperationException e) {
                             Messenger.publishMessage("Error unarchiving file '" + taskFile.getPath() +
                                 "' caused by " + e.getMessage(), NotificationType.ERROR);

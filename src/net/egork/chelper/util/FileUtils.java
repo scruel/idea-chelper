@@ -4,6 +4,7 @@ import com.intellij.ide.IdeView;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.LangDataKeys;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileTypes.FileType;
@@ -14,7 +15,6 @@ import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.util.PsiUtil;
 import net.egork.chelper.codegeneration.CodeGenerationUtils;
 import net.egork.chelper.codegeneration.MainFileTemplate;
 import net.egork.chelper.task.Task;
@@ -31,6 +31,8 @@ import java.util.Properties;
  * @author Egor Kulikov (kulikov@devexperts.com)
  */
 public class FileUtils {
+    private static final Logger LOG = Logger.getInstance(FileUtils.class);
+
     private FileUtils() {
     }
 
@@ -231,7 +233,7 @@ public class FileUtils {
         if (file == null) {
             return null;
         }
-        return PsiUtil.getPsiFile(project, file);
+        return CompatibilityUtils.getPsiFile(project, file);
     }
 
     public static PsiDirectory getDirectory(DataContext dataContext) {
@@ -333,20 +335,9 @@ public class FileUtils {
                 if (locationFile == null) {
                     return;
                 }
-                OutputStream stream = null;
-                try {
-                    PsiFile file = writeTextFile(project, locationFile, fileName, "");
-                    stream = file.getVirtualFile().getOutputStream(this);
-                    configuration.saveTask(new OutputWriter(stream));
-                } catch (IOException ignored) {
-                } finally {
-                    if (stream != null) {
-                        try {
-                            stream.close();
-                        } catch (IOException ignored) {
-                        }
-                    }
-                }
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                configuration.saveTask(new OutputWriter(out));
+                writeTextFile(project, locationFile, fileName, out.toString());
             }
         });
     }
