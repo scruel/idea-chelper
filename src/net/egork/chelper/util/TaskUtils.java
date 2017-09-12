@@ -148,17 +148,48 @@ public class TaskUtils {
             }
             if (configuration instanceof TopCoderConfiguration) {
                 TopCoderTask task = ((TopCoderConfiguration) configuration).getConfiguration();
-                if (sourceFile.equals(TaskUtils.getFile(project, task.name, ProjectUtils.getData(project).defaultDirectory))) {
+                VirtualFile configurationFile = TaskUtils.getFile(project, task.name, ProjectUtils.getData(project).defaultDirectory);
+                if (configurationFile != null && sourceFile.equals(configurationFile)) {
                     return configuration;
                 }
             } else if (configuration instanceof TaskConfiguration) {
                 Task task = ((TaskConfiguration) configuration).getConfiguration();
-                if (sourceFile.equals(FileUtils.getFileByFQN(configuration.getProject(), task.taskClass))) {
+                String fileLocation = FileUtils.getRelativePath(project.getBaseDir(), sourceFile);
+                String sourceLocation = getTaskSourceFileLocation(task);
+                String dataLocation = getTaskDataFileLocation(task);
+                if (fileLocation.equals(sourceLocation) || fileLocation.equals(dataLocation))
                     return configuration;
-                }
             }
         }
         return null;
+    }
+
+    private static String getTaskSourceFileLocation(TaskBase taskBase) {
+        if (taskBase instanceof Task) {
+            Task task = (Task) taskBase;
+            String location = task.location;
+            String taskClass = task.taskClass;
+            if (location == null || taskClass == null) return null;
+            String res = location + "/" + taskClass.substring(taskClass.lastIndexOf(".") + 1);
+            res += ".java";
+            return res;
+        } else if (taskBase instanceof TopCoderTask) {
+            //TODO haven't use TopCoder
+        }
+        return "WTF";
+    }
+
+    private static String getTaskDataFileLocation(TaskBase taskBase) {
+        if (taskBase instanceof Task) {
+            Task task = (Task) taskBase;
+            String location = task.location;
+            if (location == null || task.name == null) return null;
+            String res = location + "/" + task.name + ".task";
+            return res;
+        } else if (taskBase instanceof TopCoderTask) {
+            //TODO haven't use TopCoder
+        }
+        return "WTF";
     }
 
     public static RunConfiguration GetConfSettingsBySourceFile(Project project, VirtualFile sourceFile) {
