@@ -19,13 +19,12 @@ import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.roots.impl.libraries.ProjectLibraryTable;
 import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.roots.libraries.LibraryTable;
-import com.intellij.openapi.vfs.JarFileSystem;
-import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.openapi.vfs.*;
 import com.intellij.openapi.wm.WindowManager;
-import com.intellij.psi.*;
-import com.intellij.psi.impl.PsiManagerImpl;
+import com.intellij.psi.JavaPsiFacade;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.Processor;
 import com.intellij.util.ui.UIUtil;
@@ -89,25 +88,22 @@ public class ProjectUtils {
                             ChromeParser.checkInstalled(project, configuration);
                         }
                     });
-                    PsiManagerImpl.getInstance(project).addPsiTreeChangeListener(
-                        new PsiTreeChangeAdapter() {
+                    VirtualFileManager.getInstance().addVirtualFileListener(
+                        new VirtualFileAdapter() {
                             @Override
-                            public void childRemoved(@NotNull final PsiTreeChangeEvent event) {
-                                DumbService.getInstance(project).runWhenSmart(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        PsiElement element = event.getChild();
-                                        if (element == null) return;
-                                        PsiFile file = element.getContainingFile();
-                                        if (file == null) return;
-                                        VirtualFile vFile = file.getVirtualFile();
-                                        if (vFile == null) return;
-                                        if ("java".equals(vFile.getExtension()) || "task".equals(vFile.getExtension())) {
-                                            RunConfiguration runConfiguration = TaskUtils.GetConfSettingsBySourceFile(project, vFile);
-                                            ProjectUtils.removeConfigurationIfExists(runConfiguration);
+                            public void fileDeleted(@NotNull final VirtualFileEvent event) {
+                                DumbService.getInstance(project).smartInvokeLater(
+                                    new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            VirtualFile vFile = event.getFile();
+                                            if ("java".equals(vFile.getExtension()) || "task".equals(vFile.getExtension()) || "tctask".equals(vFile.getExtension())) {
+                                                RunConfiguration runConfiguration = TaskUtils.GetConfSettingsBySourceFile(project, vFile);
+                                                ProjectUtils.removeConfigurationIfExists(runConfiguration);
+                                            }
                                         }
                                     }
-                                });
+                                );
                             }
                         }
                     );
