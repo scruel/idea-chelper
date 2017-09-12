@@ -329,14 +329,14 @@ public class FileUtils {
         ExecuteUtils.executeStrictWriteAction(new Runnable() {
             @Override
             public void run() {
-                VirtualFile location = FileUtils.getFile(project, locationName);
-                if (location == null) {
+                PsiDirectory locationFile = FileUtils.getPsiDirectory(project, locationName);
+                if (locationFile == null) {
                     return;
                 }
                 OutputStream stream = null;
                 try {
-                    VirtualFile file = location.findOrCreateChildData(null, fileName);
-                    stream = file.getOutputStream(null);
+                    PsiFile file = writeTextFile(project, locationFile, fileName, "");
+                    stream = file.getVirtualFile().getOutputStream(this);
                     configuration.saveTask(new OutputWriter(stream));
                 } catch (IOException ignored) {
                 } finally {
@@ -372,10 +372,10 @@ public class FileUtils {
     }
 
     public static String createTaskClass(Project project, Task task, String location, String name) {
-        VirtualFile directory = FileUtils.createDirectoryIfMissing(project, location);
+        PsiDirectory directory = FileUtils.getPsiDirectory(project, location);
         String mainClass = CodeGenerationUtils.createStub(project, task, location, name);
-        if (directory.findChild(name + ".java") == null) {
-            writeTextFile(directory, name + ".java", mainClass);
+        if (directory.findFile(name + ".java") == null) {
+            writeTextFile(project, directory, name + ".java", mainClass);
         }
         PsiDirectory psiDirectory = getPsiDirectory(project, location);
         String aPackage = getPackage(psiDirectory);
@@ -428,6 +428,7 @@ public class FileUtils {
         PsiClass main = JavaPsiFacade.getInstance(project).findClass(fqn, GlobalSearchScope.allScope(project));
         return main == null ? null : main.getContainingFile() == null ? null : main.getContainingFile().getVirtualFile();
     }
+
     public static PsiFile getPsiFileByFQN(Project project, String fqn) {
         if (fqn == null)
             return null;
