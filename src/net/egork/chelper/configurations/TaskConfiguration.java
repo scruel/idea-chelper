@@ -145,13 +145,15 @@ public class TaskConfiguration extends ModuleBasedConfiguration<JavaRunConfigura
     }
 
     private void saveConfiguration(Task configuration) {
-        if (configuration == null) {
-            return;
-        }
+        if (configuration == null) return;
+        if (configuration.location == null) return;
+        if (configuration.taskClass == null) return;
+        if (configuration.name == null) return;
+        if (configuration.name.length() == 0) return;
 
         VirtualFile taskFile = FileUtils.getFileByFQN(getProject(), configuration.taskClass);
         VirtualFile parentFile = FileUtils.getFile(getProject(), configuration.location);
-        if (configuration.location != null && configuration.name != null && configuration.name.length() != 0 && taskFile != null && !taskFile.getParent().equals(parentFile))
+        if (taskFile != null && parentFile != null && taskFile.getParent().equals(parentFile))
             FileUtils.saveConfiguration(configuration.location, ArchiveAction.canonize(configuration.name) + ".task", configuration, getProject());
     }
 

@@ -422,23 +422,12 @@ public class FileUtils {
         return taskClass;
     }
 
-    /**
-     * @param project
-     * @param fqn     className
-     * @return
-     */
     public static VirtualFile getFileByFQN(Project project, String fqn) {
         if (fqn == null)
             return null;
         PsiClass main = JavaPsiFacade.getInstance(project).findClass(fqn, GlobalSearchScope.allScope(project));
         return main == null ? null : main.getContainingFile() == null ? null : main.getContainingFile().getVirtualFile();
     }
-
-    /**
-     * @param project
-     * @param fqn     className
-     * @return
-     */
     public static PsiFile getPsiFileByFQN(Project project, String fqn) {
         if (fqn == null)
             return null;
