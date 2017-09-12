@@ -1,5 +1,6 @@
 package net.egork.chelper.parser;
 
+import com.intellij.openapi.project.Project;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.task.test.TestType;
 
@@ -10,20 +11,20 @@ import java.util.Collection;
  * @author Egor Kulikov (kulikov@devexperts.com)
  */
 public interface Parser {
-    public static final Parser[] PARSERS = {new CodeforcesParser(), new TimusParser(),
+    Parser[] PARSERS = {new CodeforcesParser(), new TimusParser(),
         new RCCParser()};
 
-    public Icon getIcon();
+    Icon getIcon();
 
-    public String getName();
+    String getName();
 
-    public void getContests(DescriptionReceiver receiver);
+    void getContests(Project project, DescriptionReceiver receiver);
 
-    public void parseContest(String id, DescriptionReceiver receiver);
+    void parseContest(Project project, String id, DescriptionReceiver receiver);
 
-    public Task parseTask(Description description);
+    Task parseTask(Project project, DescriptionReceiver receiver, Description description);
 
-    public TestType defaultTestType();
+    TestType defaultTestType();
 
-    public Collection<Task> parseTaskFromHTML(String html);
+    Collection<Task> parseTaskFromHTML(String html);
 }

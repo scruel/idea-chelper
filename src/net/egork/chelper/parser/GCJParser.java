@@ -1,5 +1,6 @@
 package net.egork.chelper.parser;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
 import net.egork.chelper.checkers.PEStrictChecker;
 import net.egork.chelper.task.StreamConfiguration;
@@ -7,7 +8,6 @@ import net.egork.chelper.task.Task;
 import net.egork.chelper.task.test.Test;
 import net.egork.chelper.task.test.TestType;
 import net.egork.chelper.tester.StringInputStream;
-import net.egork.chelper.util.FileUtils;
 import net.egork.chelper.util.InputReader;
 
 import javax.swing.*;
@@ -18,16 +18,19 @@ import java.util.*;
  * @author egorku@yandex-team.ru
  */
 public class GCJParser implements Parser {
+    @Override
     public Icon getIcon() {
         return IconLoader.getIcon("/icons/gcj.png");
     }
 
+    @Override
     public String getName() {
         return "Google Code Jam";
     }
 
-    public void getContests(DescriptionReceiver receiver) {
-        String info = FileUtils.getWebPageContent("https://code.google.com/codejam/contest/microsite-info");
+    @Override
+    public void getContests(Project project, DescriptionReceiver receiver) {
+        String info = ParseProgresser.getWebPageContent(project, receiver, "https://code.google.com/codejam/contest/microsite-info");
         if (info != null) {
             Map<String, Value> parsedInfo = jsonParse(new InputReader(new StringInputStream(info)));
             if ("true".equals(parsedInfo.get("contestExists").nonJSON) && parsedInfo.containsKey("secsToEnd") &&
@@ -43,7 +46,7 @@ public class GCJParser implements Parser {
         }
         if (receiver.isStopped())
             return;
-        String historyPage = FileUtils.getWebPageContent("https://code.google.com/codejam/past-contests/past-contests-page.html");
+        String historyPage = ParseProgresser.getWebPageContent(project, receiver, "https://code.google.com/codejam/past-contests/past-contests-page.html");
         if (historyPage != null) {
             System.err.println(historyPage);
             if (true) {
@@ -164,8 +167,9 @@ public class GCJParser implements Parser {
         }
     }
 
-    public void parseContest(String id, DescriptionReceiver receiver) {
-        String info = FileUtils.getWebPageContent("https://code.google.com/codejam/contest/" + id + "/dashboard/ContestInfo");
+    @Override
+    public void parseContest(Project project, String id, DescriptionReceiver receiver) {
+        String info = ParseProgresser.getWebPageContent(project, receiver, "https://code.google.com/codejam/contest/" + id + "/dashboard/ContestInfo");
         if (info == null)
             return;
         Value problems = jsonParse(new InputReader(new StringInputStream(info))).get("problems");
@@ -187,11 +191,12 @@ public class GCJParser implements Parser {
         receiver.receiveDescriptions(descriptions);
     }
 
-    public Task parseTask(Description description) {
+    @Override
+    public Task parseTask(Project project, DescriptionReceiver receiver, Description description) {
         String[] tokens = description.id.split(" ");
         String contestID = tokens[0];
         String taskID = tokens[1];
-        String info = FileUtils.getWebPageContent("https://code.google.com/codejam/contest/" + contestID + "/dashboard/ContestInfo");
+        String info = ParseProgresser.getWebPageContent(project, receiver, "https://code.google.com/codejam/contest/" + contestID + "/dashboard/ContestInfo");
         Value problems = jsonParse(new InputReader(new StringInputStream(info))).get("problems");
         if (problems == null || problems.type != Value.Type.JSON)
             return null;
@@ -232,6 +237,7 @@ public class GCJParser implements Parser {
         }
     }
 
+    @Override
     public Collection<Task> parseTaskFromHTML(String html) {
         StringParser parser = new StringParser(html);
         List<Task> result = new ArrayList<Task>();

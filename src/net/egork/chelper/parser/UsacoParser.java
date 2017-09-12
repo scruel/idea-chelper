@@ -1,5 +1,6 @@
 package net.egork.chelper.parser;
 
+import com.intellij.openapi.project.Project;
 import net.egork.chelper.checkers.PEStrictChecker;
 import net.egork.chelper.task.StreamConfiguration;
 import net.egork.chelper.task.Task;
@@ -15,30 +16,37 @@ import java.util.Collections;
  * @author egorku@yandex-team.ru
  */
 public class UsacoParser implements Parser {
+    @Override
     public Icon getIcon() {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public String getName() {
         return "USACO";
     }
 
-    public void getContests(DescriptionReceiver receiver) {
+    @Override
+    public void getContests(Project project, DescriptionReceiver receiver) {
         throw new UnsupportedOperationException();
     }
 
-    public void parseContest(String id, DescriptionReceiver receiver) {
+    @Override
+    public void parseContest(Project project, String id, DescriptionReceiver receiver) {
         throw new UnsupportedOperationException();
     }
 
-    public Task parseTask(Description description) {
+    @Override
+    public Task parseTask(Project project, DescriptionReceiver receiver, Description description) {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public TestType defaultTestType() {
         return TestType.SINGLE;
     }
 
+    @Override
     public Collection<Task> parseTaskFromHTML(String html) {
         StringParser parser = new StringParser(html);
         try {

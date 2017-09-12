@@ -1,12 +1,12 @@
 package net.egork.chelper.parser;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
 import net.egork.chelper.checkers.PEStrictChecker;
 import net.egork.chelper.task.StreamConfiguration;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.task.test.Test;
 import net.egork.chelper.task.test.TestType;
-import net.egork.chelper.util.FileUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import javax.swing.*;
@@ -20,16 +20,19 @@ import java.util.List;
  * @author egor@egork.net
  */
 public class KattisParser implements Parser {
+    @Override
     public Icon getIcon() {
         return IconLoader.getIcon("/icons/kattis.png");
     }
 
+    @Override
     public String getName() {
         return "Kattis";
     }
 
-    public void getContests(DescriptionReceiver receiver) {
-        String contestsPage = FileUtils.getWebPageContent("https://open.kattis.com/contests");
+    @Override
+    public void getContests(Project project, DescriptionReceiver receiver) {
+        String contestsPage = ParseProgresser.getWebPageContent(project, receiver, "https://open.kattis.com/contests");
         if (contestsPage == null) {
             return;
         }
@@ -56,7 +59,7 @@ public class KattisParser implements Parser {
         int left = -1;
         int right = 1;
         while (true) {
-            if (isNotEmpty(right)) {
+            if (isNotEmpty(project, receiver, right)) {
                 left = right;
                 right *= 2;
             } else {
@@ -66,7 +69,7 @@ public class KattisParser implements Parser {
         }
         while (left < right) {
             int middle = (left + right + 1) >> 1;
-            if (isNotEmpty(middle)) {
+            if (isNotEmpty(project, receiver, middle)) {
                 left = middle;
             } else {
                 right = middle - 1;
@@ -78,23 +81,10 @@ public class KattisParser implements Parser {
         receiver.receiveDescriptions(contests);
     }
 
-    private boolean isNotEmpty(int index) {
-        String page = FileUtils.getWebPageContent("https://open.kattis.com/problems?page=" + index);
-        if (page == null) {
-            return false;
-        }
-        StringParser parser = new StringParser(page);
-        try {
-            parser.advance(true, "<tbody>");
-            return parser.advanceIfPossible(true, "<td class=\"name_column\">") != null;
-        } catch (ParseException e) {
-            return false;
-        }
-    }
-
-    public void parseContest(String id, DescriptionReceiver receiver) {
+    @Override
+    public void parseContest(Project project, String id, DescriptionReceiver receiver) {
         if (id.indexOf(' ') == -1) {
-            String mainPage = FileUtils.getWebPageContent("https://open.kattis.com/contests/" + id + "/problems");
+            String mainPage = ParseProgresser.getWebPageContent(project, receiver, "https://open.kattis.com/contests/" + id + "/problems");
             if (mainPage == null) {
                 return;
             }
@@ -117,7 +107,7 @@ public class KattisParser implements Parser {
                 receiver.receiveDescriptions(ids);
             }
         } else {
-            String mainPage = FileUtils.getWebPageContent(
+            String mainPage = ParseProgresser.getWebPageContent(project, receiver,
                 "https://open.kattis.com/problems?page=" + id.substring(id.indexOf(' ') + 1));
             if (mainPage == null) {
                 return;
@@ -139,11 +129,12 @@ public class KattisParser implements Parser {
         }
     }
 
-    public Task parseTask(Description description) {
+    @Override
+    public Task parseTask(Project project, DescriptionReceiver receiver, Description description) {
         int space = description.id.indexOf(' ');
         String id = space == -1 ?
             description.id : description.id.substring(0, space);
-        String text = FileUtils.getWebPageContent("https://open.kattis.com" + id);
+        String text = ParseProgresser.getWebPageContent(project, receiver, "https://open.kattis.com" + id);
         if (text == null) {
             return null;
         }
@@ -157,12 +148,29 @@ public class KattisParser implements Parser {
             return task;
         }
         return null;
+
     }
 
+    private boolean isNotEmpty(Project project, DescriptionReceiver receiver, int index) {
+        String page = ParseProgresser.getWebPageContent(project, receiver, "https://open.kattis.com/problems?page=" + index);
+        if (page == null) {
+            return false;
+        }
+        StringParser parser = new StringParser(page);
+        try {
+            parser.advance(true, "<tbody>");
+            return parser.advanceIfPossible(true, "<td class=\"name_column\">") != null;
+        } catch (ParseException e) {
+            return false;
+        }
+    }
+
+    @Override
     public TestType defaultTestType() {
         return TestType.SINGLE;
     }
 
+    @Override
     public Collection<Task> parseTaskFromHTML(String html) {
         StringParser parser = new StringParser(html);
         try {

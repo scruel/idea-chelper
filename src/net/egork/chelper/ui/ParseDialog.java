@@ -1,6 +1,9 @@
 package net.egork.chelper.ui;
 
 import com.intellij.notification.NotificationType;
+import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.MessageType;
@@ -21,6 +24,7 @@ import net.egork.chelper.util.ExecuteUtils;
 import net.egork.chelper.util.FileUtils;
 import net.egork.chelper.util.Messenger;
 import net.egork.chelper.util.ProjectUtils;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -38,6 +42,7 @@ import java.util.List;
  */
 @SuppressWarnings("unchecked")
 public class ParseDialog extends JDialog {
+    private final static Logger LOG = Logger.getInstance(ParseDialog.class);
     private Collection<Task> result = Collections.emptyList();
     private JBList contestList;
     private JBList taskList;
@@ -53,43 +58,79 @@ public class ParseDialog extends JDialog {
     private Receiver taskReceiver;
     private Receiver contestReceiver;
     private int width = new JTextField(20).getPreferredSize().width;
+    private Project project;
 
     private ParseDialog(final Project project) {
-        super(null, "Parse Contest", ModalityType.APPLICATION_MODAL);
+        super(null, "ParseProgresser Contest", ModalityType.APPLICATION_MODAL);
+        this.project = project;
         setIconImage(ProjectUtils.iconToImage(IconLoader.getIcon("/icons/parseContest.png")));
         ProjectData data = ProjectUtils.getData(project);
         OkCancelPanel contentPanel = new OkCancelPanel(new BorderLayout(5, 5)) {
             @Override
             public void onOk() {
-                if (!ParseDialog.this.isValidData(project)) return;
-                List<Task> list = new ArrayList<Task>();
-                Object[] tasks = taskList.getSelectedValues();
-                Parser parser = (Parser) parserCombo.getSelectedItem();
-                ProjectData data = ProjectUtils.getData(project);
-                for (Object taskDescription : tasks) {
-                    Description description = (Description) taskDescription;
-                    Task raw = parser.parseTask(description);
-                    if (raw == null) {
-                        Messenger.publishMessage("Unable to parse task " + description.description +
-                            ". Connection problems or format change", NotificationType.ERROR);
-                        continue;
-                    }
-                    raw = raw.setInputOutputClasses(data.inputClass, data.outputClass);
-                    raw = raw.setTemplate(template.getText());
-                    Task task = new Task(raw.name, (TestType) testType.getSelectedItem(), raw.input, raw.output,
-                        raw.tests, location.getText(), raw.vmArgs, raw.mainClass,
-                        FileUtils.createIfNeeded(project, raw, raw.taskClass, location.getText()), raw.checkerClass,
-                        raw.checkerParameters, raw.testClasses, date.getText(), contestName.getText(),
-                        truncate.isSelected(), data.inputClass, data.outputClass, raw.includeLocale,
-                        data.failOnIntegerOverflowForNewTasks, raw.template);
-                    list.add(task);
+                try {
+                    ProgressManager.getInstance().run(
+                        //just use for dialog.
+                        new com.intellij.openapi.progress.Task.WithResult<Object, Exception>(project, "Parse Tasks", true) {
+                            private boolean canceled = false;
+
+                            @Override
+                            public void onCancel() {
+                                this.canceled = true;
+                            }
+
+                            @Override
+                            protected Object compute(@NotNull final ProgressIndicator indicator) throws Exception {
+                                ExecuteUtils.executeWriteCommandAction(project, new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (!ParseDialog.this.isValidData(project)) return;
+                                        contestReceiver.stop();
+                                        List<Task> list = new ArrayList<Task>();
+                                        Object[] tasks = taskList.getSelectedValues();
+                                        Parser parser = (Parser) parserCombo.getSelectedItem();
+                                        ProjectData data = ProjectUtils.getData(project);
+                                        int finishedSum = 0;
+                                        for (Object taskDescription : tasks) {
+                                            if (canceled) return;
+                                            indicator.setFraction(++finishedSum / tasks.length);
+                                            Description description = (Description) taskDescription;
+                                            Task raw = parser.parseTask(project, new Receiver() {
+                                                @Override
+                                                protected void processNewDescriptions(Collection<Description> descriptions) {
+                                                    //ignore
+                                                }
+                                            }, description);
+                                            if (raw == null) {
+                                                Messenger.publishMessage("Unable to parse task " + description.description +
+                                                    ". Connection problems or format change", NotificationType.ERROR);
+                                                continue;
+                                            }
+                                            raw = raw.setInputOutputClasses(data.inputClass, data.outputClass);
+                                            raw = raw.setTemplate(template.getText());
+                                            Task task = new Task(raw.name, (TestType) testType.getSelectedItem(), raw.input, raw.output,
+                                                raw.tests, location.getText(), raw.vmArgs, raw.mainClass,
+                                                FileUtils.createIfNeeded(project, raw, raw.taskClass, location.getText()), raw.checkerClass,
+                                                raw.checkerParameters, raw.testClasses, date.getText(), contestName.getText(),
+                                                truncate.isSelected(), data.inputClass, data.outputClass, raw.includeLocale,
+                                                data.failOnIntegerOverflowForNewTasks, raw.template);
+                                            list.add(task);
+                                        }
+                                        if (canceled) return;
+                                        result = list;
+                                        if (!result.isEmpty()) {
+                                            ProjectUtils.updateDefaultTask(result.iterator().next());
+                                        }
+                                        ParseDialog.this.setVisible(false);
+                                        ProjectUtils.setDefaultParser(parser);
+                                    }
+                                });
+                                return null;
+                            }
+                        }
+                    );
+                } catch (Exception ignored) {
                 }
-                result = list;
-                if (!result.isEmpty()) {
-                    ProjectUtils.updateDefaultTask(result.iterator().next());
-                }
-                ParseDialog.this.setVisible(false);
-                ProjectUtils.setDefaultParser(parser);
             }
 
             @Override
@@ -97,6 +138,7 @@ public class ParseDialog extends JDialog {
                 ParseDialog.this.setVisible(false);
             }
         };
+
         JPanel upperPanel = new JPanel(new BorderLayout(5, 5));
         parserCombo = new ComboBox(Parser.PARSERS);
         parserCombo.setRenderer(new ListCellRendererWrapper() {
@@ -137,7 +179,10 @@ public class ParseDialog extends JDialog {
         contestList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         contestList.setLayoutOrientation(JList.VERTICAL);
         contestList.addListSelectionListener(new ListSelectionListener() {
+            @Override
             public void valueChanged(ListSelectionEvent e) {
+                if (e.getValueIsAdjusting()) return;
+                LOG.info("valueChanged: " + taskReceiver);
                 if (taskReceiver != null) {
                     taskReceiver.stop();
                     taskReceiver = null;
@@ -148,7 +193,7 @@ public class ParseDialog extends JDialog {
                     contestName.setText("");
                     return;
                 }
-                new ParserTask(contest.id, taskReceiver = new Receiver() {
+                ParserTask.parserTask(project, contest.id, taskReceiver = new Receiver() {
                     @Override
                     protected void processNewDescriptions(final Collection<Description> descriptions) {
                         final Receiver receiver = this;
@@ -259,9 +304,10 @@ public class ParseDialog extends JDialog {
         contestModel.removeAll();
         taskModel.removeAll();
         contestName.setText("");
-        new ParserTask(null, contestReceiver = new Receiver() {
+        ParserTask.parserTask(project, null, contestReceiver = new Receiver() {
             @Override
             protected void processNewDescriptions(final Collection<Description> descriptions) {
+                LOG.info("START ParserTask");
                 final Receiver receiver = this;
                 ExecuteUtils.executeStrictWriteActionAndWait(new Runnable() {
                     @Override
@@ -282,6 +328,7 @@ public class ParseDialog extends JDialog {
                         }
                     }
                 });
+                LOG.info("END ParserTask");
             }
         }, parser);
         pack();

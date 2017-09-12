@@ -1,12 +1,13 @@
 package net.egork.chelper.parser;
 
+import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
 import net.egork.chelper.checkers.PEStrictChecker;
 import net.egork.chelper.task.StreamConfiguration;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.task.test.Test;
 import net.egork.chelper.task.test.TestType;
-import net.egork.chelper.util.FileUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import javax.swing.*;
@@ -20,16 +21,21 @@ import java.util.List;
  * @author Egor Kulikov (kulikov@devexperts.com)
  */
 public class CodeforcesParser implements Parser {
+    private static final Logger LOG = Logger.getInstance(CodeforcesParser.class);
+
+    @Override
     public Icon getIcon() {
         return IconLoader.getIcon("/icons/codeforces.png");
     }
 
+    @Override
     public String getName() {
         return "Codeforces";
     }
 
-    public void getContests(DescriptionReceiver receiver) {
-        String contestsPage = FileUtils.getWebPageContent("http://codeforces.com/contests?complete=true");
+    @Override
+    public void getContests(Project project, DescriptionReceiver receiver) {
+        String contestsPage = ParseProgresser.getWebPageContent(project, receiver, "http://codeforces.com/contests?complete=true");
         if (contestsPage == null)
             return;
         List<Description> contests = new ArrayList<Description>();
@@ -61,7 +67,8 @@ public class CodeforcesParser implements Parser {
             return;
         }
         for (int i = 2; i <= additionalPagesCount; i++) {
-            String page = FileUtils.getWebPageContent("http://codeforces.com/contests/page/" + i);
+            if (receiver.isStopped()) return;
+            String page = ParseProgresser.getWebPageContent(project, receiver, "http://codeforces.com/contests/page/" + i);
             if (page == null)
                 continue;
             parser = new StringParser(page);
@@ -85,8 +92,10 @@ public class CodeforcesParser implements Parser {
         }
     }
 
-    public void parseContest(String id, DescriptionReceiver receiver) {
-        String mainPage = FileUtils.getWebPageContent("http://codeforces.com/contest/" + id);
+    @Override
+    public void parseContest(Project project, String id, DescriptionReceiver receiver) {
+        LOG.info("START parseContest: " + id + " " + receiver);
+        String mainPage = ParseProgresser.getWebPageContent(project, receiver, "http://codeforces.com/contest/" + id);
         if (mainPage == null)
             return;
         List<Description> ids = new ArrayList<Description>();
@@ -107,18 +116,22 @@ public class CodeforcesParser implements Parser {
             }
         } catch (ParseException ignored) {
         }
-        if (!receiver.isStopped())
+        if (!receiver.isStopped()) {
+            LOG.info("STOP parseContest: " + id + " " + receiver);
             receiver.receiveDescriptions(ids);
+        }
+        LOG.info("END parseContest: " + id + " " + receiver);
     }
 
-    public Task parseTask(Description description) {
+    @Override
+    public Task parseTask(Project project, DescriptionReceiver receiver, Description description) {
         String id = description.id;
         String[] tokens = id.split(" ");
         if (tokens.length != 2)
             return null;
         String contestId = tokens[0];
         id = tokens[1];
-        String text = FileUtils.getWebPageContent("http://codeforces.com/contest/" + contestId + "/problem/" + id);
+        String text = ParseProgresser.getWebPageContent(project, receiver, "http://codeforces.com/contest/" + contestId + "/problem/" + id);
         if (text == null)
             return null;
         Collection<Task> tasks = parseTaskFromHTML(text);
@@ -127,10 +140,12 @@ public class CodeforcesParser implements Parser {
         return null;
     }
 
+    @Override
     public TestType defaultTestType() {
         return TestType.SINGLE;
     }
 
+    @Override
     public Collection<Task> parseTaskFromHTML(String html) {
         StringParser parser = new StringParser(html);
         try {

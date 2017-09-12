@@ -22,7 +22,6 @@ import net.egork.chelper.task.TaskBase;
 import net.egork.chelper.task.TopCoderTask;
 
 import java.io.*;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Properties;
@@ -283,29 +282,6 @@ public class FileUtils {
         Document doc = FileDocumentManager.getInstance().getDocument(file);
         if (doc == null) return;
         FileDocumentManager.getInstance().saveDocument(doc);
-    }
-
-    public static String getWebPageContent(String address) {
-        return getWebPageContent(address, "UTF-8");
-    }
-
-    public static String getWebPageContent(String address, String charset) {
-        for (int i = 0; i < 10; i++) {
-            try {
-                URL url = new URL(address);
-                InputStream input = url.openStream();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(input, Charset.forName(charset)));
-                StringBuilder builder = new StringBuilder();
-                String s;
-                while ((s = reader.readLine()) != null) {
-                    builder.append(s).append('\n');
-                }
-                reader.close();
-                return new String(builder.toString().getBytes("UTF-8"), "UTF-8");
-            } catch (IOException ignored) {
-            }
-        }
-        return null;
     }
 
     public static Task readTask(Project project, String fileName) {

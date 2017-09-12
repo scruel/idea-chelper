@@ -1,12 +1,12 @@
 package net.egork.chelper.parser;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
 import net.egork.chelper.checkers.PEStrictChecker;
 import net.egork.chelper.task.StreamConfiguration;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.task.test.Test;
 import net.egork.chelper.task.test.TestType;
-import net.egork.chelper.util.FileUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import javax.swing.*;
@@ -20,16 +20,19 @@ import java.util.List;
  * @author Egor Kulikov (egor@egork.net)
  */
 public class TimusParser implements Parser {
+    @Override
     public Icon getIcon() {
         return IconLoader.getIcon("/icons/timus.png");
     }
 
+    @Override
     public String getName() {
         return "Timus";
     }
 
-    public void getContests(DescriptionReceiver receiver) {
-        String currentContestPage = FileUtils.getWebPageContent("http://acm.timus.ru/schedule.aspx?locale=en");
+    @Override
+    public void getContests(Project project, DescriptionReceiver receiver) {
+        String currentContestPage = ParseProgresser.getWebPageContent(project, receiver, "http://acm.timus.ru/schedule.aspx?locale=en");
         if (currentContestPage != null) {
             StringParser parser = new StringParser(currentContestPage);
             try {
@@ -46,7 +49,7 @@ public class TimusParser implements Parser {
             } catch (ParseException ignored) {
             }
         }
-        String problemsetPage = FileUtils.getWebPageContent("http://acm.timus.ru/problemset.aspx?locale=en");
+        String problemsetPage = ParseProgresser.getWebPageContent(project, receiver, "http://acm.timus.ru/problemset.aspx?locale=en");
         if (problemsetPage != null) {
             StringParser parser = new StringParser(problemsetPage);
             int index = 1;
@@ -60,7 +63,7 @@ public class TimusParser implements Parser {
             else
                 return;
         }
-        String archivePage = FileUtils.getWebPageContent("http://acm.timus.ru/archive.aspx?locale=en");
+        String archivePage = ParseProgresser.getWebPageContent(project, receiver, "http://acm.timus.ru/archive.aspx?locale=en");
         if (archivePage != null) {
             StringParser parser = new StringParser(archivePage);
             List<Description> contests = new ArrayList<Description>();
@@ -80,7 +83,8 @@ public class TimusParser implements Parser {
         }
     }
 
-    public void parseContest(String id, DescriptionReceiver receiver) {
+    @Override
+    public void parseContest(Project project, String id, DescriptionReceiver receiver) {
         int index = 1;
         String url = "http://acm.timus.ru/problemset.aspx?space=" + id + "&locale=en";
         if (Integer.parseInt(id) < 0) {
@@ -92,7 +96,7 @@ public class TimusParser implements Parser {
             else
                 return;
         }
-        String mainPage = FileUtils.getWebPageContent(url);
+        String mainPage = ParseProgresser.getWebPageContent(project, receiver, url);
         if (mainPage == null)
             return;
         List<Description> tasks = new ArrayList<Description>();
@@ -115,7 +119,8 @@ public class TimusParser implements Parser {
             receiver.receiveDescriptions(tasks);
     }
 
-    public Task parseTask(Description description) {
+    @Override
+    public Task parseTask(Project project, DescriptionReceiver receiver, Description description) {
         String id = description.id;
         String[] tokens = id.split(" ");
         String url;
@@ -128,7 +133,7 @@ public class TimusParser implements Parser {
             index = tokens[1];
         }
         url = "http://acm.timus.ru/problem.aspx?space=" + tokens[0] + "&num=" + tokens[1] + "&locale=en";
-        String text = FileUtils.getWebPageContent(url);
+        String text = ParseProgresser.getWebPageContent(project, receiver, url);
         if (text == null)
             return null;
         StringParser parser = new StringParser(text);
@@ -159,10 +164,12 @@ public class TimusParser implements Parser {
         }
     }
 
+    @Override
     public TestType defaultTestType() {
         return TestType.SINGLE;
     }
 
+    @Override
     public Collection<Task> parseTaskFromHTML(String html) {
         throw new UnsupportedOperationException();
     }

@@ -1,5 +1,6 @@
 package net.egork.chelper.parser;
 
+import com.intellij.openapi.project.Project;
 import net.egork.chelper.checkers.PEStrictChecker;
 import net.egork.chelper.task.StreamConfiguration;
 import net.egork.chelper.task.Task;
@@ -25,15 +26,16 @@ public class AtCoderParser implements Parser {
         return "AtCoder";
     }
 
-    public void getContests(DescriptionReceiver receiver) {
+    public void getContests(Project project, DescriptionReceiver receiver) {
         throw new UnsupportedOperationException();
     }
 
-    public void parseContest(String id, DescriptionReceiver receiver) {
+    @Override
+    public Task parseTask(Project project, DescriptionReceiver receiver, Description description) {
         throw new UnsupportedOperationException();
     }
 
-    public Task parseTask(Description description) {
+    public void parseContest(Project project, String id, DescriptionReceiver receiver) {
         throw new UnsupportedOperationException();
     }
 

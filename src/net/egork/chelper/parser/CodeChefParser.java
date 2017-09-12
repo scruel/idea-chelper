@@ -1,12 +1,13 @@
 package net.egork.chelper.parser;
 
+import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
 import net.egork.chelper.checkers.PEStrictChecker;
 import net.egork.chelper.task.StreamConfiguration;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.task.test.Test;
 import net.egork.chelper.task.test.TestType;
-import net.egork.chelper.util.FileUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import javax.swing.*;
@@ -17,6 +18,7 @@ import java.util.*;
  * @author Egor Kulikov (egor@egork.net)
  */
 public class CodeChefParser implements Parser {
+    private final static Logger LOG = Logger.getInstance(CodeChefParser.class);
     private final static String EASY_ID = "problems/easy";
     private final static String MEDIUM_ID = "problems/medium";
     private final static String HARD_ID = "problems/hard";
@@ -25,18 +27,22 @@ public class CodeChefParser implements Parser {
     private final static String SCHOOL_ID = "problems/school";
     private final static List<String> SPECIAL = Arrays.asList(EASY_ID, MEDIUM_ID, HARD_ID, CHALLENGE_ID, PEER_ID, SCHOOL_ID);
 
+    @Override
     public Icon getIcon() {
         return IconLoader.getIcon("/icons/codechef.png");
     }
 
+    @Override
     public String getName() {
         return "CodeChef";
     }
 
-    public void getContests(DescriptionReceiver receiver) {
+    @Override
+    public void getContests(Project project, DescriptionReceiver receiver) {
+        LOG.info("START getContests: " + receiver);
         String mainPage;
         while (true) {
-            mainPage = FileUtils.getWebPageContent("http://www.codechef.com/contests");
+            mainPage = ParseProgresser.getWebPageContent(project, receiver, "http://www.codechef.com/contests");
             if (mainPage != null)
                 break;
             if (receiver.isStopped())
@@ -77,6 +83,31 @@ public class CodeChefParser implements Parser {
         }
         if (!receiver.isStopped())
             receiver.receiveDescriptions(contests);
+        LOG.info("END getContests: " + receiver);
+    }
+
+    @Override
+    public Task parseTask(Project project, DescriptionReceiver receiver, Description description) {
+        LOG.info("START parseTask: " + description);
+        String id = description.id;
+        String[] tokens = id.split(" ");
+        if (tokens.length > 2 || tokens.length == 0)
+            return null;
+        String url;
+        if (tokens.length == 2)
+            url = "http://www.codechef.com/" + tokens[0] + "/problems/" + tokens[1];
+        else
+            url = "http://www.codechef.com/problems/" + tokens[0];
+        String text = ParseProgresser.getWebPageContent(project, receiver, url);
+        if (text == null) {
+            return null;
+        }
+        Collection<Task> tasks = parseTaskFromHTML(text);
+        if (tasks.isEmpty()) {
+            return null;
+        }
+        LOG.info("END parseTask: " + description);
+        return tasks.iterator().next();
     }
 
     private Collection<Description> buildSpecial() {
@@ -90,8 +121,9 @@ public class CodeChefParser implements Parser {
         return special;
     }
 
-    public void parseContest(String id, DescriptionReceiver receiver) {
-        String mainPage = FileUtils.getWebPageContent("http://www.codechef.com/" + id);
+    @Override
+    public void parseContest(Project project, String id, DescriptionReceiver receiver) {
+        String mainPage = ParseProgresser.getWebPageContent(project, receiver, "http://www.codechef.com/" + id);
         if (mainPage == null)
             return;
         if (SPECIAL.contains(id)) {
@@ -128,31 +160,13 @@ public class CodeChefParser implements Parser {
             receiver.receiveDescriptions(tasks);
     }
 
-    public Task parseTask(Description description) {
-        String id = description.id;
-        String[] tokens = id.split(" ");
-        if (tokens.length > 2 || tokens.length == 0)
-            return null;
-        String url;
-        if (tokens.length == 2)
-            url = "http://www.codechef.com/" + tokens[0] + "/problems/" + tokens[1];
-        else
-            url = "http://www.codechef.com/problems/" + tokens[0];
-        String text = FileUtils.getWebPageContent(url);
-        if (text == null) {
-            return null;
-        }
-        Collection<Task> tasks = parseTaskFromHTML(text);
-        if (tasks.isEmpty()) {
-            return null;
-        }
-        return tasks.iterator().next();
-    }
 
+    @Override
     public TestType defaultTestType() {
         return TestType.MULTI_NUMBER;
     }
 
+    @Override
     public Collection<Task> parseTaskFromHTML(String text) {
         StringParser parser = new StringParser(text);
         try {
