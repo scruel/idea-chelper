@@ -12,6 +12,7 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.util.IncorrectOperationException;
 import net.egork.chelper.codegeneration.CodeGenerationUtils;
 import net.egork.chelper.configurations.TaskConfiguration;
 import net.egork.chelper.configurations.TopCoderConfiguration;
@@ -58,49 +59,55 @@ public class ArchiveAction extends AnAction {
         ExecuteUtils.executeStrictWriteActionAndWait(new Runnable() {
             @Override
             public void run() {
-                PsiFile sourceFile;
-                if (configuration instanceof TaskConfiguration) {
-                    sourceFile = FileUtils.getPsiFileByFQN(project, ((Task) taskBase).taskClass);
-                } else {
-                    sourceFile = FileUtils.getPsiFile(project,
-                        ProjectUtils.getData(project).defaultDirectory
-                            + "/" + taskBase.name + ".java");
-                }
-                if (sourceFile == null) {
-                    Messenger.publishMessage("SourceFile where task was located is no longer exists",
-                        NotificationType.ERROR);
-                    return;
-                }
-                directory.copyFileFrom(sourceFile.getName(), sourceFile);
-                if (configuration instanceof TaskConfiguration) {
-                    PsiElement checker = JavaPsiFacade.getInstance(project).findClass(((Task) taskBase).checkerClass, GlobalSearchScope.allScope(project));
-                    PsiFile checkerFile = checker == null ? null : checker.getContainingFile();
-                    if (checkerFile != null && checkerFile.getParent().equals(sourceFile.getParent())) {
-                        directory.copyFileFrom(checkerFile.getName(), checkerFile);
-                        checkerFile.delete();
+                try {
+                    PsiFile sourceFile;
+                    if (configuration instanceof TaskConfiguration) {
+                        sourceFile = FileUtils.getPsiFileByFQN(project, ((Task) taskBase).taskClass);
+                    } else {
+                        sourceFile = FileUtils.getPsiFile(project,
+                            ProjectUtils.getData(project).defaultDirectory
+                                + "/" + taskBase.name + ".java");
                     }
-                }
-                for (String testClass : taskBase.testClasses) {
-                    PsiFile testFile = FileUtils.getPsiFileByFQN(project, testClass);
-                    if (testFile != null) {
-                        directory.copyFileFrom(testFile.getName(), testFile);
-                        testFile.delete();
+                    if (sourceFile == null) {
+                        Messenger.publishMessage("SourceFile where task was located is no longer exists",
+                            NotificationType.ERROR);
+                        return;
                     }
-                }
+                    directory.copyFileFrom(sourceFile.getName(), sourceFile);
+                    if (configuration instanceof TaskConfiguration) {
+                        PsiElement checker = JavaPsiFacade.getInstance(project).findClass(((Task) taskBase).checkerClass, GlobalSearchScope.allScope(project));
+                        PsiFile checkerFile = checker == null ? null : checker.getContainingFile();
+                        if (checkerFile != null && checkerFile.getParent().equals(sourceFile.getParent())) {
+                            directory.copyFileFrom(checkerFile.getName(), checkerFile);
+                            checkerFile.delete();
+                        }
+                    }
+                    for (String testClass : taskBase.testClasses) {
+                        PsiFile testFile = FileUtils.getPsiFileByFQN(project, testClass);
+                        if (testFile != null) {
+                            directory.copyFileFrom(testFile.getName(), testFile);
+                            testFile.delete();
+                        }
+                    }
 
-                PsiFile taskFile;
-                if (configuration instanceof TaskConfiguration) {
-                    taskFile = FileUtils.getPsiFile(project, ((Task) taskBase).location + "/" + canonize(taskBase.name) + ".task");
-                } else {
-                    taskFile = FileUtils.getPsiFile(project, ProjectUtils.getData(project).defaultDirectory + "/" + taskBase.name + ".tctask");
+                    PsiFile taskFile;
+                    if (configuration instanceof TaskConfiguration) {
+                        taskFile = FileUtils.getPsiFile(project, ((Task) taskBase).location + "/" + canonize(taskBase.name) + ".task");
+                    } else {
+                        taskFile = FileUtils.getPsiFile(project, ProjectUtils.getData(project).defaultDirectory + "/" + taskBase.name + ".tctask");
+                    }
+                    if (taskFile != null) {
+                        directory.copyFileFrom(taskFile.getName(), taskFile);
+                    }
+                    FileUtils.deleteTaskIfExists(project, CompatibilityUtils.getPsiFile(project, sourceFile.getVirtualFile()), true);
+                    ProjectUtils.setOtherConfiguration(manager, taskBase);
+                    Messenger.publishMessage("Configuration '" + configuration.getName() + "' successfully archived",
+                        NotificationType.INFORMATION);
+                } catch (IncorrectOperationException e) {
+                    Messenger.publishMessage("Error archiving configuration '" + configuration.getName() +
+                        "' caused by " + e.getMessage(), NotificationType.ERROR);
+                    Messenger.publishMessage("Configuration not deleted", NotificationType.WARNING);
                 }
-                if (taskFile != null) {
-                    directory.copyFileFrom(taskFile.getName(), taskFile);
-                }
-                FileUtils.deleteTaskIfExists(project, CompatibilityUtils.getPsiFile(project, sourceFile.getVirtualFile()), true);
-                ProjectUtils.setOtherConfiguration(manager, taskBase);
-                Messenger.publishMessage("Configuration '" + configuration.getName() + "' successfully archived",
-                    NotificationType.INFORMATION);
             }
         });
     }
