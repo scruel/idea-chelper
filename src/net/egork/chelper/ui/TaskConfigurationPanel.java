@@ -53,7 +53,7 @@ public class TaskConfigurationPanel extends JPanel {
     private int panelWidth = new JTextField(27).getPreferredSize().width;
     private JCheckBox includeLocale;
 
-    public TaskConfigurationPanel(final Project project, final Task task, boolean firstEdit, final SizeChangeListener listener, JPanel buttonPanel) {
+    public TaskConfigurationPanel(final Project project, final String taskName, final Task task, boolean firstEdit, final SizeChangeListener listener, JPanel buttonPanel) {
         super(new BorderLayout(5, 5));
         this.task = task;
         this.project = project;
@@ -66,7 +66,7 @@ public class TaskConfigurationPanel extends JPanel {
             }
         };
         basic.add(new JLabel("Name:"));
-        name = new JTextField(task.name);
+        name = new JTextField(taskName);
         name.setEnabled(firstEdit);
         name.getDocument().addDocumentListener(new DocumentListener() {
             String lastText = name.getText();

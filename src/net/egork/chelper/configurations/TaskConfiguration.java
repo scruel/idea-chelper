@@ -22,6 +22,7 @@ import net.egork.chelper.actions.TopCoderAction;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.ui.TaskConfigurationEditor;
 import net.egork.chelper.util.*;
+import org.apache.commons.lang.StringUtils;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -71,11 +72,19 @@ public class TaskConfiguration extends ModuleBasedConfiguration<JavaRunConfigura
         }
         final PsiClass psiClass = configurationModule.findNotNullClass(configuration.taskClass);
         if (psiClass.findMethodsByName("solve", false).length == 0) {
-            throw new RuntimeConfigurationWarning("solve method not found in class '" + configuration.taskClass + "'");
+            throw new RuntimeConfigurationWarning("solve method not found in class '" + configuration.taskClass + "'.");
         }
         ClassUtils.checkClass(getProject(), configuration.inputClass);
         ClassUtils.checkClass(getProject(), configuration.outputClass);
         ClassUtils.checkClass(getProject(), configuration.checkerClass);
+        if (StringUtils.isEmpty(configuration.location)) {
+            throw new RuntimeConfigurationWarning("configuration location '" + configuration.location + "' invalid.");
+        }
+        VirtualFile taskFile = FileUtils.getFileByFQN(getProject(), configuration.taskClass);
+        VirtualFile parentFile = FileUtils.getFile(getProject(), configuration.location);
+        if (!taskFile.getParent().equals(parentFile)) {
+            throw new RuntimeConfigurationWarning("configuration location '" + configuration.location + "' not match task class '" + configuration.taskClass + "'.");
+        }
         JavaRunConfigurationExtensionManager.checkConfigurationIsValid(this);
     }
 
@@ -136,7 +145,13 @@ public class TaskConfiguration extends ModuleBasedConfiguration<JavaRunConfigura
     }
 
     private void saveConfiguration(Task configuration) {
-        if (configuration != null && configuration.location != null && configuration.name != null && configuration.name.length() != 0)
+        if (configuration == null) {
+            return;
+        }
+
+        VirtualFile taskFile = FileUtils.getFileByFQN(getProject(), configuration.taskClass);
+        VirtualFile parentFile = FileUtils.getFile(getProject(), configuration.location);
+        if (configuration.location != null && configuration.name != null && configuration.name.length() != 0 && taskFile != null && !taskFile.getParent().equals(parentFile))
             FileUtils.saveConfiguration(configuration.location, ArchiveAction.canonize(configuration.name) + ".task", configuration, getProject());
     }
 

@@ -54,7 +54,7 @@ public class CreateTaskDialog extends JDialog {
                 pack();
             }
         });
-        panel = new TaskConfigurationPanel(project, task, canEditName, new TaskConfigurationPanel.SizeChangeListener() {
+        panel = new TaskConfigurationPanel(project, task.name, task, canEditName, new TaskConfigurationPanel.SizeChangeListener() {
             public void onSizeChanged() {
                 pack();
             }

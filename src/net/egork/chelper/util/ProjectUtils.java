@@ -313,6 +313,7 @@ public class ProjectUtils {
 
 
     public static String getSimpleName(String className) {
+        if (className == null) return null;
         int position = className.lastIndexOf('.');
         if (position != -1)
             className = className.substring(position + 1);
@@ -324,21 +325,33 @@ public class ProjectUtils {
     }
 
     /**
-     * if it {@param configuration} could not be valid, then delete and return false.
+     * if {@param configuration} not valid, then delete it and return false.
      *
      * @param configuration
      * @return
      */
     public static boolean isValidConfigurationOrDeleteIfNot(RunConfiguration configuration) {
-        boolean res = true;
-        if (configuration instanceof TaskConfiguration) {
-            res = ((TaskConfiguration) configuration).getConfiguration() != null;
-        } else if (configuration instanceof TopCoderConfiguration) {
-            res = ((TopCoderConfiguration) configuration).getConfiguration() != null;
-        }
-        if (!res) {
+        boolean isValid = isValidConfiguration(configuration);
+        if (!isValid) {
             ProjectUtils.removeConfigurationIfExists(configuration);
         }
-        return res;
+        return isValid;
+    }
+
+    /**
+     * if {@param configuration} not valid, then return false.
+     *
+     * @param configuration
+     * @return
+     */
+    public static boolean isValidConfiguration(RunConfiguration configuration) {
+        if (configuration == null) return false;
+        boolean isValid = true;
+        if (configuration instanceof TaskConfiguration) {
+            isValid = ((TaskConfiguration) configuration).getConfiguration() != null;
+        } else if (configuration instanceof TopCoderConfiguration) {
+            isValid = ((TopCoderConfiguration) configuration).getConfiguration() != null;
+        }
+        return isValid;
     }
 }

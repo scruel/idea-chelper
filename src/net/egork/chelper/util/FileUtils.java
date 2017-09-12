@@ -367,6 +367,7 @@ public class FileUtils {
     }
 
     public static boolean isValidClassName(String name) {
+        if (name == null) return false;
         return name.matches("[a-zA-Z_$][a-zA-Z\\d_$]*");
     }
 

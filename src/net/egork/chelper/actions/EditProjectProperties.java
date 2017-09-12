@@ -19,7 +19,7 @@ public class EditProjectProperties extends AnAction {
         ProjectData data = ProjectUtils.getData(project);
         ProjectData result = ProjectDataDialog.edit(project, data);
         if (result != null) {
-            if (!result.author.equals(data.author)) {
+            if (data != null && !result.author.equals(data.author)) {
                 CodeGenerationUtils.refreshAllTemplate(project, data.author, result.author);
             } else {
                 CodeGenerationUtils.createTemplatesIfNeeded(project);

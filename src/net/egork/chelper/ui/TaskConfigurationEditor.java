@@ -25,10 +25,10 @@ public class TaskConfigurationEditor extends SettingsEditor<TaskConfiguration> {
     private void applyTask() {
         if (wrapper == null)
             wrapper = new JPanel(new BorderLayout());
-        if (!ProjectUtils.isValidConfigurationOrDeleteIfNot(taskConfiguration)) {
-            return;
+        if (!ProjectUtils.isValidConfiguration(taskConfiguration)) {
+            taskConfiguration = new TaskConfiguration(taskConfiguration.getProject(), taskConfiguration.getName(), ProjectUtils.getDefaultTask().setName(taskConfiguration.getName()), taskConfiguration.getFactory());
         }
-        taskConfigurationPanel = new TaskConfigurationPanel(taskConfiguration.getProject(), taskConfiguration.getConfiguration(), false, null, null);
+        taskConfigurationPanel = new TaskConfigurationPanel(taskConfiguration.getProject(), taskConfiguration.getName(), taskConfiguration.getConfiguration(), false, null, null);
         wrapper.add(taskConfigurationPanel, BorderLayout.CENTER);
     }
 
@@ -40,6 +40,9 @@ public class TaskConfigurationEditor extends SettingsEditor<TaskConfiguration> {
 
     @Override
     protected void applyEditorTo(TaskConfiguration s) throws ConfigurationException {
+        if (!ProjectUtils.isValidConfigurationOrDeleteIfNot(s)) {
+            return;
+        }
         s.setConfiguration(taskConfigurationPanel.getTask());
     }
 
