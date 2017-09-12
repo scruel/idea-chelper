@@ -3,6 +3,7 @@ package net.egork.chelper.actions;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.impl.RunManagerImpl;
+import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
@@ -10,6 +11,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import net.egork.chelper.configurations.TaskConfiguration;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.util.FileUtils;
+import net.egork.chelper.util.Messenger;
 import net.egork.chelper.util.ProjectUtils;
 
 import java.awt.*;
@@ -54,7 +56,7 @@ public class CopyAction extends AnAction {
                     break;
                 }
             }
-
+            Messenger.publishMessage("Copy action completed.", NotificationType.INFORMATION);
         }
     }
 }
