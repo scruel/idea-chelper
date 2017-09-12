@@ -3,7 +3,7 @@ CHelper
 
 Inlines library code and provides testing framework
 
-[![Build Status](https://travis-ci.org/paulvollmer/apistatus.svg?branch=master)](https://travis-ci.org/paulvollmer/apistatus) [![license](https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000)](https://github.com/farmerx/elasticHD/blob/master/LICENSE)
+![build-status][build-status] [![license][license]][license-link]
 
 ## Introduction
 ------------
@@ -19,16 +19,31 @@ Tips
 
 you may can't receiver any update info from this forked repository because I'm not the original, so, If you like any of this, you can star it and check its update when you have time.
 
-all fixes and adds are available in commits page: [All Commits](https://github.com/scruel/idea-chelper/commits/master)  
+all fixes and adds are available in commits page: [commits-list][commits-list]
 (no time for organize updates. so try it if you want.)
 
-all released .zip plugin are available in release page: [All releases](https://github.com/scruel/idea-chelper/releases)  
+all released .zip plugin are available in release page: [release-list][latest-release]  
 
 Installation
 ------------
-you can install this plugin by guides in following links:  
-[https://www.jetbrains.com/help/idea/installing-a-plugin-from-the-disk.html](https://www.jetbrains.com/help/idea/installing-a-plugin-from-the-disk.html)
+- Using IDE built-in plugin system:
+  - <kbd>Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Browse repositories...</kbd> > <kbd>Search for "CHelper"</kbd> > <kbd>Install Plugin</kbd>
+- Manually:
+  - Download the [latest release][latest-release] and install it manually using <kbd>Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Install plugin from disk...</kbd>
+  
+Restart IDE.
+
+you can also take a look the following links:  
+[installing-a-plugin-from-the-disk][installing-a-plugin-from-the-disk]
 
 Changelog
 ---------
 *TODO*
+
+[release-list]: https://github.com/scruel/idea-chelper/releases
+[latest-release]: https://github.com/scruel/idea-chelper/releases/tag/v4.4.0
+[commits-list]: https://github.com/scruel/idea-chelper/commits/master
+[build-status]: https://travis-ci.org/paulvollmer/apistatus.svg?branch=master
+[license]: https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000
+[license-link]: https://github.com/farmerx/elasticHD/blob/master/LICENSE
+[installing-a-plugin-from-the-disk]: https://www.jetbrains.com/help/idea/installing-a-plugin-from-the-disk.html
