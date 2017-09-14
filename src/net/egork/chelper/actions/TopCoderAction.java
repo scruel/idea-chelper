@@ -109,13 +109,13 @@ public class TopCoderAction extends AnAction {
                                             message.out.printString(Message.ALREADY_DEFINED);
                                         else {
                                             message.out.printString(Message.OK);
-                                            ExecuteUtils.executeStrictWriteActionAndWait(new Runnable() {
+                                            ExecuteUtils.executeWriteAction(new Runnable() {
                                                 @Override
                                                 public void run() {
                                                     FileUtils.createDirectoryIfMissing(project, ProjectUtils.getData(project).defaultDirectory);
                                                     createConfiguration(project, task);
                                                 }
-                                            });
+                                            }, false);
                                         }
                                     }
                                 }

@@ -94,7 +94,7 @@ public class ChromeParser implements ProjectComponent {
                                 while ((s = reader.readLine()) != null)
                                     builder.append(s).append('\n');
                                 final String page = builder.toString();
-                                ExecuteUtils.executeStrictWriteActionAndWait(new Runnable() {
+                                ExecuteUtils.executeWriteAction(new Runnable() {
                                     @Override
                                     public void run() {
                                         if (TASK_PARSERS.containsKey(type)) {
@@ -117,7 +117,7 @@ public class ChromeParser implements ProjectComponent {
                                             System.err.println(page);
                                         }
                                     }
-                                });
+                                }, true);
                             } finally {
                                 socket.close();
                             }

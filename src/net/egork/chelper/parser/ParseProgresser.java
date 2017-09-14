@@ -14,6 +14,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 /**
  * Created by Scruel on 2017/9/12.
@@ -24,15 +26,14 @@ public class ParseProgresser {
     private static String requestURL;
 
     public static String getWebPageContent(Project project, final DescriptionReceiver receiver, String url) {
-        LOG.info("getWebPageContent: " + url);
+        LOG.info("getWebPageContent-> receiver: " + receiver + " url: " + url);
         return getWebPageContent(project, receiver, url, "UTF-8");
     }
 
     public static String getWebPageContent(final Project project, final DescriptionReceiver receiver, final String url, final String charset) {
-        LOG.info("START getWebPageContent: " + url);
+        LOG.info("START getWebPageContent-> receiver: " + receiver + " url: " + url);
         ParseProgresser.requestURL = url;
-        final boolean[] flag = {false};
-        final StringBuilder resultBuilder = new StringBuilder();
+        final BlockingQueue<StringBuilder> resBlockingQueue = new ArrayBlockingQueue<StringBuilder>(1);
         ProgressManager.getInstance().run(
             new Task.Backgroundable(project, "Parse Pages", true) {
                 @Override
@@ -60,8 +61,8 @@ public class ParseProgresser {
                                 builder.append(s).append('\n');
                             }
                             reader.close();
-                            resultBuilder.append(builder);
-                            flag[0] = true;
+                            builder.append(builder);
+                            resBlockingQueue.add(builder);
                             return;
                         } catch (IOException ignored) {
                         }
@@ -70,20 +71,18 @@ public class ParseProgresser {
                 }
             }
         );
-        while (!flag[0]) {
-            if (receiver.isStopped()) {
+        try {
+            StringBuilder result = resBlockingQueue.take();
+            if (receiver.isStopped() || result.length() == 0) {
+                LOG.info("STOP getWebPageContent-> receiver: " + receiver + " url: " + url + " isStop: " + receiver.isStopped());
                 return null;
             }
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            LOG.info("END getWebPageContent-> receiver: " + receiver + " url: " + url);
+            return result.toString();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-        if (resultBuilder.length() == 0) {
-            return null;
-        }
-        LOG.info("END getWebPageContent: " + url);
-        return resultBuilder.toString();
+        LOG.info("ERROR getWebPageContent-> receiver: " + receiver + " url: " + url);
+        return null;
     }
 }

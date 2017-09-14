@@ -130,7 +130,7 @@ public class KattisParser implements Parser {
     }
 
     @Override
-    public Task parseTask(Project project, DescriptionReceiver receiver, Description description) {
+    public Task parseTask(Project project, Description description, DescriptionReceiver receiver) {
         int space = description.id.indexOf(' ');
         String id = space == -1 ?
             description.id : description.id.substring(0, space);

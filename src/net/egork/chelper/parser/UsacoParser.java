@@ -37,7 +37,7 @@ public class UsacoParser implements Parser {
     }
 
     @Override
-    public Task parseTask(Project project, DescriptionReceiver receiver, Description description) {
+    public Task parseTask(Project project, Description description, DescriptionReceiver receiver) {
         throw new UnsupportedOperationException();
     }
 

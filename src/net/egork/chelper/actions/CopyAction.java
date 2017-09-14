@@ -6,6 +6,9 @@ import com.intellij.execution.impl.RunManagerImpl;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.application.Application;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import net.egork.chelper.configurations.TaskConfiguration;
@@ -22,7 +25,10 @@ import java.awt.datatransfer.StringSelection;
  * @author Egor Kulikov (kulikov@devexperts.com)
  */
 public class CopyAction extends AnAction {
-    public void actionPerformed(AnActionEvent e) {
+    private static final Logger LOG = Logger.getInstance(CopyAction.class);
+    private static final Application application = ApplicationManager.getApplication();
+
+    public void actionPerformed(final AnActionEvent e) {
         if (!ProjectUtils.isEligible(e.getDataContext()))
             return;
         final Project project = ProjectUtils.getProject(e.getDataContext());

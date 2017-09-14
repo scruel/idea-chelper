@@ -192,7 +192,7 @@ public class GCJParser implements Parser {
     }
 
     @Override
-    public Task parseTask(Project project, DescriptionReceiver receiver, Description description) {
+    public Task parseTask(Project project, Description description, DescriptionReceiver receiver) {
         String[] tokens = description.id.split(" ");
         String contestID = tokens[0];
         String taskID = tokens[1];

@@ -83,7 +83,7 @@ public class ProjectData {
     }
 
     public void save(final Project project) {
-        ExecuteUtils.executeWriteCommandAction(project, new Runnable() {
+        ExecuteUtils.executeWriteAction(new Runnable() {
             public void run() {
                 if (project == null)
                     return;
@@ -121,7 +121,7 @@ public class ProjectData {
                 } catch (IOException ignore) {
                 }
             }
-        });
+        }, false);
     }
 
     public static String join(String[] excludedPackages) {

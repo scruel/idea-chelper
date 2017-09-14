@@ -15,6 +15,7 @@ import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.util.PsiUtil;
 import net.egork.chelper.codegeneration.CodeGenerationUtils;
 import net.egork.chelper.codegeneration.MainFileTemplate;
 import net.egork.chelper.task.Task;
@@ -42,7 +43,7 @@ public class FileUtils {
         if (psiFile == null) {
             return;
         }
-        ExecuteUtils.executeStrictWriteActionAndWait(new Runnable() {
+        ExecuteUtils.executeWriteAction(new Runnable() {
             @Override
             public void run() {
                 VirtualFile vFile = psiFile.getVirtualFile();
@@ -61,7 +62,7 @@ public class FileUtils {
                     Messenger.publishMessage("Unable to delete file: " + e, NotificationType.ERROR);
                 }
             }
-        });
+        }, false);
     }
 
     public static Properties loadProperties(VirtualFile file) {
@@ -103,7 +104,7 @@ public class FileUtils {
         if (location == null) {
             return null;
         }
-        ExecuteUtils.executeStrictWriteActionAndWait(new Runnable() {
+        ExecuteUtils.executeWriteAction(new Runnable() {
             @Override
             public void run() {
                 OutputStream stream = null;
@@ -121,7 +122,7 @@ public class FileUtils {
                     }
                 }
             }
-        });
+        }, false);
         return location.findChild(fileName);
     }
 
@@ -129,38 +130,42 @@ public class FileUtils {
      * detectable creation
      *
      * @param project
-     * @param location
+     * @param directory
      * @param fileName
      * @return
      */
-    public static PsiFile writeTextFile(final Project project, final PsiDirectory location, final String fileName, final String context) {
-        if (location == null) {
+    public static PsiFile writeTextFile(final Project project, final PsiDirectory directory, final String fileName, final String context) {
+        if (directory == null) {
             return null;
         }
         ExecuteUtils.executeWriteCommandAction(project, new Runnable() {
             @Override
             public void run() {
-                PsiFileFactory factory = PsiFileFactory.getInstance(project);
-                PsiFile psiFile = location.findFile(fileName);
-                FileType type = FileTypeRegistry.getInstance().getFileTypeByFileName(fileName);
-                if (psiFile == null) {
-                    if (type.isBinary()) {
-                        type = UnknownFileType.INSTANCE;
-                    }
-                    psiFile = factory.createFileFromText(fileName, type, context);
-                    location.add(psiFile);
-                } else {
-                    VirtualFile vFile = psiFile.getVirtualFile();
-                    try {
-                        BufferedOutputStream out = new BufferedOutputStream(vFile.getOutputStream(null));
-                        out.write(context.getBytes("UTF-8"));
-                        out.close();
-                    } catch (IOException ignore) {
-                    }
-                }
+                _writeTextFile(project, directory, fileName, context);
             }
-        });
-        return location.findFile(fileName);
+        }, true);
+        return directory.findFile(fileName);
+    }
+
+    private static void _writeTextFile(Project project, PsiDirectory directory, String fileName, String context) {
+        PsiFileFactory factory = PsiFileFactory.getInstance(project);
+        PsiFile psiFile = directory.findFile(fileName);
+        FileType type = FileTypeRegistry.getInstance().getFileTypeByFileName(fileName);
+        if (psiFile == null) {
+            if (type.isBinary()) {
+                type = UnknownFileType.INSTANCE;
+            }
+            psiFile = factory.createFileFromText(fileName, type, context);
+            directory.add(psiFile);
+        } else {
+            VirtualFile vFile = psiFile.getVirtualFile();
+            try {
+                BufferedOutputStream out = new BufferedOutputStream(vFile.getOutputStream(null));
+                out.write(context.getBytes("UTF-8"));
+                out.close();
+            } catch (IOException ignore) {
+            }
+        }
     }
 
     public static boolean isValidDirectory(Project project, String location) {
@@ -232,7 +237,7 @@ public class FileUtils {
         if (file == null) {
             return null;
         }
-        return CompatibilityUtils.getPsiFile(project, file);
+        return PsiUtil.getPsiFile(project, file);
     }
 
     public static PsiDirectory getDirectory(DataContext dataContext) {
@@ -257,7 +262,7 @@ public class FileUtils {
     }
 
     public static VirtualFile createDirectoryIfMissing(final Project project, final String location) {
-        ExecuteUtils.executeStrictWriteActionAndWait(new Runnable() {
+        ExecuteUtils.executeWriteAction(new Runnable() {
             @Override
             public void run() {
                 VirtualFile baseDir = project.getBaseDir();
@@ -269,7 +274,7 @@ public class FileUtils {
                 } catch (IOException ignored) {
                 }
             }
-        });
+        }, true);
         return getFile(project, location);
     }
 
@@ -304,7 +309,7 @@ public class FileUtils {
         if (locationName == null) {
             return;
         }
-        ExecuteUtils.executeStrictWriteAction(new Runnable() {
+        ExecuteUtils.executeWriteAction(new Runnable() {
             @Override
             public void run() {
                 PsiDirectory locationFile = FileUtils.getPsiDirectory(project, locationName);
@@ -313,9 +318,9 @@ public class FileUtils {
                 }
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 configuration.saveTask(new OutputWriter(out));
-                writeTextFile(project, locationFile, fileName, out.toString());
+                _writeTextFile(project, locationFile, fileName, out.toString());
             }
-        });
+        }, false);
     }
 
     public static boolean isChild(VirtualFile parent, VirtualFile child) {
