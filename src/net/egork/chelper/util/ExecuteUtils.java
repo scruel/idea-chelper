@@ -2,6 +2,7 @@ package net.egork.chelper.util;
 
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.application.Result;
 import com.intellij.openapi.application.ex.ApplicationEx;
 import com.intellij.openapi.application.ex.ApplicationManagerEx;
@@ -40,10 +41,10 @@ public class ExecuteUtils {
             }
         };
         if (blocking && !application.holdsReadLock()) {
-            application.invokeAndWait(_runnable, application.getDefaultModalityState());
+            application.invokeAndWait(_runnable, ModalityState.NON_MODAL);
             return;
         }
-        application.invokeLater(_runnable, application.getDefaultModalityState());
+        application.invokeLater(_runnable, ModalityState.NON_MODAL);
     }
 
     public static void executeWriteAction(final Runnable runnable, boolean blocking) {
@@ -60,10 +61,10 @@ public class ExecuteUtils {
             }
         };
         if (blocking && !application.holdsReadLock()) {
-            application.invokeAndWait(_runnable, application.getDefaultModalityState());
+            application.invokeAndWait(_runnable, ModalityState.NON_MODAL);
             return;
         }
-        application.invokeLater(_runnable, application.getDefaultModalityState());
+        application.invokeLater(_runnable, ModalityState.NON_MODAL);
     }
 
     public static void executeReadAction(final Runnable runnable) {
