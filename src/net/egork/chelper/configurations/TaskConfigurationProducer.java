@@ -42,7 +42,7 @@ public class TaskConfigurationProducer extends RunConfigurationProducer<TaskConf
         if (null == (dataFile = (VirtualFile) map.get(TaskUtils.TASK_DATA_KEY)))
             return false;
 
-        Task task = FileUtils.readTask(project, FileUtils.getRelativePath(project.getBaseDir(), dataFile));
+        Task task = FileUtils.readTask(dataFile);
         if (task == null) return false;
         task = (Task) TaskUtils.fixedTaskByTaskFile(project, task, dataFile);
         if (task == null) return false;
