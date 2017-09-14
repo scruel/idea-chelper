@@ -61,7 +61,6 @@ public class ParseProgresser {
                                 builder.append(s).append('\n');
                             }
                             reader.close();
-                            builder.append(builder);
                             resBlockingQueue.add(builder);
                             return;
                         } catch (IOException ignored) {
