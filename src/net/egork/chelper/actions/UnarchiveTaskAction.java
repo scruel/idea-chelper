@@ -46,7 +46,7 @@ public class UnarchiveTaskAction extends AnAction {
                 }
             }, project, null);
         final VirtualFile[] files = dialog.choose(project, FileUtils.getFile(project, ProjectUtils.getData(project).archiveDirectory));
-        ExecuteUtils.executeStrictWriteActionAndWait(new Runnable() {
+        ExecuteUtils.executeWriteAction(new Runnable() {
             public void run() {
                 try {
                     for (VirtualFile taskFile : files) {
@@ -145,6 +145,6 @@ public class UnarchiveTaskAction extends AnAction {
                     throw new RuntimeException(e);
                 }
             }
-        });
+        }, true);
     }
 }

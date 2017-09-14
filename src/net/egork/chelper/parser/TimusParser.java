@@ -120,7 +120,7 @@ public class TimusParser implements Parser {
     }
 
     @Override
-    public Task parseTask(Project project, DescriptionReceiver receiver, Description description) {
+    public Task parseTask(Project project, Description description, DescriptionReceiver receiver) {
         String id = description.id;
         String[] tokens = id.split(" ");
         String url;

@@ -22,7 +22,7 @@ public interface Parser {
 
     void parseContest(Project project, String id, DescriptionReceiver receiver);
 
-    Task parseTask(Project project, DescriptionReceiver receiver, Description description);
+    Task parseTask(Project project, Description description, DescriptionReceiver receiver);
 
     TestType defaultTestType();
 

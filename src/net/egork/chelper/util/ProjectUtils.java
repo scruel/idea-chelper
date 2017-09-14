@@ -6,6 +6,7 @@ import com.intellij.execution.impl.RunManagerImpl;
 import com.intellij.execution.impl.RunnerAndConfigurationSettingsImpl;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
@@ -122,38 +123,38 @@ public class ProjectUtils {
     }
 
     public static void ensureLibraryAndData(final Project project) {
-        ExecuteUtils.executeStrictWriteActionAndWait(new Runnable() {
-            @Override
-            public void run() {
-                ProjectUtils.ensureLibrary(project);
-            }
-        });
+        ProjectUtils.ensureLibrary(project);
     }
 
-    public static void ensureLibrary(Project project) {
-        LibraryTable table = ProjectLibraryTable.getInstance(project);
-        String path = TopCoderAction.getJarPathForClass(NewTester.class);
-        if (path == null) {
-            throw new RuntimeException("Could not find " + ProjectUtils.PROJECT_NAME + " jar!");
-        }
-        VirtualFile jar;
-        jar = VirtualFileManager.getInstance().findFileByUrl(VirtualFileManager.constructUrl(JarFileSystem.PROTOCOL, path) + JarFileSystem.JAR_SEPARATOR);
+    public static void ensureLibrary(final Project project) {
+        ExecuteUtils.executeWriteAction(new Runnable() {
+            @Override
+            public void run() {
+                LibraryTable table = ProjectLibraryTable.getInstance(project);
+                String path = TopCoderAction.getJarPathForClass(NewTester.class);
+                if (path == null) {
+                    throw new RuntimeException("Could not find " + ProjectUtils.PROJECT_NAME + " jar!");
+                }
+                VirtualFile jar;
+                jar = VirtualFileManager.getInstance().findFileByUrl(VirtualFileManager.constructUrl(JarFileSystem.PROTOCOL, path) + JarFileSystem.JAR_SEPARATOR);
 
-        if (jar == null) {
-            jar = LocalFileSystem.getInstance().refreshAndFindFileByPath(path);
-        }
-        if (jar == null) {
-            throw new RuntimeException("Could not find " + ProjectUtils.PROJECT_NAME + " jar!");
-        }
-        Library library = table.getLibraryByName(PROJECT_NAME);
-        if (library != null) {
-            table.removeLibrary(library);
-        }
-        library = table.createLibrary(PROJECT_NAME);
-        Library.ModifiableModel libraryModel = library.getModifiableModel();
-        libraryModel.addRoot(jar, OrderRootType.CLASSES);
-        libraryModel.commit();
-        addLibray(project, library);
+                if (jar == null) {
+                    jar = LocalFileSystem.getInstance().refreshAndFindFileByPath(path);
+                }
+                if (jar == null) {
+                    throw new RuntimeException("Could not find " + ProjectUtils.PROJECT_NAME + " jar!");
+                }
+                Library library = table.getLibraryByName(PROJECT_NAME);
+                if (library != null) {
+                    table.removeLibrary(library);
+                }
+                library = table.createLibrary(PROJECT_NAME);
+                Library.ModifiableModel libraryModel = library.getModifiableModel();
+                libraryModel.addRoot(jar, OrderRootType.CLASSES);
+                libraryModel.commit();
+                addLibray(project, library);
+            }
+        }, true);
     }
 
     private static void addLibray(Project project, Library library) {
@@ -203,16 +204,21 @@ public class ProjectUtils {
         return eligibleProjects.get(project);
     }
 
-    public static void openElement(Project project, PsiElement element) {
-        if (element instanceof PsiFile) {
-            VirtualFile virtualFile = ((PsiFile) element).getVirtualFile();
-            if (virtualFile == null)
-                return;
-            FileEditorManager.getInstance(project).openFile(virtualFile, true);
-        } else if (element instanceof PsiClass) {
-            FileEditorManager.getInstance(project).openFile(FileUtils.getFile(project, String.format("%s/%s.java", getData(project).defaultDirectory, ((PsiClass) element).getName())
-            ), true);
-        }
+    public static void openElement(final Project project, final PsiElement element) {
+        ApplicationManager.getApplication().invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                if (element instanceof PsiFile) {
+                    VirtualFile virtualFile = ((PsiFile) element).getVirtualFile();
+                    if (virtualFile == null)
+                        return;
+                    FileEditorManager.getInstance(project).openFile(virtualFile, true);
+                } else if (element instanceof PsiClass) {
+                    FileEditorManager.getInstance(project).openFile(FileUtils.getFile(project, String.format("%s/%s.java", getData(project).defaultDirectory, ((PsiClass) element).getName())
+                    ), true);
+                }
+            }
+        });
     }
 
     public static Point getLocation(Project project, Dimension size) {

@@ -2,7 +2,6 @@ package net.egork.chelper.actions;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import net.egork.chelper.ProjectData;
 import net.egork.chelper.codegeneration.CodeGenerationUtils;
@@ -26,11 +25,7 @@ public class EditProjectProperties extends AnAction {
             }
             result.save(project);
             ProjectUtils.putProjectData(project, result);
-            ApplicationManager.getApplication().runWriteAction(new Runnable() {
-                public void run() {
-                    ProjectUtils.ensureLibrary(project);
-                }
-            });
+            ProjectUtils.ensureLibrary(project);
         }
     }
 }

@@ -1,6 +1,7 @@
 package net.egork.chelper.codegeneration;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -29,6 +30,8 @@ import java.util.Map;
  * @author Egor Kulikov (kulikov@devexperts.com)
  */
 public class CodeGenerationUtils {
+    private static final Logger LOG = Logger.getInstance(CodeGenerationUtils.class);
+
     private CodeGenerationUtils() {
     }
 

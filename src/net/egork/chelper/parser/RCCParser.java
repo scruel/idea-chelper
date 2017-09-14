@@ -124,7 +124,7 @@ public class RCCParser implements Parser {
     }
 
     @Override
-    public Task parseTask(Project project, DescriptionReceiver receiver, Description description) {
+    public Task parseTask(Project project, Description description, DescriptionReceiver receiver) {
         String page = ParseProgresser.getWebPageContent(project, receiver, description.id, "UTF-8");
         if (page == null)
             return null;

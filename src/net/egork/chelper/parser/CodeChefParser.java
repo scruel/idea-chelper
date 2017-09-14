@@ -39,7 +39,7 @@ public class CodeChefParser implements Parser {
 
     @Override
     public void getContests(Project project, DescriptionReceiver receiver) {
-        LOG.info("START getContests: " + receiver);
+        LOG.info("START getContests-> receiver: " + receiver);
         String mainPage;
         while (true) {
             mainPage = ParseProgresser.getWebPageContent(project, receiver, "http://www.codechef.com/contests");
@@ -83,12 +83,12 @@ public class CodeChefParser implements Parser {
         }
         if (!receiver.isStopped())
             receiver.receiveDescriptions(contests);
-        LOG.info("END getContests: " + receiver);
+        LOG.info("END getContests-> receiver: " + receiver);
     }
 
     @Override
-    public Task parseTask(Project project, DescriptionReceiver receiver, Description description) {
-        LOG.info("START parseTask: " + description);
+    public Task parseTask(Project project, Description description, DescriptionReceiver receiver) {
+        LOG.info("START processTask-> receiver: " + receiver + " description" + description);
         String id = description.id;
         String[] tokens = id.split(" ");
         if (tokens.length > 2 || tokens.length == 0)
@@ -106,7 +106,7 @@ public class CodeChefParser implements Parser {
         if (tasks.isEmpty()) {
             return null;
         }
-        LOG.info("END parseTask: " + description);
+        LOG.info("END processTask-> receiver: " + receiver + " description" + description);
         return tasks.iterator().next();
     }
 

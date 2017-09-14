@@ -56,7 +56,7 @@ public class ArchiveAction extends AnAction {
             return;
         }
         CodeGenerationUtils.createUnitTest(project, taskBase);
-        ExecuteUtils.executeStrictWriteActionAndWait(new Runnable() {
+        ExecuteUtils.executeWriteAction(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -109,7 +109,7 @@ public class ArchiveAction extends AnAction {
                     Messenger.publishMessage("Configuration not deleted", NotificationType.WARNING);
                 }
             }
-        });
+        }, false);
     }
 
     private String getDateAndContest(TaskBase task) {

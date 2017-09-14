@@ -94,7 +94,7 @@ public class CodeforcesParser implements Parser {
 
     @Override
     public void parseContest(Project project, String id, DescriptionReceiver receiver) {
-        LOG.info("START parseContest: " + id + " " + receiver);
+        LOG.info("START parseContest-> " + id + " receiver: " + receiver);
         String mainPage = ParseProgresser.getWebPageContent(project, receiver, "http://codeforces.com/contest/" + id);
         if (mainPage == null)
             return;
@@ -117,14 +117,15 @@ public class CodeforcesParser implements Parser {
         } catch (ParseException ignored) {
         }
         if (!receiver.isStopped()) {
-            LOG.info("STOP parseContest: " + id + " " + receiver);
+            LOG.info(" receiveDescriptions-> " + id + " dataSize: " + ids.size() + " receiver: " + receiver);
             receiver.receiveDescriptions(ids);
         }
-        LOG.info("END parseContest: " + id + " " + receiver);
+        LOG.info("END parseContest-> " + id);
     }
 
     @Override
-    public Task parseTask(Project project, DescriptionReceiver receiver, Description description) {
+    public Task parseTask(Project project, Description description, DescriptionReceiver receiver) {
+        LOG.info("START processTask-> receiver: " + receiver + " description: " + description);
         String id = description.id;
         String[] tokens = id.split(" ");
         if (tokens.length != 2)
@@ -137,6 +138,7 @@ public class CodeforcesParser implements Parser {
         Collection<Task> tasks = parseTaskFromHTML(text);
         if (!tasks.isEmpty())
             return tasks.iterator().next();
+        LOG.info("END processTask-> receiver: " + receiver + " description: " + description);
         return null;
     }
 
