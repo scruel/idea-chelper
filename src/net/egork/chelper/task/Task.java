@@ -156,8 +156,10 @@ public class Task extends TaskBase<Test> {
             String date = in.readString();
             String contestName = in.readString();
             boolean truncate = in.readBoolean();
-            String inputClass = in.readString();
-            String outputClass = in.readString();
+            in.readInt();
+            String inputClass = in.readToken();
+            in.readInt();
+            String outputClass = in.readToken();
             boolean includeLocale = false;
             boolean failOnOverflow = false;
             try {
