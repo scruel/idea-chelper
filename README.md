@@ -26,8 +26,8 @@ all released .zip plugin are available in release page: [release-list][latest-re
 
 Installation
 ------------
-- Using IDE built-in plugin system:
-  - <kbd>Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Browse repositories...</kbd> > <kbd>Search for "CHelper"</kbd> > <kbd>Install Plugin</kbd>
+- ~~Using IDE built-in plugin system(not the plugin here):~~
+  - <kbd>Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Browse repositories...</kbd> > <kbd>Search for "CHelper"</kbd> > <kbd>Install Plugin</kbd>--
 - Manually:
   - Download the [latest release][latest-release] and install it manually using <kbd>Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Install plugin from disk...</kbd>
   
