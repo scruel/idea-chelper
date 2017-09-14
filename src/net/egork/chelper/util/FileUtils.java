@@ -290,6 +290,10 @@ public class FileUtils {
 
     public static Task readTask(Project project, String fileName) {
         VirtualFile vFile = getFile(project, fileName);
+        return readTask(vFile);
+    }
+
+    public static Task readTask(VirtualFile vFile) {
         if (vFile == null) {
             return null;
         }

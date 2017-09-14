@@ -109,7 +109,7 @@ public class TaskUtils {
      */
     public static Map<String, Object> getTaskMapWithDataFile(Project project, VirtualFile file) {
         Map<String, Object> map = new HashMap<String, Object>();
-        TaskBase taskBase = FileUtils.readTask(project, FileUtils.getRelativePath(project.getBaseDir(), file));
+        TaskBase taskBase = FileUtils.readTask(file);
         if (taskBase == null) {
             taskBase = FileUtils.readTopCoderTask(project, FileUtils.getRelativePath(project.getBaseDir(), file));
         }
