@@ -3,7 +3,7 @@ CHelper
 
 Inlines library code and provides testing framework
 
-![build-status][build-status] [![license][license]][license-link]
+[![license][license]][license-link]
 
 ## Introduction
 ------------
