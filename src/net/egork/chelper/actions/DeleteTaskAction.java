@@ -45,6 +45,10 @@ public class DeleteTaskAction extends AnAction {
             return;
         if (configuration instanceof TaskConfiguration) {
             final Task task = ((TaskConfiguration) configuration).getConfiguration();
+            if (task.taskClass == null) {
+                ProjectUtils.removeConfigurationIfExists(configuration);
+                return;
+            }
             ApplicationManager.getApplication().runWriteAction(new Runnable() {
                 public void run() {
                     try {
@@ -74,6 +78,9 @@ public class DeleteTaskAction extends AnAction {
         }
         if (configuration instanceof TopCoderConfiguration) {
             final TopCoderTask task = ((TopCoderConfiguration) configuration).getConfiguration();
+            if (task.name == null) {
+                ProjectUtils.removeConfigurationIfExists(configuration);
+            }
             ApplicationManager.getApplication().runWriteAction(new Runnable() {
                 public void run() {
                     try {

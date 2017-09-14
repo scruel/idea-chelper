@@ -15,6 +15,7 @@ import javax.swing.*;
  * @author egorku@yandex-team.ru
  */
 public class Messenger {
+    //要不要整理一下message。。。233
     private static final NotificationGroup NOTIFICATIONS = new NotificationGroup(ProjectUtils.PROJECT_NAME, NotificationDisplayType.BALLOON, false);
 
     private Messenger() {
