@@ -3,6 +3,7 @@ package net.egork.chelper.actions;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.impl.RunManagerImpl;
+import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
@@ -13,6 +14,7 @@ import net.egork.chelper.task.TopCoderTask;
 import net.egork.chelper.ui.CreateTaskDialog;
 import net.egork.chelper.ui.EditTCDialog;
 import net.egork.chelper.util.FileUtils;
+import net.egork.chelper.util.Messenger;
 import net.egork.chelper.util.ProjectUtils;
 
 /**
@@ -34,6 +36,10 @@ public class EditTask extends AnAction {
         if (configuration instanceof TaskConfiguration) {
             TaskConfiguration taskConfiguration = (TaskConfiguration) configuration;
             Task task = taskConfiguration.getConfiguration();
+            if (task == null || task.location == null) {
+                Messenger.publishMessage("Configuration corrupted.", NotificationType.WARNING);
+                return;
+            }
             task = CreateTaskDialog.showDialog(
                 FileUtils.getPsiDirectory(project, task.location), task.name, task, false);
             if (task != null)
@@ -42,6 +48,10 @@ public class EditTask extends AnAction {
         if (configuration instanceof TopCoderConfiguration) {
             TopCoderConfiguration taskConfiguration = (TopCoderConfiguration) configuration;
             TopCoderTask task = taskConfiguration.getConfiguration();
+            if (task == null) {
+                Messenger.publishMessage("Configuration corrupted.", NotificationType.WARNING);
+                return;
+            }
             taskConfiguration.setConfiguration(EditTCDialog.show(project, task));
         }
     }
