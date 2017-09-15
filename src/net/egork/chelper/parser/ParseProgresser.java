@@ -50,7 +50,6 @@ public class ParseProgresser {
                             URL url = new URL(ParseProgresser.requestURL);
                             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                             conn.setReadTimeout(10000);
-                            conn.setRequestProperty("User-Agent", "GoogleBot");
                             conn.connect();
 
                             InputStream input = conn.getInputStream();
