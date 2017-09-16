@@ -1,8 +1,11 @@
 package net.egork.chelper.task;
 
+import com.intellij.notification.NotificationType;
+import net.egork.chelper.exception.TaskCorruptException;
 import net.egork.chelper.task.test.Test;
 import net.egork.chelper.task.test.TestType;
 import net.egork.chelper.util.InputReader;
+import net.egork.chelper.util.Messenger;
 import net.egork.chelper.util.OutputWriter;
 
 import java.util.Calendar;
@@ -131,8 +134,10 @@ public class Task extends TaskBase<Test> {
     }
 
     public static Task load(InputReader in) {
+        String errorFile = null;
         try {
             String name = in.readString();
+            errorFile = name + ".task";
             TestType testType = in.readEnum(TestType.class);
             StreamConfiguration.StreamType inputStreamType = in.readEnum(StreamConfiguration.StreamType.class);
             String inputFileName = in.readString();
@@ -172,7 +177,7 @@ public class Task extends TaskBase<Test> {
                 taskClass, checkerClass, checkerParameters, testClasses, date, contestName, truncate, inputClass,
                 outputClass, includeLocale, failOnOverflow);
         } catch (InputMismatchException e) {
-//            throw new RuntimeException("CHelper could not continue because the associated data file is missing or corrupt");
+            Messenger.publishMessage(TaskCorruptException.getDefaultMessage(errorFile), NotificationType.ERROR);
             return null;
         }
     }

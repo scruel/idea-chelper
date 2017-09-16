@@ -26,17 +26,6 @@ public class Messenger {
 //        Messages.showInfoMessage( ... );
     }
 
-    /**
-     * wan't display until user click close.
-     *
-     * @param message
-     * @param type
-     */
-    public static void publishHoledMessage(String message, NotificationType type) {
-        NOTIFICATIONS.createNotification("CHelper", message, type, null).notify(null);
-//        Messages.showInfoMessage( ... );
-    }
-
     public static void publishMessageWithBalloon(Project project, String message, MessageType type) {
         StatusBar statusBar = WindowManager.getInstance()
             .getStatusBar(project);

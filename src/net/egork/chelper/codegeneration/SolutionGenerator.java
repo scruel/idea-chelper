@@ -410,7 +410,7 @@ public class SolutionGenerator {
 
     private boolean shouldAddElement(PsiElement element) {
         if (element == null) {
-            throw new TaskCorruptException("configuration corrupt.");
+            throw new TaskCorruptException();
         }
         PsiClass containingClass = element instanceof PsiClass ? (PsiClass) element : ((PsiMember) element).getContainingClass();
         if (containingClass == null) {

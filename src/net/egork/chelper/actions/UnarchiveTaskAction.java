@@ -54,7 +54,7 @@ public class UnarchiveTaskAction extends AnAction {
                             if ("task".equals(taskFile.getExtension())) {
                                 Task task = Task.load(new InputReader(taskFile.getInputStream()));
                                 if (task == null) {
-                                    Messenger.publishMessage(TaskCorruptException.defauleMessage + " " + taskFile.getName(),
+                                    Messenger.publishMessage(TaskCorruptException.getDefaultMessage(taskFile.getName()),
                                         NotificationType.ERROR);
                                     continue;
                                 }

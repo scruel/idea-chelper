@@ -5,9 +5,15 @@ package net.egork.chelper.exception;
  * Github : https://github.com/scruel
  */
 public class TaskCorruptException extends RuntimeException {
-    public static final String defauleMessage = "CHelper could not continue because the associated data file is missing or corrupt";
+    private static final String defauleMessage = "CHelper could not continue because the associated data file '%file%' is missing or corrupt.";
+
+    //TODO replace to bundle
+    public static String getDefaultMessage(String filename) {
+        return defauleMessage.replace("%file%", filename);
+    }
+
     public TaskCorruptException() {
-        super(defauleMessage);
+        super(getDefaultMessage("UnKnown"));
     }
 
     public TaskCorruptException(String message) {
