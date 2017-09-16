@@ -85,12 +85,13 @@ public class ParseDialog extends JDialog {
         JPanel upperPanel = new JPanel(new BorderLayout(5, 5));
         parserCombo = new ComboBox(Parser.PARSERS);
         parserCombo.setRenderer(new ListCellRendererWrapper() {
+            @Override
             public void customize(JList list, Object value, int index, boolean selected, boolean hasFocus) {
                 Parser parser = (Parser) value;
-                JLabel label = new JLabel(parser.getName(), parser.getIcon(), JLabel.LEFT);
-                label.setOpaque(true);
+                this.setIcon(parser.getIcon());
+                this.setText(parser.getName());
                 if (selected)
-                    label.setBackground(UIManager.getColor("textHighlight"));
+                    this.setBackground(UIManager.getColor("textHighlight"));
             }
         });
         parserCombo.setSelectedItem(ProjectUtils.getDefaultParser());
