@@ -16,14 +16,20 @@ import javax.swing.*;
  */
 public class Messenger {
     //要不要整理一下message。。。233
+    private static String currentMessage;
     private static final NotificationGroup NOTIFICATIONS = new NotificationGroup(ProjectUtils.PROJECT_NAME, NotificationDisplayType.BALLOON, false);
 
     private Messenger() {
     }
 
     public static void publishMessage(String message, NotificationType type) {
+        if (currentMessage == null) {
+            currentMessage = message;
+        } else {
+            if (message.equals(currentMessage)) return;
+            currentMessage = message;
+        }
         Notifications.Bus.notify(new Notification(ProjectUtils.PROJECT_NAME, ProjectUtils.PROJECT_NAME, message, type));
-//        Messages.showInfoMessage( ... );
     }
 
     public static void publishMessageWithBalloon(Project project, String message, MessageType type) {
@@ -38,6 +44,12 @@ public class Messenger {
     }
 
     public static void publishMessageWithBalloon(Project project, JComponent component, String message, MessageType type) {
+        if (currentMessage == null) {
+            currentMessage = message;
+        } else {
+            if (message.equals(currentMessage)) return;
+            currentMessage = message;
+        }
         JBPopupFactory.getInstance()
             .createHtmlTextBalloonBuilder(message, type, null)
             .setFadeoutTime(5000)

@@ -10,9 +10,11 @@ import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.testFramework.LightVirtualFile;
+import net.egork.chelper.actions.ArchiveAction;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.util.FileUtils;
 import net.egork.chelper.util.ProjectUtils;
+import net.egork.chelper.util.StackTraceLogger;
 import net.egork.chelper.util.TaskUtils;
 
 import java.util.Map;
@@ -22,12 +24,15 @@ import java.util.Map;
  * Github : https://github.com/scruel
  */
 public class TaskConfigurationProducer extends RunConfigurationProducer<TaskConfiguration> {
+    private static final StackTraceLogger LOG = new StackTraceLogger(TaskConfigurationProducer.class);
+
     protected TaskConfigurationProducer(TaskConfigurationType configurationType) {
         super(configurationType);
     }
 
     @Override
     protected boolean setupConfigurationFromContext(TaskConfiguration configuration, ConfigurationContext context, Ref sourceElement) {
+        LOG.printMethodInfoWithValues(true);
         final Location location = context.getLocation();
         if (location == null) return false;
         final PsiFile script = location.getPsiElement().getContainingFile();
@@ -41,14 +46,16 @@ public class TaskConfigurationProducer extends RunConfigurationProducer<TaskConf
         VirtualFile dataFile;
         if (null == (dataFile = (VirtualFile) map.get(TaskUtils.TASK_DATA_KEY)))
             return false;
-
         Task task = FileUtils.readTask(dataFile);
         if (task == null) return false;
+        LOG.printMethodInfoWithValues(true, "location", task.location);
         task = (Task) TaskUtils.fixedTaskByTaskFile(project, task, dataFile);
         if (task == null) return false;
+        LOG.printMethodInfoWithValues(true, "fixedLocation", task.location);
+        ProjectUtils.createConfiguration(project, task, true);
         configuration.setName(task.name);
         configuration.setConfiguration(task);
-        ProjectUtils.createConfiguration(project, task, true);
+        LOG.printMethodInfoWithValues(false);
         return true;
     }
 
@@ -62,6 +69,7 @@ public class TaskConfigurationProducer extends RunConfigurationProducer<TaskConf
 
     @Override
     public boolean isConfigurationFromContext(TaskConfiguration configuration, ConfigurationContext context) {
+        LOG.printMethodInfoWithNamesAndValues(true, "configuration", configuration);
         if (!ProjectUtils.isValidConfigurationOrDeleteIfNot(configuration)) return false;
         final Location location = context.getLocation();
         if (location == null) return false;
@@ -70,16 +78,17 @@ public class TaskConfigurationProducer extends RunConfigurationProducer<TaskConf
         VirtualFile file = script.getVirtualFile();
         if (file == null) return false;
         if (file instanceof LightVirtualFile) return false;
-
         Project project = context.getProject();
         Map<String, Object> map = TaskUtils.getTaskMapWitFile(project, file);
         if (map == null) return false;
-        if (null == (file = (VirtualFile) map.get(TaskUtils.TASK_SOURCE_KEY)))
-            return false;
+        if (null == map.get(TaskUtils.TASK_SOURCE_KEY)) return false;
 
         final String taskLocation = configuration.getConfiguration().location;
         final String classSimpleName = ProjectUtils.getSimpleName(configuration.getConfiguration().taskClass);
-        final String path = FileUtils.getRelativePath(context.getProject().getBaseDir(), file);
-        return path.equals(taskLocation + "/" + classSimpleName + ".java");
+        final String taskName = ArchiveAction.canonize(configuration.getConfiguration().name);
+        final String fileLocation = FileUtils.getRelativePath(context.getProject().getBaseDir(), file.getParent());
+        final String fileName = file.getNameWithoutExtension();
+        LOG.printMethodInfoWithValues(false, taskLocation, fileLocation, classSimpleName, taskName, fileName);
+        return taskLocation.equals(fileLocation) && (fileName.equals(classSimpleName) || fileName.equals(taskName));
     }
 }
