@@ -19,10 +19,11 @@ public class StackTraceLogger extends Logger {
 
     public StackTraceLogger(@NotNull @NonNls String category) {
         LOG = Logger.getInstance(category);
+        LOG.setLevel(Level.DEBUG);
     }
 
     public StackTraceLogger(@NotNull Class cl) {
-        LOG = Logger.getInstance(cl);
+        this("#" + cl.getName());
     }
 
     public String getCurrentMethodInfo() {
@@ -45,7 +46,7 @@ public class StackTraceLogger extends Logger {
                 sb.append(".");
             }
         }
-        info(sb.toString());
+        debug(sb.toString());
     }
 
     /**
@@ -56,7 +57,7 @@ public class StackTraceLogger extends Logger {
      * @return
      */
     public void printMethodInfoWithNamesAndValues(boolean enter, Object... namesAndValues) {
-        if ((namesAndValues.length & 1) != 0) throw new RuntimeException("改改吧。。。");
+        if ((namesAndValues.length & 1) != 0) throw new RuntimeException("需打印的参数数量非偶数，改改吧。。。");
         StringBuilder sb = new StringBuilder();
         sb.append(getCurrentMethodInfo());
         sb.append(getEnterSymbol(enter));
@@ -87,7 +88,7 @@ public class StackTraceLogger extends Logger {
                 sb.append(".");
             }
         }
-        info(sb.toString());
+        debug(sb.toString());
     }
 
     private List<String> processObjectsToStringList(Object[] objs) {
@@ -122,7 +123,7 @@ public class StackTraceLogger extends Logger {
 
     @Override
     public void debug(String message) {
-        LOG.error(message);
+        LOG.debug(message);
     }
 
     @Override
