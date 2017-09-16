@@ -109,7 +109,7 @@ public class FileUtils {
                 OutputStream stream = null;
                 try {
                     VirtualFile file = location.findOrCreateChildData(null, fileName);
-                    stream = file.getOutputStream(null);
+                    stream = file.getOutputStream(FileDocumentManager.getInstance());
                     stream.write(context.getBytes(Charset.forName("UTF-8")));
                 } catch (IOException ignored) {
                 } finally {
@@ -163,7 +163,7 @@ public class FileUtils {
         } else {
             VirtualFile vFile = psiFile.getVirtualFile();
             try {
-                BufferedOutputStream out = new BufferedOutputStream(vFile.getOutputStream(null));
+                BufferedOutputStream out = new BufferedOutputStream(vFile.getOutputStream(FileDocumentManager.getInstance()));
                 out.write(context.getBytes("UTF-8"));
                 out.close();
             } catch (IOException ignore) {
