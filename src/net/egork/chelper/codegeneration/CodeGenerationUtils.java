@@ -459,6 +459,9 @@ public class CodeGenerationUtils {
                 return source;
             source = source.substring(index + 1);
         }
+        while (source.startsWith("\n")) {
+            source = source.substring(1);
+        }
         if (packageName.length() == 0)
             return source;
         source = "package " + packageName + ";\n\n" + source;
