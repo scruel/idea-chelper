@@ -19,6 +19,7 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.search.GlobalSearchScope;
 import net.egork.chelper.actions.ArchiveAction;
 import net.egork.chelper.actions.TopCoderAction;
+import net.egork.chelper.codegeneration.SolutionGenerator;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.ui.TaskConfigurationEditor;
 import net.egork.chelper.util.*;
@@ -91,7 +92,7 @@ public class TaskConfiguration extends ModuleBasedConfiguration<JavaRunConfigura
     @Override
     public RunProfileState getState(@NotNull Executor executor, @NotNull ExecutionEnvironment env)
         throws ExecutionException {
-        TaskUtils.createSourceFile(getProject(), configuration);
+        SolutionGenerator.createSourceFile(getProject(), configuration);
         JavaCommandLineState state = new JavaCommandLineState(env) {
             @Override
             protected JavaParameters createJavaParameters() throws ExecutionException {

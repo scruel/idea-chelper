@@ -127,34 +127,36 @@ public class ProjectUtils {
     }
 
     public static void ensureLibrary(final Project project) {
+        final LibraryTable table = ProjectLibraryTable.getInstance(project);
+        String path = TopCoderAction.getJarPathForClass(NewTester.class);
+        if (path == null) {
+            throw new RuntimeException("Could not find " + ProjectUtils.PROJECT_NAME + " jar!");
+        }
+        VirtualFile jar;
+        jar = VirtualFileManager.getInstance().findFileByUrl(VirtualFileManager.constructUrl(JarFileSystem.PROTOCOL, path) + JarFileSystem.JAR_SEPARATOR);
+
+        if (jar == null) {
+            jar = LocalFileSystem.getInstance().refreshAndFindFileByPath(path);
+        }
+        if (jar == null) {
+            throw new RuntimeException("Could not find " + ProjectUtils.PROJECT_NAME + " jar!");
+        }
+        final VirtualFile jarFile = jar;
         ExecuteUtils.executeWriteAction(new Runnable() {
             @Override
             public void run() {
-                LibraryTable table = ProjectLibraryTable.getInstance(project);
-                String path = TopCoderAction.getJarPathForClass(NewTester.class);
-                if (path == null) {
-                    throw new RuntimeException("Could not find " + ProjectUtils.PROJECT_NAME + " jar!");
-                }
-                VirtualFile jar;
-                jar = VirtualFileManager.getInstance().findFileByUrl(VirtualFileManager.constructUrl(JarFileSystem.PROTOCOL, path) + JarFileSystem.JAR_SEPARATOR);
-
-                if (jar == null) {
-                    jar = LocalFileSystem.getInstance().refreshAndFindFileByPath(path);
-                }
-                if (jar == null) {
-                    throw new RuntimeException("Could not find " + ProjectUtils.PROJECT_NAME + " jar!");
-                }
                 Library library = table.getLibraryByName(PROJECT_NAME);
                 if (library != null) {
                     table.removeLibrary(library);
                 }
                 library = table.createLibrary(PROJECT_NAME);
                 Library.ModifiableModel libraryModel = library.getModifiableModel();
-                libraryModel.addRoot(jar, OrderRootType.CLASSES);
+                libraryModel.addRoot(jarFile, OrderRootType.CLASSES);
                 libraryModel.commit();
                 addLibray(project, library);
+
             }
-        }, true);
+        }, false);
     }
 
     private static void addLibray(Project project, Library library) {

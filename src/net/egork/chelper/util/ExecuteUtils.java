@@ -7,7 +7,6 @@ import com.intellij.openapi.application.Result;
 import com.intellij.openapi.application.ex.ApplicationEx;
 import com.intellij.openapi.application.ex.ApplicationManagerEx;
 import com.intellij.openapi.command.WriteCommandAction;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.impl.PsiModificationTrackerImpl;
@@ -22,68 +21,83 @@ import java.util.concurrent.Future;
  * Github : https://github.com/scruel
  */
 public class ExecuteUtils {
-    private static final Logger LOG = Logger.getInstance(ExecuteUtils.class);
+    private static final StackTraceLogger LOG = new StackTraceLogger(ExecuteUtils.class);
 
     private ExecuteUtils() {
     }
 
-    public static void executeWriteCommandAction(final Project project, final Runnable runnable, boolean blocking) {
-        final ApplicationEx application = ApplicationManagerEx.getApplicationEx();
-
-        if (application.isDispatchThread()) {
-            WriteCommandAction.runWriteCommandAction(project, runnable);
-            return;
+    private static boolean holdsReadLock(ApplicationEx applicationEx) {
+        try {
+            return applicationEx.holdsReadLock();
+        } catch (Exception e) {
+            return true;
         }
-        Runnable _runnable = new Runnable() {
+    }
+
+    public static void executeWriteCommandAction(final Project project, final Runnable runnable, boolean blocking) {
+        LOG.printMethodInfoWithNamesAndValues(true, "thread", Thread.currentThread().getName(), "project", project, "blocking", blocking);
+        final ApplicationEx application = ApplicationManagerEx.getApplicationEx();
+        Runnable writeRunnable = new Runnable() {
             @Override
             public void run() {
                 WriteCommandAction.runWriteCommandAction(project, runnable);
             }
         };
-        if (blocking && !application.holdsReadLock()) {
-            application.invokeAndWait(_runnable, ModalityState.NON_MODAL);
+
+        if (!blocking) {
+            application.invokeLater(writeRunnable, ModalityState.NON_MODAL);
+            LOG.printMethodInfoWithNamesAndValues(false);
             return;
         }
-        application.invokeLater(_runnable, ModalityState.NON_MODAL);
+        if (application.isDispatchThread()) {
+            if (application.isWriteAccessAllowed())
+                runnable.run();
+            else
+                writeRunnable.run();
+            LOG.printMethodInfoWithNamesAndValues(false);
+            return;
+        }
+        if (!application.isReadAccessAllowed()) {
+            application.invokeAndWait(writeRunnable, ModalityState.NON_MODAL);
+            LOG.printMethodInfoWithNamesAndValues(false);
+            return;
+        }
+        LOG.printMethodInfoWithNamesAndValues(false);
+        LOG.error("Could not run write action with wait.");
+        throw new IllegalStateException("Could not run write action with wait.");
     }
 
     public static void executeWriteAction(final Runnable runnable, boolean blocking) {
+        LOG.printMethodInfoWithNamesAndValues(true, "blocking", blocking);
         final ApplicationEx application = ApplicationManagerEx.getApplicationEx();
-
-        if (application.isDispatchThread()) {
-            application.runWriteAction(runnable);
-            return;
-        }
-        Runnable _runnable = new Runnable() {
+        Runnable writeRunnable = new Runnable() {
             @Override
             public void run() {
                 application.runWriteAction(runnable);
             }
         };
-        if (blocking && !application.holdsReadLock()) {
-            application.invokeAndWait(_runnable, ModalityState.NON_MODAL);
+        if (!blocking) {
+            application.invokeLater(writeRunnable, ModalityState.NON_MODAL);
+            LOG.printMethodInfoWithNamesAndValues(false);
             return;
         }
-        application.invokeLater(_runnable, ModalityState.NON_MODAL);
-    }
-
-    public static void executeReadAction(final Runnable runnable) {
-        final Application application = ApplicationManager.getApplication();
         if (application.isDispatchThread()) {
-            runnable.run();
+            if (application.isWriteAccessAllowed())
+                runnable.run();
+            else
+                writeRunnable.run();
+            LOG.printMethodInfoWithNamesAndValues(false);
             return;
         }
-        application.runReadAction(runnable);
-//        application.invokeLater(
-//            new Runnable() {
-//                @Override
-//                public void run() {
-//                    application.runReadAction(runnable);
-//                }
-//            }
-//        );
+        if (!holdsReadLock(application)) {
+            application.invokeAndWait(writeRunnable, ModalityState.NON_MODAL);
+            LOG.printMethodInfoWithNamesAndValues(false);
+            return;
+        }
+        LOG.printMethodInfoWithNamesAndValues(false);
+        LOG.error("Could not run write action with wait.");
+        throw new IllegalStateException("Could not run write action with wait.");
     }
-
 
     private static <T> T executeWriteAction(final Project project, final Callable<T> callable) {
         return new WriteCommandAction<T>(project) {
@@ -100,31 +114,25 @@ public class ExecuteUtils {
         }.execute().getResultObject();
     }
 
+    //TODO
     public static <E> E executeOnPooledThreadWriteCommandActionWithResult(final Project project, final Callable<E> callable) {
-        LOG.info("START executeOnPooledThreadWriteCommandActionWithResult");
         final Application application = ApplicationManager.getApplication();
         Future<E> task = application.executeOnPooledThread(
             new Callable<E>() {
                 @Override
                 public E call() throws Exception {
-                    LOG.info("START executeOnPooledThreadWriteCommandActionWithResult-> executeOnPooledThread");
                     E res = executeWriteAction(project, callable);
-                    LOG.info("END executeOnPooledThreadWriteCommandActionWithResult-> executeOnPooledThread");
                     return res;
                 }
             }
         );
         try {
-            LOG.info("END executeOnPooledThreadWriteCommandActionWithResult");
             return task.get();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
-        LOG.info("Failed executeOnPooledThreadWriteCommandActionWithResult");
         return null;
     }
-
-
 }

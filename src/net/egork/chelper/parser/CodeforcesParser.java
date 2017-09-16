@@ -1,6 +1,5 @@
 package net.egork.chelper.parser;
 
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
 import net.egork.chelper.checkers.PEStrictChecker;
@@ -8,6 +7,8 @@ import net.egork.chelper.task.StreamConfiguration;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.task.test.Test;
 import net.egork.chelper.task.test.TestType;
+import net.egork.chelper.util.ExecuteUtils;
+import net.egork.chelper.util.StackTraceLogger;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import javax.swing.*;
@@ -21,7 +22,7 @@ import java.util.List;
  * @author Egor Kulikov (kulikov@devexperts.com)
  */
 public class CodeforcesParser implements Parser {
-    private static final Logger LOG = Logger.getInstance(CodeforcesParser.class);
+    private static final StackTraceLogger LOG = new StackTraceLogger(ExecuteUtils.class);
 
     @Override
     public Icon getIcon() {
@@ -94,7 +95,6 @@ public class CodeforcesParser implements Parser {
 
     @Override
     public void parseContest(Project project, String id, DescriptionReceiver receiver) {
-        LOG.info("START parseContest-> " + id + " receiver: " + receiver);
         String mainPage = ParseProgresser.getWebPageContent(project, receiver, "http://codeforces.com/contest/" + id);
         if (mainPage == null)
             return;
@@ -117,15 +117,13 @@ public class CodeforcesParser implements Parser {
         } catch (ParseException ignored) {
         }
         if (!receiver.isStopped()) {
-            LOG.info(" receiveDescriptions-> " + id + " dataSize: " + ids.size() + " receiver: " + receiver);
             receiver.receiveDescriptions(ids);
         }
-        LOG.info("END parseContest-> " + id);
     }
 
     @Override
     public Task parseTask(Project project, Description description, DescriptionReceiver receiver) {
-        LOG.info("START processTask-> receiver: " + receiver + " description: " + description);
+        LOG.printMethodInfoWithNamesAndValues(true, "description", description, "receiver", receiver);
         String id = description.id;
         String[] tokens = id.split(" ");
         if (tokens.length != 2)
@@ -138,7 +136,7 @@ public class CodeforcesParser implements Parser {
         Collection<Task> tasks = parseTaskFromHTML(text);
         if (!tasks.isEmpty())
             return tasks.iterator().next();
-        LOG.info("END processTask-> receiver: " + receiver + " description: " + description);
+        LOG.printMethodInfoWithNamesAndValues(true, "description", description, "receiver", receiver);
         return null;
     }
 

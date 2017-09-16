@@ -11,7 +11,6 @@ import com.intellij.psi.PsiManager;
 import net.egork.chelper.actions.ArchiveAction;
 import net.egork.chelper.checkers.PEStrictChecker;
 import net.egork.chelper.codegeneration.MainFileTemplate;
-import net.egork.chelper.codegeneration.SolutionGenerator;
 import net.egork.chelper.configurations.TaskConfiguration;
 import net.egork.chelper.configurations.TopCoderConfiguration;
 import net.egork.chelper.task.Task;
@@ -31,10 +30,6 @@ public class TaskUtils {
     public static final String TASK_DATA_KEY = "TASK_DATA_KEY";
 
     private TaskUtils() {
-    }
-
-    public static void createSourceFile(Project project, Task task) {
-        SolutionGenerator.createSourceFile(project, task);
     }
 
     public static VirtualFile getFile(Project project, String name, String location) {

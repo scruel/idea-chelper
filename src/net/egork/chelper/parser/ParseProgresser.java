@@ -1,10 +1,10 @@
 package net.egork.chelper.parser;
 
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
+import net.egork.chelper.util.StackTraceLogger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
@@ -22,29 +22,23 @@ import java.util.concurrent.BlockingQueue;
  * Github : https://github.com/scruel
  */
 public class ParseProgresser {
-    private static final Logger LOG = Logger.getInstance(ParseProgresser.class);
+    private static final StackTraceLogger LOG = new StackTraceLogger(ParseProgresser.class);
     private static String requestURL;
 
     public static String getWebPageContent(Project project, final DescriptionReceiver receiver, String url) {
-        LOG.info("getWebPageContent-> receiver: " + receiver + " url: " + url);
         return getWebPageContent(project, receiver, url, "UTF-8");
     }
 
-    public static String getWebPageContent(final Project project, final DescriptionReceiver receiver, final String url, final String charset) {
-        LOG.info("START getWebPageContent-> receiver: " + receiver + " url: " + url);
-        ParseProgresser.requestURL = url;
+    public static String getWebPageContent(final Project project, final DescriptionReceiver receiver, final String urlstr, final String charset) {
+        ParseProgresser.requestURL = urlstr;
         final BlockingQueue<StringBuilder> resBlockingQueue = new ArrayBlockingQueue<StringBuilder>(1);
         ProgressManager.getInstance().run(
-            new Task.Backgroundable(project, "Parse Pages", true) {
-                @Override
-                public void onCancel() {
-                    receiver.isStopped();
-                }
-
+            new Task.Backgroundable(project, "Parse Pages", false) {
                 @Override
                 public void run(@NotNull ProgressIndicator indicator) {
                     indicator.setText("Parsing pages form '" + ParseProgresser.requestURL + "'");
                     for (int i = 0; i < 10; i++) {
+                        if (receiver.isStopped()) return;
                         indicator.setFraction((i + 1) / 10);
                         try {
                             URL url = new URL(ParseProgresser.requestURL);
@@ -72,15 +66,14 @@ public class ParseProgresser {
         try {
             StringBuilder result = resBlockingQueue.take();
             if (receiver.isStopped() || result.length() == 0) {
-                LOG.info("STOP getWebPageContent-> receiver: " + receiver + " url: " + url + " isStop: " + receiver.isStopped());
+                LOG.printMethodInfoWithNamesAndValues(false, "receiver", receiver, "url", urlstr, "stop", receiver.isStopped());
                 return null;
             }
-            LOG.info("END getWebPageContent-> receiver: " + receiver + " url: " + url);
             return result.toString();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        LOG.info("ERROR getWebPageContent-> receiver: " + receiver + " url: " + url);
+        LOG.printMethodInfoWithNamesAndValues(false, "receiver", receiver, "url", urlstr);
         return null;
     }
 }

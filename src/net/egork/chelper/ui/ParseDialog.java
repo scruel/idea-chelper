@@ -1,7 +1,6 @@
 package net.egork.chelper.ui;
 
 import com.intellij.notification.NotificationType;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.EmptyProgressIndicator;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
@@ -17,10 +16,7 @@ import net.egork.chelper.ProjectData;
 import net.egork.chelper.parser.*;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.task.test.TestType;
-import net.egork.chelper.util.ExecuteUtils;
-import net.egork.chelper.util.FileUtils;
-import net.egork.chelper.util.Messenger;
-import net.egork.chelper.util.ProjectUtils;
+import net.egork.chelper.util.*;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -39,7 +35,7 @@ import java.util.List;
  */
 @SuppressWarnings("unchecked")
 public class ParseDialog extends JDialog {
-    private final static Logger LOG = Logger.getInstance(ParseDialog.class);
+    private static final StackTraceLogger LOG = new StackTraceLogger(ExecuteUtils.class);
     private JBList contestList;
     private JBList taskList;
     private JComboBox parserCombo;
@@ -83,7 +79,6 @@ public class ParseDialog extends JDialog {
                 if (contestsReceiver != null)
                     contestsReceiver.stop();
                 ParseDialog.this.setVisible(false);
-
             }
         };
 
@@ -130,7 +125,6 @@ public class ParseDialog extends JDialog {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 if (e.getValueIsAdjusting()) return;
-                LOG.info("valueChanged-> contestReceiver: " + contestReceiver);
                 if (contestReceiver != null) {
                     contestReceiver.stop();
                     contestReceiver = null;
@@ -257,7 +251,6 @@ public class ParseDialog extends JDialog {
         ParserContest.parser(project, null, contestsReceiver = new Receiver() {
             @Override
             protected void processNewDescriptions(final Collection<Description> descriptions) {
-                LOG.info("START processNewDescriptions");
                 final Receiver receiver = this;
                 if (contestsReceiver != receiver)
                     return;
@@ -273,15 +266,12 @@ public class ParseDialog extends JDialog {
                     if (contestModel.getSize() > 0)
                         contestList.setSelectedIndex(0);
                 }
-                LOG.info("END processNewDescriptions");
             }
         }, parser);
         pack();
     }
 
     public void getResults() {
-        LOG.info("START execute");
-
         final Object[] tasks = taskList.getSelectedValues();
         final Parser parser = (Parser) parserCombo.getSelectedItem();
         final ProjectData data = ProjectUtils.getData(project);
@@ -307,19 +297,15 @@ public class ParseDialog extends JDialog {
                     rawTmp = rawTmp.setInputOutputClasses(data.inputClass, data.outputClass);
                     rawTmp = rawTmp.setTemplate(template.getText());
                     final Task raw = rawTmp;
-
-                    ExecuteUtils.executeReadAction(new Runnable() {
-                        @Override
-                        public void run() {
-                            Task task = new Task(raw.name, (TestType) testType.getSelectedItem(), raw.input, raw.output,
-                                raw.tests, location.getText(), raw.vmArgs, raw.mainClass,
-                                FileUtils.createIfNeeded(project, raw, raw.taskClass, location.getText()), raw.checkerClass,
-                                raw.checkerParameters, raw.testClasses, date.getText(), contestName.getText(),
-                                truncate.isSelected(), data.inputClass, data.outputClass, raw.includeLocale,
-                                data.failOnIntegerOverflowForNewTasks, raw.template);
-                            taskProcessReceiver.receiveTask(task);
-                        }
-                    });
+                    LOG.printMethodInfoWithValues(true, "executeReadAction");
+                    Task task = new Task(raw.name, (TestType) testType.getSelectedItem(), raw.input, raw.output,
+                        raw.tests, location.getText(), raw.vmArgs, raw.mainClass,
+                        raw.taskClass, raw.checkerClass,
+                        raw.checkerParameters, raw.testClasses, date.getText(), contestName.getText(),
+                        truncate.isSelected(), data.inputClass, data.outputClass, raw.includeLocale,
+                        data.failOnIntegerOverflowForNewTasks, raw.template);
+                    taskProcessReceiver.receiveTask(task);
+                    LOG.printMethodInfoWithValues(false, "executeReadAction");
                 }
                 if (!taskProcessReceiver.isEmpty()) {
                     ProjectUtils.updateDefaultTask(taskProcessReceiver.getFirstTask());
@@ -327,8 +313,6 @@ public class ParseDialog extends JDialog {
                 ProjectUtils.setDefaultParser(parser);
             }
         }.start();
-
-        LOG.info("END execute");
     }
 
     private static class ParseListModel extends AbstractListModel {

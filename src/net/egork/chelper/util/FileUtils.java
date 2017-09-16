@@ -4,7 +4,6 @@ import com.intellij.ide.IdeView;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.LangDataKeys;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileTypes.FileType;
@@ -30,7 +29,7 @@ import java.util.Properties;
  * @author Egor Kulikov (kulikov@devexperts.com)
  */
 public class FileUtils {
-    private static final Logger LOG = Logger.getInstance(FileUtils.class);
+    private static final StackTraceLogger LOG = new StackTraceLogger(FileUtils.class);
 
     private FileUtils() {
     }
@@ -99,10 +98,11 @@ public class FileUtils {
         return directory != null && JavaDirectoryService.getInstance().getPackage(directory) != null;
     }
 
-    public static VirtualFile writeTextFile(final VirtualFile location, final String fileName, final String fileContent) {
+    public static VirtualFile writeTextFile(final VirtualFile location, final String fileName, final String context) {
         if (location == null) {
             return null;
         }
+        LOG.printMethodInfoWithNamesAndValues(true, "location", location, "fileName", fileName, "context", context);
         ExecuteUtils.executeWriteAction(new Runnable() {
             @Override
             public void run() {
@@ -110,7 +110,7 @@ public class FileUtils {
                 try {
                     VirtualFile file = location.findOrCreateChildData(null, fileName);
                     stream = file.getOutputStream(null);
-                    stream.write(fileContent.getBytes(Charset.forName("UTF-8")));
+                    stream.write(context.getBytes(Charset.forName("UTF-8")));
                 } catch (IOException ignored) {
                 } finally {
                     if (stream != null) {
@@ -121,7 +121,8 @@ public class FileUtils {
                     }
                 }
             }
-        }, false);
+        }, true);
+        LOG.printMethodInfoWithNamesAndValues(false, "location", location, "fileName", fileName, "context", context, "result", location.findChild(fileName));
         return location.findChild(fileName);
     }
 
@@ -137,16 +138,19 @@ public class FileUtils {
         if (directory == null) {
             return null;
         }
+        LOG.printMethodInfoWithNamesAndValues(true, "directory", directory, "fileName", fileName, "fileContent", context);
         ExecuteUtils.executeWriteCommandAction(project, new Runnable() {
             @Override
             public void run() {
                 _writeTextFile(project, directory, fileName, context);
             }
         }, true);
+        LOG.printMethodInfoWithNamesAndValues(false, "directory", directory, "fileName", fileName, "context", context, "result", directory.findFile(fileName));
         return directory.findFile(fileName);
     }
 
     private static void _writeTextFile(Project project, PsiDirectory directory, String fileName, String context) {
+        LOG.printMethodInfoWithNamesAndValues(true, "directory", directory, "fileName", fileName, "fileContent", context);
         PsiFileFactory factory = PsiFileFactory.getInstance(project);
         PsiFile psiFile = directory.findFile(fileName);
         FileType type = FileTypeRegistry.getInstance().getFileTypeByFileName(fileName);
@@ -165,6 +169,7 @@ public class FileUtils {
             } catch (IOException ignore) {
             }
         }
+        LOG.printMethodInfoWithNamesAndValues(false, "directory", directory, "fileName", fileName, "fileContent", context);
     }
 
     public static boolean isValidDirectory(Project project, String location) {
@@ -346,12 +351,16 @@ public class FileUtils {
         return name.matches("[a-zA-Z_$][a-zA-Z\\d_$]*");
     }
 
-    public static String createTaskClass(Project project, Task task, String location, String name) {
+    public static String createTaskClass(Project project, Task task, String name, String location) {
         PsiDirectory directory = FileUtils.getPsiDirectory(project, location);
         String mainClass = CodeGenerationUtils.createStub(project, task, location, name);
         if (directory.findFile(name + ".java") == null) {
             writeTextFile(project, directory, name + ".java", mainClass);
         }
+        return getTaskClassName(project, name, location);
+    }
+
+    public static String getTaskClassName(Project project, String name, String location) {
         PsiDirectory psiDirectory = getPsiDirectory(project, location);
         String aPackage = getPackage(psiDirectory);
         return aPackage + "." + name;
@@ -392,7 +401,7 @@ public class FileUtils {
 
     public static String createIfNeeded(Project project, Task task, String taskClass, String location) {
         if (taskClass.indexOf('.') == -1) {
-            taskClass = createTaskClass(project, task, location, taskClass);
+            taskClass = createTaskClass(project, task, taskClass, location);
         }
         return taskClass;
     }

@@ -164,7 +164,7 @@ public class TaskConfigurationPanel extends JPanel {
         };
         taskClass = new SelectOrCreateClass(task.taskClass, project, locationProvider, new FileCreator() {
             public String createFile(Project project, String path, String name) {
-                return FileUtils.createTaskClass(project, task, path, name);
+                return FileUtils.createTaskClass(project, task, name, path);
             }
 
             public boolean isValid(String name) {

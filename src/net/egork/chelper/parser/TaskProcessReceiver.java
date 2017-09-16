@@ -3,7 +3,9 @@ package net.egork.chelper.parser;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import net.egork.chelper.task.Task;
+import net.egork.chelper.util.ExecuteUtils;
 import net.egork.chelper.util.ProjectUtils;
+import net.egork.chelper.util.StackTraceLogger;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -13,6 +15,7 @@ import java.util.HashSet;
  * Github : https://github.com/scruel
  */
 public abstract class TaskProcessReceiver {
+    private static final StackTraceLogger LOG = new StackTraceLogger(ExecuteUtils.class);
     private int totalSum = -1;
     private int currentCount = 0;
     private boolean firstConfiguration = true;
@@ -77,8 +80,10 @@ public abstract class TaskProcessReceiver {
     protected abstract void processTask(Task task);
 
     public void receiveTask(Task task) {
+        LOG.printMethodInfoWithNamesAndValues(true, "task", task, "size", currentCount);
         result.add(task);
         increaseTotalSum();
+        LOG.printMethodInfoWithNamesAndValues(false, "task", task, "size", currentCount);
     }
 
     public boolean isEmpty() {
