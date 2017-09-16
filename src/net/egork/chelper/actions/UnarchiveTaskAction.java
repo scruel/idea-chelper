@@ -83,19 +83,16 @@ public class UnarchiveTaskAction extends AnAction {
                                 }
 
                                 for (String className : toCopy) {
-                                    String fullClassName = className;
-                                    int position = className.lastIndexOf('.');
-                                    if (position != -1)
-                                        className = className.substring(position + 1);
+                                    String simpleName = ProjectUtils.getSimpleName(className);
                                     VirtualFile file = taskFile.getParent().findChild(className + ".java");
                                     if (file != null) {
                                         String fileContent = FileUtils.readTextFile(file);
                                         if (aPackage != null && !aPackage.isEmpty()) {
                                             fileContent = CodeGenerationUtils.changePackage(fileContent, aPackage);
                                             String fqn = aPackage + "." + className;
-                                            if (task.taskClass.equals(fullClassName))
+                                            if (task.taskClass.equals(simpleName))
                                                 task = task.setTaskClass(fqn);
-                                            else if (task.checkerClass.equals(fullClassName))
+                                            else if (task.checkerClass.equals(simpleName))
                                                 task = task.setCheckerClass(fqn);
                                             else {
                                                 for (int i = 0; i < task.testClasses.length; i++) {
@@ -106,7 +103,7 @@ public class UnarchiveTaskAction extends AnAction {
                                                 }
                                             }
                                         }
-                                        FileUtils.writeTextFile(project, baseDirectory, className + ".java", fileContent);
+                                        FileUtils.writeTextFile(project, baseDirectory, simpleName + ".java", fileContent);
                                     }
                                 }
                                 ProjectUtils.createConfiguration(project, task, true);
@@ -126,9 +123,7 @@ public class UnarchiveTaskAction extends AnAction {
                                     FileUtils.writeTextFile(project, baseDirectory, task.name + ".java", FileUtils.readTextFile(sourceFile));
                                 Collections.addAll(toCopy, task.testClasses);
                                 for (String className : toCopy) {
-                                    int position = className.lastIndexOf('.');
-                                    if (position != -1)
-                                        className = className.substring(position + 1);
+                                    className = ProjectUtils.getSimpleName(className);
                                     VirtualFile file = taskFile.getParent().findChild(className + ".java");
                                     if (file != null)
                                         FileUtils.writeTextFile(project, baseDirectory, className + ".java", FileUtils.readTextFile(file));

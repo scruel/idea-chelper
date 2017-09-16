@@ -373,7 +373,7 @@ public class FileUtils {
         PsiDirectory psiDirectory = getPsiDirectory(project, location);
         String aPackage = getPackage(psiDirectory);
         String fqn = aPackage + "." + name;
-        ProjectUtils.openElement(project, ProjectUtils.getPsiElement(project, fqn));
+        ProjectUtils.openElement(project, ProjectUtils.getPsiElementByFQN(project, fqn));
         return fqn;
     }
 
@@ -384,7 +384,7 @@ public class FileUtils {
         PsiDirectory psiDirectory = getPsiDirectory(project, location);
         String aPackage = getPackage(psiDirectory);
         String fqn = aPackage + "." + name;
-        ProjectUtils.openElement(project, ProjectUtils.getPsiElement(project, fqn));
+        ProjectUtils.openElement(project, ProjectUtils.getPsiElementByFQN(project, fqn));
         return fqn;
     }
 
@@ -395,22 +395,29 @@ public class FileUtils {
         String mainClass = CodeGenerationUtils.createTopCoderTestStub(project, aPackage, name);
         writeTextFile(directory, name + ".java", mainClass);
         String fqn = aPackage + "." + name;
-        ProjectUtils.openElement(project, ProjectUtils.getPsiElement(project, fqn));
+        ProjectUtils.openElement(project, ProjectUtils.getPsiElementByFQN(project, fqn));
         return fqn;
     }
 
+    /**
+     * create taskClass if {@param taskClass} not valid.
+     *
+     * @param project
+     * @param task
+     * @param taskClass
+     * @param location
+     * @return
+     */
     public static String createIfNeeded(Project project, Task task, String taskClass, String location) {
-        if (taskClass.indexOf('.') == -1) {
+        if (!taskClass.contains(".")) {
             taskClass = createTaskClass(project, task, taskClass, location);
         }
         return taskClass;
     }
 
     public static VirtualFile getFileByFQN(Project project, String fqn) {
-        if (fqn == null)
-            return null;
-        PsiClass main = JavaPsiFacade.getInstance(project).findClass(fqn, GlobalSearchScope.allScope(project));
-        return main == null ? null : main.getContainingFile() == null ? null : main.getContainingFile().getVirtualFile();
+        PsiFile main = getPsiFileByFQN(project, fqn);
+        return main == null ? null : main.getVirtualFile();
     }
 
     public static PsiFile getPsiFileByFQN(Project project, String fqn) {

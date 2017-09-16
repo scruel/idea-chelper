@@ -3,7 +3,6 @@ package net.egork.chelper.util;
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.impl.RunManagerImpl;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.text.StringUtilRt;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDirectory;
@@ -32,8 +31,33 @@ public class TaskUtils {
     private TaskUtils() {
     }
 
+    private static String getTaskSourceFileLocation(TaskBase taskBase) {
+        if (taskBase instanceof Task) {
+            Task task = (Task) taskBase;
+            String location = task.location;
+            String taskClass = task.taskClass;
+            if (location == null || taskClass == null) return null;
+            String res = location + "/" + ProjectUtils.getSimpleName(taskClass) + ".java";
+            return res;
+        } else if (taskBase instanceof TopCoderTask) {
+            //TODO haven't use TopCoder
+        }
+        return null;
+    }
+
     public static VirtualFile getFile(Project project, String name, String location) {
         return FileUtils.getFile(project, location + "/" + name + ".java");
+    }
+
+    private static String getTaskDataFileLocation(TaskBase taskBase) {
+        if (taskBase instanceof Task) {
+            Task task = (Task) taskBase;
+            return getTaskFileName(task.location, task.name);
+        } else if (taskBase instanceof TopCoderTask) {
+            TopCoderTask task = (TopCoderTask) taskBase;
+            //TODO haven't use TopCoder
+        }
+        return null;
     }
 
     public static String getTaskFileName(String location, String name) {
@@ -113,9 +137,7 @@ public class TaskUtils {
         VirtualFile taskSourceFile = null;
         if (taskBase instanceof Task) {
             Task task = (Task) taskBase;
-            String sourceFileName = task.taskClass;
-            int i = StringUtilRt.lastIndexOf(sourceFileName, '.', 0, sourceFileName.length());
-            sourceFileName = i < 0 ? sourceFileName : sourceFileName.substring(i + 1) + ".java";
+            String sourceFileName = ProjectUtils.getSimpleName(task.taskClass) + ".java";
             taskSourceFile = file.getParent().findChild(sourceFileName);
         } else if (taskBase instanceof TopCoderTask) {
             TopCoderTask task = (TopCoderTask) taskBase;
@@ -150,6 +172,7 @@ public class TaskUtils {
             } else if (configuration instanceof TaskConfiguration) {
                 Task task = ((TaskConfiguration) configuration).getConfiguration();
                 String fileLocation = FileUtils.getRelativePath(project.getBaseDir(), sourceFile);
+                if (fileLocation == null) return null;
                 String sourceLocation = getTaskSourceFileLocation(task);
                 String dataLocation = getTaskDataFileLocation(task);
                 if (fileLocation.equals(sourceLocation) || fileLocation.equals(dataLocation))
@@ -157,34 +180,6 @@ public class TaskUtils {
             }
         }
         return null;
-    }
-
-    private static String getTaskSourceFileLocation(TaskBase taskBase) {
-        if (taskBase instanceof Task) {
-            Task task = (Task) taskBase;
-            String location = task.location;
-            String taskClass = task.taskClass;
-            if (location == null || taskClass == null) return null;
-            String res = location + "/" + taskClass.substring(taskClass.lastIndexOf(".") + 1);
-            res += ".java";
-            return res;
-        } else if (taskBase instanceof TopCoderTask) {
-            //TODO haven't use TopCoder
-        }
-        return "WTF";
-    }
-
-    private static String getTaskDataFileLocation(TaskBase taskBase) {
-        if (taskBase instanceof Task) {
-            Task task = (Task) taskBase;
-            String location = task.location;
-            if (location == null || task.name == null) return null;
-            String res = location + "/" + task.name + ".task";
-            return res;
-        } else if (taskBase instanceof TopCoderTask) {
-            //TODO haven't use TopCoder
-        }
-        return "WTF";
     }
 
     public static RunConfiguration GetConfSettingsBySourceFile(Project project, VirtualFile sourceFile) {
@@ -244,7 +239,7 @@ public class TaskUtils {
         if (location.equals(task.location)) return task;
         String aPackage = FileUtils.getPackage(FileUtils.getPsiDirectory(project, location));
         if (aPackage == null) return task;
-        task = task.setTaskClass(aPackage + "." + task.name);
+        task = task.setTaskClass(aPackage + "." + ProjectUtils.getSimpleName(task.taskClass));
         task = task.setLocation(location);
         return task;
     }

@@ -41,7 +41,7 @@ public class TaskConfiguration extends ModuleBasedConfiguration<JavaRunConfigura
     public TaskConfiguration(Project project, String name, Task configuration, ConfigurationFactory factory) {
         super(name, new JavaRunConfigurationModule(project, false), factory);
         this.configuration = configuration;
-        saveConfiguration(configuration);
+        saveConfiguration(configuration, false);
     }
 
     @Override
@@ -92,6 +92,7 @@ public class TaskConfiguration extends ModuleBasedConfiguration<JavaRunConfigura
     @Override
     public RunProfileState getState(@NotNull Executor executor, @NotNull ExecutionEnvironment env)
         throws ExecutionException {
+        saveConfiguration(configuration, false);
         SolutionGenerator.createSourceFile(getProject(), configuration);
         JavaCommandLineState state = new JavaCommandLineState(env) {
             @Override
@@ -142,19 +143,31 @@ public class TaskConfiguration extends ModuleBasedConfiguration<JavaRunConfigura
 
     public void setConfiguration(Task configuration) {
         this.configuration = configuration;
-        saveConfiguration(configuration);
+        saveConfiguration(configuration, true);
     }
 
-    private void saveConfiguration(Task configuration) {
+    private void saveConfiguration(Task configuration, boolean cover) {
         if (configuration == null) return;
         if (configuration.location == null) return;
         if (configuration.taskClass == null) return;
         if (configuration.name == null) return;
         if (configuration.name.length() == 0) return;
 
-        VirtualFile taskFile = FileUtils.getFileByFQN(getProject(), configuration.taskClass);
         VirtualFile parentFile = FileUtils.getFile(getProject(), configuration.location);
-        if (taskFile != null && parentFile != null && taskFile.getParent().equals(parentFile))
+        if (parentFile == null) return;
+
+        if (!cover) {
+            VirtualFile dataFile = parentFile.findChild(ArchiveAction.canonize(configuration.name) + ".task");
+            if (dataFile != null) {
+                try {
+                    this.configuration = Task.load(new InputReader(dataFile.getInputStream()));
+                    return;
+                } catch (IOException ignore) {
+                }
+            }
+        }
+        VirtualFile taskFile = FileUtils.getFileByFQN(getProject(), configuration.taskClass);
+        if (taskFile != null && taskFile.getParent().equals(parentFile))
             FileUtils.saveConfiguration(configuration.location, ArchiveAction.canonize(configuration.name) + ".task", configuration, getProject());
     }
 

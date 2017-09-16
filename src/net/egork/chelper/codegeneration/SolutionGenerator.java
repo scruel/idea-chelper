@@ -486,13 +486,13 @@ public class SolutionGenerator {
             builder.append("      throw new RuntimeException(e);\n");
             builder.append("    }\n");
         }
-        String inputClass = CodeGenerationUtils.getSimpleName(task.inputClass);
+        String inputClass = ProjectUtils.getSimpleName(task.inputClass);
         builder.append("    ").append(inputClass).append(" in = new ").append(inputClass).
             append("(inputStream);\n");
-        String outputClass = CodeGenerationUtils.getSimpleName(task.outputClass);
+        String outputClass = ProjectUtils.getSimpleName(task.outputClass);
         builder.append("    ").append(outputClass).append(" out = new ").append(outputClass).
             append("(outputStream);\n");
-        String className = CodeGenerationUtils.getSimpleName(task.taskClass);
+        String className = ProjectUtils.getSimpleName(task.taskClass);
         builder.append("    ").append(className).append(" solver = new ").append(className).append("();\n");
         switch (task.testType) {
             case SINGLE:

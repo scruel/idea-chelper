@@ -22,14 +22,10 @@ public class NewTaskAction extends CreateElementActionBase {
         Task task = CreateTaskDialog.showDialog(psiDirectory, s, template, allowNameChange);
         if (task == null)
             return PsiElement.EMPTY_ARRAY;
-        Task oldTask = FileUtils.readTask(psiDirectory.getProject(), task.location + "/" + ArchiveAction.canonize(task.name) + ".task");
-        if (oldTask != null) {
-            task = oldTask;
-        }
 
-        PsiElement main = ProjectUtils.getPsiElement(psiDirectory.getProject(), task.taskClass);
+        PsiElement main = ProjectUtils.getPsiElementByFQN(psiDirectory.getProject(), task.taskClass);
         if (main == null) {
-            FileUtils.deleteTaskIfExists(psiDirectory.getProject(), FileUtils.getPsiFile(psiDirectory.getProject(), task.location + "/" + ArchiveAction.canonize(task.name) + ".java"), true);
+            FileUtils.deleteTaskIfExists(psiDirectory.getProject(), FileUtils.getPsiFileByFQN(psiDirectory.getProject(), task.taskClass), true);
             return PsiElement.EMPTY_ARRAY;
         }
 

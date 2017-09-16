@@ -336,7 +336,7 @@ public class CodeGenerationUtils {
             VirtualFile sourceFile = main == null ? null : main.getContainingFile() == null ? null : main.getContainingFile().getVirtualFile();
             String mainContent = FileUtils.readTextFile(sourceFile);
             mainContent = changePackage(mainContent, packageName);
-            String taskClassSimple = getSimpleName(((Task) task).taskClass);
+            String taskClassSimple = ProjectUtils.getSimpleName(((Task) task).taskClass);
             FileUtils.writeTextFile(directory, taskClassSimple + ".java", mainContent);
             task = ((Task) task).setTaskClass(packageName + "." + taskClassSimple);
             PsiElement checker = JavaPsiFacade.getInstance(project).findClass(((Task) task).checkerClass, GlobalSearchScope.allScope(project));
@@ -344,7 +344,7 @@ public class CodeGenerationUtils {
             if (checkerFile != null && sourceFile != null && checkerFile.getParent().equals(sourceFile.getParent())) {
                 String checkerContent = FileUtils.readTextFile(checkerFile);
                 checkerContent = changePackage(checkerContent, packageName);
-                String checkerClassSimple = getSimpleName(((Task) task).checkerClass);
+                String checkerClassSimple = ProjectUtils.getSimpleName(((Task) task).checkerClass);
                 FileUtils.writeTextFile(directory, checkerClassSimple + ".java", checkerContent);
                 task = ((Task) task).setCheckerClass(packageName + "." + checkerClassSimple);
             }
@@ -364,7 +364,7 @@ public class CodeGenerationUtils {
             VirtualFile testFile = test == null ? null : test.getContainingFile() == null ? null : test.getContainingFile().getVirtualFile();
             String testContent = FileUtils.readTextFile(testFile);
             testContent = changePackage(testContent, packageName);
-            String testClassSimple = getSimpleName(testClasses[i]);
+            String testClassSimple = ProjectUtils.getSimpleName(testClasses[i]);
             FileUtils.writeTextFile(directory, testClassSimple + ".java", testContent);
             testClasses[i] = packageName + "." + testClassSimple;
         }
@@ -494,12 +494,5 @@ public class CodeGenerationUtils {
     public static String createTopCoderTestStub(Project project, String aPackage, String name) {
         String template = createTopCoderTestCaseClassTemplateIfNeeded(project);
         return new Template(template).apply("package", aPackage, "TestCaseClass", name);
-    }
-
-    static String getSimpleName(String className) {
-        int position = className.lastIndexOf('.');
-        if (position != -1)
-            className = className.substring(position + 1);
-        return className;
     }
 }

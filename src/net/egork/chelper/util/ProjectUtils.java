@@ -118,7 +118,7 @@ public class ProjectUtils {
         });
     }
 
-    public static PsiElement getPsiElement(Project project, String classFQN) {
+    public static PsiElement getPsiElementByFQN(Project project, String classFQN) {
         return JavaPsiFacade.getInstance(project).findClass(classFQN, GlobalSearchScope.allScope(project));
     }
 
@@ -314,7 +314,6 @@ public class ProjectUtils {
             return image;
         }
     }
-
 
     public static String getSimpleName(String className) {
         if (className == null) return null;

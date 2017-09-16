@@ -114,7 +114,7 @@ public class CHelperArenaPlugin implements ArenaPlugin {
                 BufferedReader bfr = new BufferedReader(new InputStreamReader(new FileInputStream(System.getProperty("user.home") + File.separator + ".chelper"), "utf-8"));
                 String path = bfr.readLine();
                 bfr.close();
-                File file = new File(path + File.separator + ".tctask");
+                File file = new File(path + "/" + ".tctask");
                 file.deleteOnExit();
                 FileOutputStream outputStream = new FileOutputStream(file);
                 task.saveTask(new OutputWriter(outputStream));

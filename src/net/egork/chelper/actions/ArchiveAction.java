@@ -125,6 +125,12 @@ public class ArchiveAction extends AnAction {
         return canonize(yearAndMonth) + "/" + canonize(task.date + " - " + (task.contestName.length() == 0 ? "unsorted" : task.contestName));
     }
 
+    /**
+     * Standardize the file name so that it can be saved.
+     *
+     * @param filename
+     * @return
+     */
     public static String canonize(String filename) {
         filename = filename.replaceAll("[\\\\?%*:|\"<>/]", "-");
         while (filename.endsWith("."))

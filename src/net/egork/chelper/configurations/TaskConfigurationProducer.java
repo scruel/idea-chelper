@@ -78,8 +78,8 @@ public class TaskConfigurationProducer extends RunConfigurationProducer<TaskConf
             return false;
 
         final String taskLocation = configuration.getConfiguration().location;
-        final String scriptName = configuration.getConfiguration().name;
+        final String classSimpleName = ProjectUtils.getSimpleName(configuration.getConfiguration().taskClass);
         final String path = FileUtils.getRelativePath(context.getProject().getBaseDir(), file);
-        return path.equals(taskLocation + "/" + scriptName + ".java");
+        return path.equals(taskLocation + "/" + classSimpleName + ".java");
     }
 }
