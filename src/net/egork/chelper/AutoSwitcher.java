@@ -7,6 +7,9 @@ import com.intellij.execution.impl.RunManagerImpl;
 import com.intellij.execution.impl.RunnerAndConfigurationSettingsImpl;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ProjectComponent;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.FileEditorManagerAdapter;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
@@ -15,7 +18,9 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import net.egork.chelper.configurations.TaskConfiguration;
 import net.egork.chelper.configurations.TopCoderConfiguration;
+import net.egork.chelper.task.Task;
 import net.egork.chelper.task.TaskBase;
+import net.egork.chelper.task.TopCoderTask;
 import net.egork.chelper.util.FileUtils;
 import net.egork.chelper.util.ProjectUtils;
 import net.egork.chelper.util.TaskUtils;
@@ -68,16 +73,38 @@ public class AutoSwitcher implements ProjectComponent {
                 }
                 busy = true;
                 VirtualFile toOpen = null;
-                if (configuration instanceof TopCoderConfiguration)
-                    toOpen = TaskUtils.getFile(project, ((TopCoderConfiguration) configuration).getConfiguration().name, ProjectUtils.getData(project).defaultDirectory);
-                else if (configuration instanceof TaskConfiguration)
-                    toOpen = FileUtils.getFileByFQN(configuration.getProject(), ((TaskConfiguration) configuration).getConfiguration().taskClass);
+
+                String taskLocation = null;
+                String taskName = null;
+                if (configuration instanceof TopCoderConfiguration) {
+                    TopCoderTask task = ((TopCoderConfiguration) configuration).getConfiguration();
+                    toOpen = TaskUtils.getFile(project, task.name, ProjectUtils.getData(project).defaultDirectory);
+                } else if (configuration instanceof TaskConfiguration) {
+                    Task task = ((TaskConfiguration) configuration).getConfiguration();
+                    taskLocation = task.location;
+                    taskName = task.name;
+                    toOpen = FileUtils.getFileByFQN(configuration.getProject(), task.taskClass);
+                }
+
 
                 if (toOpen != null) {
                     final VirtualFile finalToOpen = toOpen;
+                    final String finalTaskLocation = taskLocation;
+                    final String finalTaskName = taskName;
                     ApplicationManager.getApplication().invokeLater(new Runnable() {
                         @Override
                         public void run() {
+                            Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
+                            VirtualFile currentFile = null;
+                            if (editor != null) {
+                                Document doc = editor.getDocument();
+                                currentFile = FileDocumentManager.getInstance().getFile(doc);
+                            }
+                            if (currentFile != null && finalTaskLocation != null && finalTaskName != null) {
+                                if (currentFile.equals(FileUtils.getFile(project, finalTaskLocation + "/" + finalTaskName + ".task"))) {
+                                    return;
+                                }
+                            }
                             FileEditorManager.getInstance(project).openFile(finalToOpen, true);
                         }
                     });
@@ -114,7 +141,7 @@ public class AutoSwitcher implements ProjectComponent {
                         Map<String, Object> taskMap;
                         if (null == (taskMap = TaskUtils.getTaskMapWitFile(project, file))) return;
 
-                        RunConfiguration configuration = TaskUtils.GetConfSettingsBySourceFile(project, runManager,
+                        RunConfiguration configuration = TaskUtils.getConfSettingsBySourceFile(project, runManager,
                             (VirtualFile) taskMap.get(TaskUtils.TASK_SOURCE_KEY));
                         if (configuration != null) {
                             busy = true;

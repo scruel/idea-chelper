@@ -156,7 +156,7 @@ public class TaskUtils {
      * @param sourceFile .java(source)
      * @return
      */
-    public static RunConfiguration GetConfSettingsBySourceFile(Project project, RunManagerImpl runManager, VirtualFile sourceFile) {
+    public static RunConfiguration getConfSettingsBySourceFile(Project project, RunManagerImpl runManager, VirtualFile sourceFile) {
         if (sourceFile == null)
             return null;
         for (RunConfiguration configuration : runManager.getAllConfigurationsList()) {
@@ -182,9 +182,9 @@ public class TaskUtils {
         return null;
     }
 
-    public static RunConfiguration GetConfSettingsBySourceFile(Project project, VirtualFile sourceFile) {
+    public static RunConfiguration getConfSettingsBySourceFile(Project project, VirtualFile sourceFile) {
         RunManagerImpl runManager = RunManagerImpl.getInstanceImpl(project);
-        return GetConfSettingsBySourceFile(project, runManager, sourceFile);
+        return getConfSettingsBySourceFile(project, runManager, sourceFile);
     }
 
     /**

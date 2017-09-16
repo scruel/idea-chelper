@@ -99,7 +99,7 @@ public class ProjectUtils {
                                         public void run() {
                                             VirtualFile vFile = event.getFile();
                                             if ("java".equals(vFile.getExtension()) || "task".equals(vFile.getExtension()) || "tctask".equals(vFile.getExtension())) {
-                                                RunConfiguration runConfiguration = TaskUtils.GetConfSettingsBySourceFile(project, vFile);
+                                                RunConfiguration runConfiguration = TaskUtils.getConfSettingsBySourceFile(project, vFile);
                                                 ProjectUtils.removeConfigurationIfExists(runConfiguration);
                                             }
                                         }

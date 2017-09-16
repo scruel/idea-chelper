@@ -52,7 +52,7 @@ public class FileUtils {
                 VirtualFile sourceFile = (VirtualFile) taskMap.get(TaskUtils.TASK_SOURCE_KEY);
                 VirtualFile dataFile = (VirtualFile) taskMap.get(TaskUtils.TASK_DATA_KEY);
                 if (removeConf)
-                    ProjectUtils.removeConfigurationIfExists(TaskUtils.GetConfSettingsBySourceFile(psiFile.getProject(), sourceFile));
+                    ProjectUtils.removeConfigurationIfExists(TaskUtils.getConfSettingsBySourceFile(psiFile.getProject(), sourceFile));
                 try {
                     sourceFile.delete(null);
                     dataFile.delete(null);
