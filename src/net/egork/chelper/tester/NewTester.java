@@ -1,5 +1,6 @@
 package net.egork.chelper.tester;
 
+import com.intellij.notification.NotificationType;
 import net.egork.chelper.checkers.Checker;
 import net.egork.chelper.exception.TaskCorruptException;
 import net.egork.chelper.task.Task;
@@ -7,6 +8,7 @@ import net.egork.chelper.task.test.Test;
 import net.egork.chelper.task.test.TestType;
 import net.egork.chelper.util.EncodingUtils;
 import net.egork.chelper.util.InputReader;
+import net.egork.chelper.util.Messenger;
 import net.egork.chelper.util.OutputWriter;
 
 import java.io.*;
@@ -21,7 +23,11 @@ import java.util.*;
 public class NewTester {
     public static void main(String[] args) throws InterruptedException, InvocationTargetException,
         ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-        test(args);
+        try {
+            test(args);
+        } catch (TaskCorruptException e) {
+            Messenger.publishMessage(TaskCorruptException.getDefaultMessage(args[0]), NotificationType.ERROR);
+        }
     }
 
     public static boolean test(String... args) throws InvocationTargetException, ClassNotFoundException,

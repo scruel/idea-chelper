@@ -545,53 +545,57 @@ public class SolutionGenerator {
     }
 
     public static void createSourceFile(final Project project, final TaskBase task) {
-        ApplicationManager.getApplication().runWriteAction(new Runnable() {
-            @Override
-            public void run() {
-                String outputDirectory = ProjectUtils.getData(project).outputDirectory;
-                VirtualFile directory = FileUtils.createDirectoryIfMissing(project, outputDirectory);
-                if (directory == null)
-                    return;
-                for (VirtualFile file : directory.getChildren()) {
-                    if ("java".equals(file.getExtension())) {
-                        try {
-                            file.delete(null);
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
+        try {
+            ApplicationManager.getApplication().runWriteAction(new Runnable() {
+                @Override
+                public void run() {
+                    String outputDirectory = ProjectUtils.getData(project).outputDirectory;
+                    VirtualFile directory = FileUtils.createDirectoryIfMissing(project, outputDirectory);
+                    if (directory == null)
+                        return;
+                    for (VirtualFile file : directory.getChildren()) {
+                        if ("java".equals(file.getExtension())) {
+                            try {
+                                file.delete(null);
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
                         }
                     }
-                }
-                VirtualFile file = null;
-                if (task instanceof Task) {
-                    SolutionGenerator generator = new SolutionGenerator(new HashSet<String>(Arrays.asList(ProjectUtils.getData(project).excludedPackages)),
-                        createMainClassTemplate(project, (Task) task), true,
-                        MainFileTemplate.getMethod(project, ((Task) task).taskClass, "solve", "void", "int", ((Task) task).inputClass, ((Task) task).outputClass));
-                    String source = generator.createInlinedSource();
-                    file = FileUtils.writeTextFile(directory, ((Task) task).mainClass + ".java", source);
-                } else if (task instanceof TopCoderTask) {
-                    SolutionGenerator generator = new SolutionGenerator(
-                        new HashSet<String>(Arrays.asList(ProjectUtils.getData(project).excludedPackages)),
-                        new MainFileTemplate("%IMPORTS%\npublic %INLINED_SOURCE%", Collections.<PsiElement>emptySet(),
-                            Collections.<String>emptySet()), false, ((TopCoderTask) task).getMethod(project));
-                    String text = generator.createInlinedSource();
-                    file = FileUtils.writeTextFile(directory, task.name + ".java", text);
-                }
+                    VirtualFile file = null;
+                    if (task instanceof Task) {
+                        SolutionGenerator generator = new SolutionGenerator(new HashSet<String>(Arrays.asList(ProjectUtils.getData(project).excludedPackages)),
+                            createMainClassTemplate(project, (Task) task), true,
+                            MainFileTemplate.getMethod(project, ((Task) task).taskClass, "solve", "void", "int", ((Task) task).inputClass, ((Task) task).outputClass));
+                        String source = generator.createInlinedSource();
+                        file = FileUtils.writeTextFile(directory, ((Task) task).mainClass + ".java", source);
+                    } else if (task instanceof TopCoderTask) {
+                        SolutionGenerator generator = new SolutionGenerator(
+                            new HashSet<String>(Arrays.asList(ProjectUtils.getData(project).excludedPackages)),
+                            new MainFileTemplate("%IMPORTS%\npublic %INLINED_SOURCE%", Collections.<PsiElement>emptySet(),
+                                Collections.<String>emptySet()), false, ((TopCoderTask) task).getMethod(project));
+                        String text = generator.createInlinedSource();
+                        file = FileUtils.writeTextFile(directory, task.name + ".java", text);
+                    }
 
-                FileUtils.synchronizeFile(file);
-                ReformatCodeProcessor processor = new ReformatCodeProcessor(project, CompatibilityUtils.getPsiFile(project, file), null, false);
-
-                processor.run();
-
-                if (task instanceof Task) {
                     FileUtils.synchronizeFile(file);
-                } else {
-                    String source = FileUtils.readTextFile(file);
-                    VirtualFile virtualFile = FileUtils.writeTextFile(LocalFileSystem.getInstance().findFileByPath(System.getProperty("user.home")), ".java", source);
-                    String path = virtualFile.getCanonicalPath();
-                    if (path == null) return;
-                    new File(path).deleteOnExit();
+                    ReformatCodeProcessor processor = new ReformatCodeProcessor(project, CompatibilityUtils.getPsiFile(project, file), null, false);
+
+                    processor.run();
+
+                    if (task instanceof Task) {
+                        FileUtils.synchronizeFile(file);
+                    } else {
+                        String source = FileUtils.readTextFile(file);
+                        VirtualFile virtualFile = FileUtils.writeTextFile(LocalFileSystem.getInstance().findFileByPath(System.getProperty("user.home")), ".java", source);
+                        String path = virtualFile.getCanonicalPath();
+                        if (path == null) return;
+                        new File(path).deleteOnExit();
+                    }
                 }
-            }
-        });
+            });
+        } catch (TaskCorruptException e) {
+            Messenger.publishMessage(TaskCorruptException.getDefaultMessage(task == null ? "unknown" : (task.name == null) ? "unknown" : task.name), NotificationType.ERROR);
+        }
     }
 }
