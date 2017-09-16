@@ -1,5 +1,6 @@
 package net.egork.chelper.parser;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
@@ -32,37 +33,43 @@ public class ParseProgresser {
     public static String getWebPageContent(final Project project, final DescriptionReceiver receiver, final String urlstr, final String charset) {
         ParseProgresser.requestURL = urlstr;
         final BlockingQueue<StringBuilder> resBlockingQueue = new ArrayBlockingQueue<StringBuilder>(1);
-        ProgressManager.getInstance().run(
-            new Task.Backgroundable(project, "Parse Pages", false) {
-                @Override
-                public void run(@NotNull ProgressIndicator indicator) {
-                    indicator.setText("Parsing pages form '" + ParseProgresser.requestURL + "'");
-                    for (int i = 0; i < 10; i++) {
-                        if (receiver.isStopped()) return;
-                        indicator.setFraction((i + 1) / 10);
-                        try {
-                            URL url = new URL(ParseProgresser.requestURL);
-                            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                            conn.setReadTimeout(10000);
-                            conn.connect();
+        ApplicationManager.getApplication().invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                ProgressManager.getInstance().run(
+                    new Task.Backgroundable(project, "Parse Pages", false) {
+                        @Override
+                        public void run(@NotNull ProgressIndicator indicator) {
+                            indicator.setIndeterminate(true);
+                            indicator.setText("Parsing pages form '" + ParseProgresser.requestURL + "'");
+                            for (int i = 0; i < 10; i++) {
+                                if (receiver.isStopped()) return;
+                                indicator.setFraction((i + 1) / 10);
+                                try {
+                                    URL url = new URL(ParseProgresser.requestURL);
+                                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                                    conn.setReadTimeout(10000);
+                                    conn.connect();
 
-                            InputStream input = conn.getInputStream();
-                            BufferedReader reader = new BufferedReader(new InputStreamReader(input, Charset.forName(charset)));
-                            StringBuilder builder = new StringBuilder();
-                            String s;
-                            while ((s = reader.readLine()) != null) {
-                                builder.append(s).append('\n');
+                                    InputStream input = conn.getInputStream();
+                                    BufferedReader reader = new BufferedReader(new InputStreamReader(input, Charset.forName(charset)));
+                                    StringBuilder builder = new StringBuilder();
+                                    String s;
+                                    while ((s = reader.readLine()) != null) {
+                                        builder.append(s).append('\n');
+                                    }
+                                    reader.close();
+                                    resBlockingQueue.add(builder);
+                                    return;
+                                } catch (IOException ignored) {
+                                }
                             }
-                            reader.close();
-                            resBlockingQueue.add(builder);
-                            return;
-                        } catch (IOException ignored) {
+                            indicator.setText("finished");
                         }
                     }
-                    indicator.setText("finished");
-                }
+                );
             }
-        );
+        });
         try {
             StringBuilder result = resBlockingQueue.take();
             if (receiver.isStopped() || result.length() == 0) {
