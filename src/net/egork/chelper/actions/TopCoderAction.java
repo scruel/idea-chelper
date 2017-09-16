@@ -170,6 +170,7 @@ public class TopCoderAction extends AnAction {
         });
         VirtualFile file = FileUtils.writeTextFile(LocalFileSystem.getInstance().findFileByPath(System.getProperty("user.home")),
             ".chelper", project.getBasePath() + "\n");
+        if (file == null) return;
         String path = file.getCanonicalPath();
         if (path == null) return;
         new File(path).deleteOnExit();
