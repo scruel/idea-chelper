@@ -13,7 +13,7 @@ public class TaskCorruptException extends RuntimeException {
     }
 
     public TaskCorruptException() {
-        super(getDefaultMessage("UnKnown"));
+        super();
     }
 
     public TaskCorruptException(String message) {

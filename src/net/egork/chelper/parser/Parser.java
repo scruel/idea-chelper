@@ -22,6 +22,14 @@ public interface Parser {
 
     void parseContest(Project project, String id, DescriptionReceiver receiver);
 
+    /**
+     * Returns task with only test cases(bases on default task).
+     *
+     * @param project
+     * @param description
+     * @param receiver
+     * @return
+     */
     Task parseTask(Project project, Description description, DescriptionReceiver receiver);
 
     TestType defaultTestType();

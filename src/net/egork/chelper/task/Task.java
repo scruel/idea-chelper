@@ -134,10 +134,10 @@ public class Task extends TaskBase<Test> {
     }
 
     public static Task load(InputReader in) {
-        String errorFile = null;
+        String errorFileName = null;
         try {
             String name = in.readString();
-            errorFile = name + ".task";
+            errorFileName = name + ".task";
             TestType testType = in.readEnum(TestType.class);
             StreamConfiguration.StreamType inputStreamType = in.readEnum(StreamConfiguration.StreamType.class);
             String inputFileName = in.readString();
@@ -177,7 +177,7 @@ public class Task extends TaskBase<Test> {
                 taskClass, checkerClass, checkerParameters, testClasses, date, contestName, truncate, inputClass,
                 outputClass, includeLocale, failOnOverflow);
         } catch (InputMismatchException e) {
-            Messenger.publishMessage(TaskCorruptException.getDefaultMessage(errorFile), NotificationType.ERROR);
+            Messenger.publishMessage(TaskCorruptException.getDefaultMessage(errorFileName == null ? "unknown" : errorFileName), NotificationType.ERROR);
             return null;
         }
     }

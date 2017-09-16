@@ -16,6 +16,7 @@ import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiManager;
 import net.egork.chelper.configurations.TaskConfiguration;
 import net.egork.chelper.configurations.TopCoderConfiguration;
 import net.egork.chelper.task.Task;
@@ -135,6 +136,8 @@ public class AutoSwitcher implements ProjectComponent {
                     @Override
                     public void run() {
                         if (busy || file == null)
+                            return;
+                        if (!FileUtils.isJavaDirectory(PsiManager.getInstance(project).findDirectory(file.getParent())))
                             return;
                         RunManagerImpl runManager = RunManagerImpl.getInstanceImpl(project);
 
