@@ -77,7 +77,7 @@ public class CodeGenerationUtils {
         }
         String author = ProjectUtils.getData(project).author;
         if (author.isEmpty()) {
-            author = "unknow";
+            author = "unknown";
         }
         String template = inputTemplate != null ? inputTemplate : "package %package%;\n" +
             "\n" +
@@ -106,7 +106,7 @@ public class CodeGenerationUtils {
             return FileUtils.readTextFile(file);
         String author = ProjectUtils.getData(project).author;
         if (author.isEmpty()) {
-            author = "unknow";
+            author = "unknown";
         }
         String template = inputTemplate != null ? inputTemplate : "package %package%;\n" +
             "\n" +
@@ -141,7 +141,7 @@ public class CodeGenerationUtils {
             return FileUtils.readTextFile(file);
         String author = ProjectUtils.getData(project).author;
         if (author.isEmpty()) {
-            author = "unknow";
+            author = "unknown";
         }
         String template = inputTemplate != null ? inputTemplate : "package %package%;\n" +
             "\n" +
@@ -175,7 +175,7 @@ public class CodeGenerationUtils {
             return FileUtils.readTextFile(file);
         String author = ProjectUtils.getData(project).author;
         if (author.isEmpty()) {
-            author = "unknow";
+            author = "unknown";
         }
         String template = inputTemplate != null ? inputTemplate : "package %package%;\n" +
             "\n" +
@@ -210,7 +210,7 @@ public class CodeGenerationUtils {
             return FileUtils.readTextFile(file);
         String author = ProjectUtils.getData(project).author;
         if (author.isEmpty()) {
-            author = "unknow";
+            author = "unknown";
         }
         String template = inputTemplate != null ? inputTemplate : "package %package%;\n" +
             "\n" +
