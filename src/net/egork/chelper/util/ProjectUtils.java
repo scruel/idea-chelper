@@ -26,6 +26,7 @@ import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.codeStyle.CodeStyleSettingsManager;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.Processor;
 import com.intellij.util.ui.UIUtil;
@@ -77,6 +78,7 @@ public class ProjectUtils {
         ProjectManager.getInstance().addProjectManagerListener(new ProjectManagerAdapter() {
             @Override
             public void projectOpened(final Project project) {
+                CodeStyleSettingsManager.getSettings(project).LINE_SEPARATOR = "\n";
                 final ProjectData configuration = ProjectData.load(project);
                 if (configuration != null) {
                     eligibleProjects.put(project, configuration);
