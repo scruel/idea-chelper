@@ -5,10 +5,10 @@ Inlines library code and provides testing framework
 
 [![license][license]][license-link]
 
-## Introduction
+Introduction
 ------------
 
-I'm working on this amazing project, I will add functions which I want to implementation , fix the problem I encountered or even make some guides to make CHelper better.
+I'm now working on this amazing project, I will add functions which I want to implement, fix bugs I encountered, or write some guides to make CHelper better.
 
 Features
 --------
@@ -26,7 +26,7 @@ all released .zip plugin are available in release page: [release-list][latest-re
 
 Installation
 ------------
-- ~~Using IDE built-in plugin system(not the plugin here):~~
+- ~~Using IDE built-in plugin system~~(not the plugin here):
   - <kbd>Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Browse repositories...</kbd> > <kbd>Search for "CHelper"</kbd> > <kbd>Install Plugin</kbd>--
 - Manually:
   - Download the [latest release][latest-release] and install it manually using <kbd>Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Install plugin from disk...</kbd>
@@ -40,10 +40,11 @@ Changelog
 ---------
 *TODO*
 
+
 [release-list]: https://github.com/scruel/idea-chelper/releases
-[latest-release]: https://github.com/scruel/idea-chelper/releases/tag/v4.4.0
+[latest-release]: https://github.com/scruel/idea-chelper/releases
 [commits-list]: https://github.com/scruel/idea-chelper/commits/master
 [build-status]: https://travis-ci.org/paulvollmer/apistatus.svg?branch=master
 [license]: https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000
-[license-link]: https://github.com/farmerx/elasticHD/blob/master/LICENSE
+[license-link]: https://github.com/scruel/ClipIt/blob/master/LICENSE
 [installing-a-plugin-from-the-disk]: https://www.jetbrains.com/help/idea/installing-a-plugin-from-the-disk.html
