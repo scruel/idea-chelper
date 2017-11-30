@@ -135,7 +135,7 @@ public class AutoSwitcher implements ProjectComponent {
                 Runnable selectTaskRunnable = new Runnable() {
                     @Override
                     public void run() {
-                        if (busy || file == null)
+                        if (busy || file == null || file.getParent() == null)
                             return;
                         if (!FileUtils.isJavaDirectory(PsiManager.getInstance(project).findDirectory(file.getParent())))
                             return;
