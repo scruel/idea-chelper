@@ -326,7 +326,13 @@ public class FileUtils {
                 }
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 configuration.saveTask(new OutputWriter(out));
-                _writeTextFile(project, locationFile, fileName, out.toString());
+                String content;
+                try {
+                    content = out.toString("UTF-8");
+                } catch (UnsupportedEncodingException ignore) {
+                    content = out.toString();
+                }
+                _writeTextFile(project, locationFile, fileName, content);
             }
         }, false);
     }
