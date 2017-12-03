@@ -14,6 +14,8 @@ import net.egork.chelper.util.ProjectUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.Properties;
 
 /**
@@ -139,5 +141,31 @@ public class ProjectData {
             archiveDirectory, defaultDirectory, testDirectory, enableUnitTests, failOnIntegerOverflowForNewTasks, smartTesting, true);
         newData.save(project);
         ProjectUtils.putProjectData(project, newData);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ProjectData that = (ProjectData) o;
+        return enableUnitTests == that.enableUnitTests &&
+            failOnIntegerOverflowForNewTasks == that.failOnIntegerOverflowForNewTasks &&
+            smartTesting == that.smartTesting &&
+            extensionProposed == that.extensionProposed &&
+            Objects.equals(inputClass, that.inputClass) &&
+            Objects.equals(outputClass, that.outputClass) &&
+            Arrays.equals(excludedPackages, that.excludedPackages) &&
+            Objects.equals(outputDirectory, that.outputDirectory) &&
+            Objects.equals(author, that.author) &&
+            Objects.equals(archiveDirectory, that.archiveDirectory) &&
+            Objects.equals(defaultDirectory, that.defaultDirectory) &&
+            Objects.equals(testDirectory, that.testDirectory);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(inputClass, outputClass, outputDirectory, author, archiveDirectory, defaultDirectory, testDirectory, enableUnitTests, failOnIntegerOverflowForNewTasks, smartTesting, extensionProposed);
+        result = 31 * result + Arrays.hashCode(excludedPackages);
+        return result;
     }
 }

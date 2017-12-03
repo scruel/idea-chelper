@@ -52,14 +52,15 @@ public class OutputWriter {
     }
 
     public void printString(String s) {
-        if (s == null)
+        if (s == null) {
             printLine(-1);
-        else
+        } else {
             try {
                 printLine(s.getBytes("UTF-8").length, s);
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException(e);
             }
+        }
     }
 
     public void printBoolean(boolean b) {
@@ -71,14 +72,15 @@ public class OutputWriter {
     }
 
     public void printTopCoder(Object o) {
-        if (o == null)
+        if (o == null) {
             printString(null);
-        else if (o instanceof Integer)
+        } else if (o instanceof Integer) {
             printLine("int", o);
-        else if (o instanceof Long)
+        } else if (o instanceof Long) {
             printLine("long", o);
-        else if (o instanceof Double)
+        } else if (o instanceof Double) {
             printLine("double", o);
+        }
         else if (o instanceof String) {
             printLine("String");
             printString((String) o);
