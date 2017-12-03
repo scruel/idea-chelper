@@ -21,7 +21,7 @@ public class EditProjectProperties extends AnAction {
             result.save(project);
             ProjectUtils.putProjectData(project, result);
             if (data != null && !result.equals(data)) {
-                CodeGenerationUtils.refreshAllTemplate(project, data.author, result.author);
+                CodeGenerationUtils.refreshAllTemplate(project, data, result);
             } else {
                 CodeGenerationUtils.createTemplatesIfNeeded(project);
             }

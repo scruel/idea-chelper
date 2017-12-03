@@ -10,6 +10,7 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.GlobalSearchScope;
+import net.egork.chelper.ProjectData;
 import net.egork.chelper.actions.ArchiveAction;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.task.TaskBase;
@@ -271,22 +272,17 @@ public class CodeGenerationUtils {
     }
 
     /**
-     * @param args target string, replacement string.
+     * refresh all template files by new ProjectData.
+     *
+     * @param project
+     * @param oldData
+     * @param newData
      */
-    public static void refreshAllTemplate(Project project, String... args) {
-        // if ((args.length & 2) != 0) {
-        //   return;
-        // }
+    public static void refreshAllTemplate(Project project, ProjectData oldData, ProjectData newData) {
         Map<TemplateType, String> allTemplates = getAllTemplate(project);
-        for (int i = 0; i < args.length; i += 2) {
-            // if (args[i] == "author")
-            if (args[i + 1].isEmpty()) {
-                continue;
-            }
-            for (Map.Entry<TemplateType, String> entry : allTemplates.entrySet()) {
-                String tmp = entry.getValue().replaceAll("Created by (.*)+ on", "Created by " + args[i + 1] + " on");
-                // String tmp = entry.getValue().replaceAll("Created by " + args[i] + " on", "Created by " + args[i + 1] + " on");
-                allTemplates.put(entry.getKey(), tmp);
+        for (Map.Entry<TemplateType, String> entry : allTemplates.entrySet()) {
+            if (newData.author != null) {
+                allTemplates.put(entry.getKey(), entry.getValue().replaceAll("Created by (.*)+ on", "Created by " + newData.author + " on"));
             }
         }
         writeAllTemplate(project, allTemplates);
