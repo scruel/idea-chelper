@@ -298,7 +298,7 @@ public class ParseDialog extends JDialog {
                     rawTmp = rawTmp.setInputOutputClasses(data.inputClass, data.outputClass);
                     rawTmp = rawTmp.setTemplate(template.getText());
                     final Task raw = rawTmp;
-                    LOG.printMethodInfoWithValues(true, "executeReadAction");
+                    LOG.debugMethodInfo(true, false, "executeReadAction");
                     Task task = new Task(raw.name, (TestType) testType.getSelectedItem(), raw.input, raw.output,
                         raw.tests, location.getText(), raw.vmArgs, raw.mainClass,
                         raw.taskClass, raw.checkerClass,
@@ -306,7 +306,7 @@ public class ParseDialog extends JDialog {
                         truncate.isSelected(), data.inputClass, data.outputClass, raw.includeLocale,
                         data.failOnIntegerOverflowForNewTasks, raw.template);
                     taskProcessReceiver.receiveTask(task);
-                    LOG.printMethodInfoWithValues(false, "executeReadAction");
+                    LOG.debugMethodInfo(false, false, "executeReadAction");
                 }
                 if (!taskProcessReceiver.isEmpty()) {
                     ProjectUtils.updateDefaultTask(taskProcessReceiver.getFirstTask());

@@ -35,7 +35,7 @@ public class ExecuteUtils {
     }
 
     public static void executeWriteCommandAction(final Project project, final Runnable runnable, boolean blocking) {
-        LOG.printMethodInfoWithNamesAndValues(true, "thread", Thread.currentThread().getName(), "project", project, "blocking", blocking);
+        LOG.debugMethodInfo(true, true, "thread", Thread.currentThread().getName(), "project", project, "blocking", blocking);
         final ApplicationEx application = ApplicationManagerEx.getApplicationEx();
         Runnable writeRunnable = new Runnable() {
             @Override
@@ -46,7 +46,7 @@ public class ExecuteUtils {
 
         if (!blocking) {
             application.invokeLater(writeRunnable, ModalityState.NON_MODAL);
-            LOG.printMethodInfoWithNamesAndValues(false);
+            LOG.debugMethodInfo(false, false);
             return;
         }
         if (application.isDispatchThread()) {
@@ -54,21 +54,21 @@ public class ExecuteUtils {
                 runnable.run();
             else
                 writeRunnable.run();
-            LOG.printMethodInfoWithNamesAndValues(false);
+            LOG.debugMethodInfo(false, false);
             return;
         }
         if (!application.isReadAccessAllowed()) {
             application.invokeAndWait(writeRunnable, ModalityState.NON_MODAL);
-            LOG.printMethodInfoWithNamesAndValues(false);
+            LOG.debugMethodInfo(false, false);
             return;
         }
-        LOG.printMethodInfoWithNamesAndValues(false);
+        LOG.debugMethodInfo(false, false);
         LOG.error("Could not run write action with wait.");
         throw new IllegalStateException("Could not run write action with wait.");
     }
 
     public static void executeWriteAction(final Runnable runnable, boolean blocking) {
-        LOG.printMethodInfoWithNamesAndValues(true, "blocking", blocking);
+        LOG.debugMethodInfo(true, true, "blocking", blocking);
         final ApplicationEx application = ApplicationManagerEx.getApplicationEx();
         Runnable writeRunnable = new Runnable() {
             @Override
@@ -78,7 +78,7 @@ public class ExecuteUtils {
         };
         if (!blocking) {
             application.invokeLater(writeRunnable, ModalityState.NON_MODAL);
-            LOG.printMethodInfoWithNamesAndValues(false);
+            LOG.debugMethodInfo(false, false);
             return;
         }
         if (application.isDispatchThread()) {
@@ -86,15 +86,15 @@ public class ExecuteUtils {
                 runnable.run();
             else
                 writeRunnable.run();
-            LOG.printMethodInfoWithNamesAndValues(false);
+            LOG.debugMethodInfo(false, false);
             return;
         }
         if (!holdsReadLock(application)) {
             application.invokeAndWait(writeRunnable, ModalityState.NON_MODAL);
-            LOG.printMethodInfoWithNamesAndValues(false);
+            LOG.debugMethodInfo(false, false);
             return;
         }
-        LOG.printMethodInfoWithNamesAndValues(false);
+        LOG.debugMethodInfo(false, false);
         LOG.error("Could not run write action with wait.");
         throw new IllegalStateException("Could not run write action with wait.");
     }

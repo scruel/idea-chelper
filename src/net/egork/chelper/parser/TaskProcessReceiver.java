@@ -80,10 +80,10 @@ public abstract class TaskProcessReceiver {
     protected abstract void processTask(Task task);
 
     public void receiveTask(Task task) {
-        LOG.printMethodInfoWithNamesAndValues(true, "task", task, "size", currentCount);
+        LOG.debugMethodInfo(true, true, "task", task, "size", currentCount);
         result.add(task);
         increaseTotalSum();
-        LOG.printMethodInfoWithNamesAndValues(false, "task", task, "size", currentCount);
+        LOG.debugMethodInfo(false, true, "task", task, "size", currentCount);
     }
 
     public boolean isEmpty() {

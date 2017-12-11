@@ -32,7 +32,7 @@ public class TaskConfigurationProducer extends RunConfigurationProducer<TaskConf
 
     @Override
     protected boolean setupConfigurationFromContext(TaskConfiguration configuration, ConfigurationContext context, Ref sourceElement) {
-        LOG.printMethodInfoWithValues(true);
+        LOG.debugMethodInfo(true, false);
         final Location location = context.getLocation();
         if (location == null) return false;
         final PsiFile script = location.getPsiElement().getContainingFile();
@@ -48,14 +48,14 @@ public class TaskConfigurationProducer extends RunConfigurationProducer<TaskConf
             return false;
         Task task = FileUtils.readTask(dataFile);
         if (task == null) return false;
-        LOG.printMethodInfoWithValues(true, "location", task.location);
+        LOG.debugMethodInfo(true, true, "location", task.location);
         task = (Task) TaskUtils.fixedTaskByTaskFile(project, task, dataFile);
         if (task == null) return false;
-        LOG.printMethodInfoWithValues(true, "fixedLocation", task.location);
+        LOG.debugMethodInfo(true, true, "fixedLocation", task.location);
         ProjectUtils.createConfiguration(project, task, true);
         configuration.setName(task.name);
         configuration.setConfiguration(task);
-        LOG.printMethodInfoWithValues(false);
+        LOG.debugMethodInfo(false, false);
         return true;
     }
 
@@ -69,7 +69,7 @@ public class TaskConfigurationProducer extends RunConfigurationProducer<TaskConf
 
     @Override
     public boolean isConfigurationFromContext(TaskConfiguration configuration, ConfigurationContext context) {
-        LOG.printMethodInfoWithNamesAndValues(true, "configuration", configuration);
+        LOG.debugMethodInfo(true, true, "configuration", configuration);
         if (!ProjectUtils.isValidConfigurationOrDeleteIfNot(configuration)) return false;
         final Location location = context.getLocation();
         if (location == null) return false;
@@ -88,7 +88,7 @@ public class TaskConfigurationProducer extends RunConfigurationProducer<TaskConf
         final String taskName = ArchiveAction.canonize(configuration.getConfiguration().name);
         final String fileLocation = FileUtils.getRelativePath(context.getProject().getBaseDir(), file.getParent());
         final String fileName = file.getNameWithoutExtension();
-        LOG.printMethodInfoWithValues(false, taskLocation, fileLocation, classSimpleName, taskName, fileName);
+        LOG.debugMethodInfo(false, false, taskLocation, fileLocation, classSimpleName, taskName, fileName);
         return taskLocation.equals(fileLocation) && (fileName.equals(classSimpleName) || fileName.equals(taskName));
     }
 }

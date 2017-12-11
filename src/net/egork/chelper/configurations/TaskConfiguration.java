@@ -41,11 +41,11 @@ public class TaskConfiguration extends ModuleBasedConfiguration<JavaRunConfigura
 
     public TaskConfiguration(Project project, String name, Task configuration, ConfigurationFactory factory) {
         super(name, new JavaRunConfigurationModule(project, false), factory);
-        LOG.printMethodInfoWithNamesAndValues(true, "name", name, "configuration", configuration, "location", configuration.location);
+        LOG.debugMethodInfo(true, true, "name", name, "configuration", configuration, "location", configuration.location);
         boolean coverSave = this.configuration != configuration;
         saveConfiguration(configuration, coverSave);
         this.configuration = configuration;
-        LOG.printMethodInfoWithNamesAndValues(false, "name", name, "configuration", configuration, "location", configuration.location);
+        LOG.debugMethodInfo(false, true, "name", name, "configuration", configuration, "location", configuration.location);
     }
 
     @Override
@@ -151,7 +151,7 @@ public class TaskConfiguration extends ModuleBasedConfiguration<JavaRunConfigura
     }
 
     private void saveConfiguration(Task configuration, boolean cover) {
-        LOG.printMethodInfoWithNamesAndValues(true, "task", configuration);
+        LOG.debugMethodInfo(true, true, "task", configuration);
         if (configuration == null) return;
         if (configuration.location == null) return;
         if (configuration.taskClass == null) return;
@@ -174,7 +174,7 @@ public class TaskConfiguration extends ModuleBasedConfiguration<JavaRunConfigura
         VirtualFile taskFile = FileUtils.getFileByFQN(getProject(), configuration.taskClass);
         if (taskFile != null && taskFile.getParent().equals(parentFile))
             FileUtils.saveConfiguration(configuration.location, ArchiveAction.canonize(configuration.name) + ".task", configuration, getProject());
-        LOG.printMethodInfoWithNamesAndValues(false, "task", configuration);
+        LOG.debugMethodInfo(false, true, "task", configuration);
     }
 
     // Used to support previous versions of JDK6.0

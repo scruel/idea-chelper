@@ -102,7 +102,7 @@ public class FileUtils {
         if (location == null) {
             return null;
         }
-        LOG.printMethodInfoWithNamesAndValues(true, "location", location, "fileName", fileName, "context", context);
+        LOG.debugMethodInfo(true, true, "location", location, "fileName", fileName, "context", context);
         ExecuteUtils.executeWriteAction(new Runnable() {
             @Override
             public void run() {
@@ -122,7 +122,7 @@ public class FileUtils {
                 }
             }
         }, true);
-        LOG.printMethodInfoWithNamesAndValues(false, "location", location, "fileName", fileName, "context", context, "result", location.findChild(fileName));
+        LOG.debugMethodInfo(false, true, "location", location, "fileName", fileName, "context", context, "result", location.findChild(fileName));
         return location.findChild(fileName);
     }
 
@@ -138,19 +138,19 @@ public class FileUtils {
         if (directory == null) {
             return null;
         }
-        LOG.printMethodInfoWithNamesAndValues(true, "directory", directory, "fileName", fileName, "fileContent", context);
+        LOG.debugMethodInfo(true, true, "directory", directory, "fileName", fileName, "fileContent", context);
         ExecuteUtils.executeWriteCommandAction(project, new Runnable() {
             @Override
             public void run() {
                 _writeTextFile(project, directory, fileName, context);
             }
         }, true);
-        LOG.printMethodInfoWithNamesAndValues(false, "directory", directory, "fileName", fileName, "context", context, "result", directory.findFile(fileName));
+        LOG.debugMethodInfo(false, true, "directory", directory, "fileName", fileName, "context", context, "result", directory.findFile(fileName));
         return directory.findFile(fileName);
     }
 
     private static void _writeTextFile(Project project, PsiDirectory directory, String fileName, String context) {
-        LOG.printMethodInfoWithNamesAndValues(true, "directory", directory, "fileName", fileName, "fileContent", context);
+        LOG.debugMethodInfo(true, true, "directory", directory, "fileName", fileName, "fileContent", context);
         PsiFileFactory factory = PsiFileFactory.getInstance(project);
         PsiFile psiFile = directory.findFile(fileName);
         FileType type = FileTypeRegistry.getInstance().getFileTypeByFileName(fileName);
@@ -169,7 +169,7 @@ public class FileUtils {
             } catch (IOException ignore) {
             }
         }
-        LOG.printMethodInfoWithNamesAndValues(false, "directory", directory, "fileName", fileName, "fileContent", context);
+        LOG.debugMethodInfo(false, true, "directory", directory, "fileName", fileName, "fileContent", context);
     }
 
     public static boolean isValidDirectory(Project project, String location) {

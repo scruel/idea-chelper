@@ -123,7 +123,7 @@ public class CodeforcesParser implements Parser {
 
     @Override
     public Task parseTask(Project project, Description description, DescriptionReceiver receiver) {
-        LOG.printMethodInfoWithNamesAndValues(true, "description", description, "receiver", receiver);
+        LOG.debugMethodInfo(true, true, "description", description, "receiver", receiver);
         String id = description.id;
         String[] tokens = id.split(" ");
         if (tokens.length != 2)
@@ -136,7 +136,7 @@ public class CodeforcesParser implements Parser {
         Collection<Task> tasks = parseTaskFromHTML(text);
         if (!tasks.isEmpty())
             return tasks.iterator().next();
-        LOG.printMethodInfoWithNamesAndValues(true, "description", description, "receiver", receiver);
+        LOG.debugMethodInfo(true, true, "description", description, "receiver", receiver);
         return null;
     }
 

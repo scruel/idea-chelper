@@ -26,69 +26,56 @@ public class StackTraceLogger extends Logger {
         this("#" + cl.getName());
     }
 
-    public String getCurrentMethodInfo() {
+    public String getClickableMethodString() {
         StringBuilder sb = new StringBuilder();
         StackTraceElement[] stacks = new Throwable().getStackTrace();
         sb.append(String.format("%s(%s:%d)", stacks[2].getMethodName(), stacks[2].getFileName(), stacks[2].getLineNumber()));
         return sb.toString();
     }
 
-    public void printMethodInfoWithValues(boolean enter, Object... values) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getCurrentMethodInfo());
-        sb.append(getEnterSymbol(enter));
-        List<String> res = processObjectsToStringList(values);
-        for (int i = 0; i < res.size(); i++) {
-            sb.append(String.format("\"%s\"", res.get(i)));
-            if (i != res.size() - 1) {
-                sb.append(", ");
-            } else {
-                sb.append(".");
-            }
-        }
-        debug(sb.toString());
-    }
-
     /**
-     * usage: printMethodInfoWithNamesAndValues(true, "value1Name", value1, "value2Name", value2)
+     * This method is for debug using. If {@param tuple} is true
+     * <p>
+     * usage: debugMethodInfo(true, true, "valueName1", value1, "valueName2", value2);
+     * usage: debugMethodInfo(true, true, value1, value2);
      *
-     * @param enter
-     * @param namesAndValues
-     * @return
+     * @param enter   determines the direction of arrow string.
+     * @param tuple   determines the style of message.
+     *                if <code>true</code> and the length of param 'objects' is even, this method will log debug message like <b>valueName1: "value1", valueName2: "value2", ...</b>.
+     *                if <code>false</code>, message will like <b>"obj1", "obj2", ...</b>.
+     * @param objects object values.
      */
-    public void printMethodInfoWithNamesAndValues(boolean enter, Object... namesAndValues) {
-        if ((namesAndValues.length & 1) != 0) throw new RuntimeException("需打印的参数数量非偶数，改改吧。。。");
-        StringBuilder sb = new StringBuilder();
-        sb.append(getCurrentMethodInfo());
-        sb.append(getEnterSymbol(enter));
+    public void debugMethodInfo(boolean enter, boolean tuple, Object... objects) {
+        if (tuple && (objects.length & 1) != 0)
+            throw new RuntimeException("The length of 'objects' must be even.");
+        StringBuilder message = new StringBuilder();
+        message.append(getClickableMethodString());
+        message.append(getEnterSymbol(enter));
 
-        List<String> res = new LinkedList<String>();
-        for (Object obj : namesAndValues) {
-            if (obj == null) {
-                res.add(null);
-                continue;
-            }
-            res.add(obj.toString());
-        }
-        for (int i = 0; i < res.size(); i += 2) {
-            if (null == (res.get(i + 1))) continue;
-            res.set(i + 1, res.get(i + 1)
-                .replace("\n", "\\n")
-                .replace("\t", "\\t"));
-            if (res.get(i + 1).length() > 100) {
-                res.set(i + 1, res.get(i + 1).substring(0, 100) + " ...");
-            }
-        }
-
-        for (int i = 0; i < res.size(); i += 2) {
-            sb.append(String.format("%s: \"%s\"", res.get(i), res.get(i + 1)));
-            if (i != res.size() - 2) {
-                sb.append(", ");
+        for (int i = 0; i < objects.length; i++) {
+            String str;
+            if (null == objects[i]) {
+                str = "null";
             } else {
-                sb.append(".");
+                str = objects[i].toString();
+                str = str.replace("\n", "\\n").replace("\t", "\\t");
+                if (str.length() > 100) {
+                    str = str.substring(0, 100);
+                }
+            }
+
+            if (tuple && (i & 1) == 0) {
+                message.append(str).append(": ");
+            } else {
+                message.append("\"").append(objects[i]).append("\"");
+                if (i != objects.length - 1) {
+                    message.append(", ");
+                } else {
+                    message.append(".");
+                }
             }
         }
-        debug(sb.toString());
+        this.debug(message.toString());
     }
 
     private List<String> processObjectsToStringList(Object[] objs) {
@@ -113,7 +100,7 @@ public class StackTraceLogger extends Logger {
     }
 
     private String getEnterSymbol(boolean enter) {
-        return enter ? "-> " : "<- ";
+        return enter ? " -> " : " <- ";
     }
 
     @Override

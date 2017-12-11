@@ -61,6 +61,7 @@ import java.util.Map;
  */
 public class ProjectUtils {
     private static final StackTraceLogger LOG = new StackTraceLogger(ProjectUtils.class);
+
     private ProjectUtils() {
     }
 
@@ -238,7 +239,7 @@ public class ProjectUtils {
 
 
     public static RunnerAndConfigurationSettings createConfiguration(Project project, TaskBase task, boolean setActive) {
-        LOG.printMethodInfoWithNamesAndValues(true, "task", task);
+        LOG.debugMethodInfo(true, true, "task", task);
         RunManagerImpl manager = RunManagerImpl.getInstanceImpl(project);
         RunnerAndConfigurationSettings old = manager.findConfigurationByName(task.name);
         if (old != null) {
@@ -249,7 +250,7 @@ public class ProjectUtils {
             configuration = new RunnerAndConfigurationSettingsImpl(manager,
                 new TaskConfiguration(project, task.name, (Task) task,
                     TaskConfigurationType.INSTANCE.getConfigurationFactories()[0]), false);
-            LOG.printMethodInfoWithNamesAndValues(false, "location", ((Task) task).location);
+            LOG.debugMethodInfo(false, true, "location", ((Task) task).location);
         } else if (task instanceof TopCoderTask) {
             configuration = new RunnerAndConfigurationSettingsImpl(manager,
                 new TopCoderConfiguration(project, task.name, (TopCoderTask) task,
@@ -258,7 +259,7 @@ public class ProjectUtils {
         manager.addConfiguration(configuration, false);
         if (setActive)
             manager.setSelectedConfiguration(configuration);
-        LOG.printMethodInfoWithNamesAndValues(false, "task", task);
+        LOG.debugMethodInfo(false, true, "task", task);
         return configuration;
     }
 

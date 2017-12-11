@@ -73,14 +73,14 @@ public class ParseProgresser {
         try {
             StringBuilder result = resBlockingQueue.take();
             if (receiver.isStopped() || result.length() == 0) {
-                LOG.printMethodInfoWithNamesAndValues(false, "receiver", receiver, "url", urlstr, "stop", receiver.isStopped());
+                LOG.debugMethodInfo(false, true, "receiver", receiver, "url", urlstr, "stop", receiver.isStopped());
                 return null;
             }
             return result.toString();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        LOG.printMethodInfoWithNamesAndValues(false, "receiver", receiver, "url", urlstr);
+        LOG.debugMethodInfo(false, true, "receiver", receiver, "url", urlstr);
         return null;
     }
 }
