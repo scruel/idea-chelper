@@ -46,8 +46,12 @@ public class StackTraceLogger extends Logger {
      * @param objects object values.
      */
     public void debugMethodInfo(boolean enter, boolean tuple, Object... objects) {
-        if (tuple && (objects.length & 1) != 0)
+        if (!LOG.isDebugEnabled()) {
+            return;
+        }
+        if (tuple && (objects.length & 1) != 0) {
             throw new RuntimeException("The length of 'objects' must be even.");
+        }
         StringBuilder message = new StringBuilder();
         message.append(getClickableMethodString());
         message.append(getEnterSymbol(enter));
