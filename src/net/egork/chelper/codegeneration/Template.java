@@ -1,7 +1,5 @@
 package net.egork.chelper.codegeneration;
 
-import net.egork.chelper.task.Task;
-
 /**
  * @author egor@egork.net
  */
@@ -21,7 +19,6 @@ public class Template {
 //            if (replacement[i] == null || replacement[i + 1] == null) continue;
             result = result.replace("%" + replacement[i] + "%", replacement[i + 1]);
         }
-        result = result.replace("%date%", Task.getDateString('/'));
         return result;
     }
 }

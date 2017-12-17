@@ -1,8 +1,7 @@
 package net.egork.chelper.exception;
 
 /**
- * Created by Scruel on 2017/9/9.
- * Github : https://github.com/scruel
+ * @author Scruel Tao
  */
 public class TaskCorruptException extends RuntimeException {
     private static final String defauleMessage = "CHelper could not continue because the associated data file '%file%' is missing or corrupt.";

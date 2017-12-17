@@ -17,8 +17,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 /**
- * Created by Scruel on 2017/9/8.
- * Github : https://github.com/scruel
+ * @author Scruel Tao
  */
 public class ExecuteUtils {
     private static final StackTraceLogger LOG = new StackTraceLogger(ExecuteUtils.class);

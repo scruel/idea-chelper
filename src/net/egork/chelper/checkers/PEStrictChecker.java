@@ -3,8 +3,7 @@ package net.egork.chelper.checkers;
 import net.egork.chelper.tester.Verdict;
 
 /**
- * Created by Scruel on 2017/5/29.
- * Github : https://github.com/scruel
+ * @author Scruel Tao
  */
 public class PEStrictChecker implements Checker {
 

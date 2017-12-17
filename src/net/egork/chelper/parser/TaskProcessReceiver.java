@@ -11,8 +11,7 @@ import java.util.Collection;
 import java.util.HashSet;
 
 /**
- * Created by Scruel on 2017/9/13.
- * Github : https://github.com/scruel
+ * @author Scruel Tao
  */
 public abstract class TaskProcessReceiver {
     private static final StackTraceLogger LOG = new StackTraceLogger(ExecuteUtils.class);

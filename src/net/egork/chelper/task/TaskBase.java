@@ -4,8 +4,7 @@ import net.egork.chelper.task.test.TestBase;
 import net.egork.chelper.util.OutputWriter;
 
 /**
- * Created by Scruel on 2017/9/8.
- * Github : https://github.com/scruel
+ * @author Scruel Tao
  */
 public abstract class TaskBase<E extends TestBase> {
     //Basic

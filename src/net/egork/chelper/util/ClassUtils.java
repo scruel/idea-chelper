@@ -7,8 +7,7 @@ import com.intellij.psi.PsiClass;
 import net.egork.chelper.codegeneration.MainFileTemplate;
 
 /**
- * Created by Scruel on 2017/9/10.
- * Github : https://github.com/scruel
+ * @author Scruel Tao
  */
 public class ClassUtils {
     private ClassUtils() {

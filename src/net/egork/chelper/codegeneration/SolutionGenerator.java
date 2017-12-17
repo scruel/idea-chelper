@@ -438,7 +438,7 @@ public class SolutionGenerator {
             " * Actual solution is at the top\n");
         String author = ProjectUtils.getData(project).author;
         if (!author.isEmpty()) {
-            builder.append(" * Created by ").append(author).append(".\n");
+            builder.append("\n * @author ").append(author);
         }
         builder.append("*/");
         builder.append("public class ").append(task.mainClass).append(" {\n");

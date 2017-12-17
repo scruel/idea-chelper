@@ -9,7 +9,8 @@ import net.egork.chelper.ui.ProjectDataDialog;
 import net.egork.chelper.util.ProjectUtils;
 
 /**
- * @author Egor Kulikov, scruel (egorku@yandex-team.ru)
+ * @author Egor Kulikov (egorku@yandex-team.ru)
+ * @author Scruel Tao (scruel@vip.qq.com)
  */
 public class EditProjectProperties extends AnAction {
     @Override

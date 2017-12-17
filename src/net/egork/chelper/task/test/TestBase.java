@@ -4,8 +4,7 @@ import net.egork.chelper.util.OutputWriter;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Created by Scruel on 2017/9/8.
- * Github : https://github.com/scruel
+ * @author Scruel Tao
  */
 public interface TestBase {
     /**

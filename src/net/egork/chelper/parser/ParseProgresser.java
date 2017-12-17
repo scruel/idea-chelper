@@ -19,8 +19,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 /**
- * Created by Scruel on 2017/9/12.
- * Github : https://github.com/scruel
+ * @author Scruel Tao
  */
 public class ParseProgresser {
     private static final StackTraceLogger LOG = new StackTraceLogger(ParseProgresser.class);

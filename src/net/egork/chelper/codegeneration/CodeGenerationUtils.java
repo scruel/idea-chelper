@@ -86,7 +86,7 @@ public class CodeGenerationUtils {
             "import %OutputClassFQN%;\n" +
             "\n" +
             "/**\n" +
-            " * Created by " + author + " on %date%.\n" +
+            " * @author " + author + "\n" +
             " */\n" +
             "public class %TaskClass% {\n" +
             "    public void solve(int testNumber, %InputClass% in, %OutputClass% out) {\n" +
@@ -115,7 +115,7 @@ public class CodeGenerationUtils {
             "import net.egork.chelper.checkers.Checker;\n" +
             "\n" +
             "/**\n" +
-            " * Created by " + author + " on %date%.\n" +
+            " * @author " + author + "\n" +
             " */\n" +
             "public class %CheckerClass% implements Checker {\n" +
             "    public %CheckerClass%(String parameters) {\n" +
@@ -153,7 +153,7 @@ public class CodeGenerationUtils {
             "import java.util.Collections;\n" +
             "\n" +
             "/**\n" +
-            " * Created by " + author + " on %date%.\n" +
+            " * @author " + author + "\n" +
             " */\n" +
             "public class %TestCaseClass% {\n" +
             "    @TestCase\n" +
@@ -187,7 +187,7 @@ public class CodeGenerationUtils {
             "import java.util.Collections;\n" +
             "\n" +
             "/**\n" +
-            " * Created by " + author + " on %date%.\n" +
+            " * @author " + author + "\n" +
             " */\n" +
             "public class %TestCaseClass% {\n" +
             "    @TestCase\n" +
@@ -216,7 +216,7 @@ public class CodeGenerationUtils {
         String template = inputTemplate != null ? inputTemplate : "package %package%;\n" +
             "\n" +
             "/**\n" +
-            " * Created by " + author + " on %date%.\n" +
+            " * @author " + author + "\n" +
             " */\n" +
             "public class %TaskClass% {\n" +
             "    public %Signature% {\n" +
@@ -282,7 +282,7 @@ public class CodeGenerationUtils {
         Map<TemplateType, String> allTemplates = getAllTemplate(project);
         for (Map.Entry<TemplateType, String> entry : allTemplates.entrySet()) {
             if (newData.author != null) {
-                allTemplates.put(entry.getKey(), entry.getValue().replaceAll("Created by (.*)+ on", "Created by " + newData.author + " on"));
+                allTemplates.put(entry.getKey(), entry.getValue().replaceAll("@author (.*)+", "@author " + newData.author));
             }
         }
         writeAllTemplate(project, allTemplates);

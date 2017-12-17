@@ -18,9 +18,8 @@ import java.util.List;
 
 /**
  * this utils class just for supporting the old version.
- * <p>
- * Created by Scruel on 2017/9/12.
- * Github : https://github.com/scruel
+ *
+ * @author Scruel Tao
  */
 public class CompatibilityUtils {
     @NotNull

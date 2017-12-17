@@ -12,7 +12,7 @@ import java.util.Calendar;
 import java.util.InputMismatchException;
 
 /**
- * 这部分的重构实在是有心无力。。。
+ * 有心重构，无力回天，有志之士，闲暇之余，且试一二。
  *
  * @author Egor Kulikov (kulikov@devexperts.com)
  */

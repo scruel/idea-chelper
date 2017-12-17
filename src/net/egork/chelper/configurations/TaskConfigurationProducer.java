@@ -20,8 +20,7 @@ import net.egork.chelper.util.TaskUtils;
 import java.util.Map;
 
 /**
- * Created by Scruel on 2017/9/6.
- * Github : https://github.com/scruel
+ * @author Scruel Tao
  */
 public class TaskConfigurationProducer extends RunConfigurationProducer<TaskConfiguration> {
     private static final StackTraceLogger LOG = new StackTraceLogger(TaskConfigurationProducer.class);

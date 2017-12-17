@@ -10,9 +10,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Created by Scruel on 2017/9/15.
- * Github : https://github.com/scruel
- * just for convince. aspect will be better.
+ * just for convince.
+ *
+ * @author Scruel Tao
  */
 public class StackTraceLogger extends Logger {
     private Logger LOG;
