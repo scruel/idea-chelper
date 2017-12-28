@@ -8,7 +8,7 @@ Inlines library code and provides testing framework
 Introduction
 ------------
 
-I'm now working on this amazing project, I will add functions which I want to implement, fix bugs I encountered, or write some guides to make CHelper better.
+I'm now working on this amazing project, and will add functions which I want to implement, fix bugs I encountered, or write some guides to make CHelper better.
 
 Features
 --------
@@ -17,7 +17,7 @@ Features
 Tips
 ----
 
-you may can't receiver any update info from this forked repository because I'm not the original, so, If you like any of this, you can star it and check its update when you have time.
+you may can't receiver any update info from this forked repository because it's not the original, so if you like any of this, you can star and check the update when ever you have time.
 
 all fixes and adds are available in commits page: [commits-list][commits-list]
 (no time for organize updates. so try it if you want.)
