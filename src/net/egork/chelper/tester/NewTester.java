@@ -112,6 +112,7 @@ public class NewTester {
                 if (checkResult.type != Verdict.VerdictType.OK && checkResult.type != Verdict.VerdictType.UNDECIDED)
                     ok = false;
             } catch (Throwable e) {
+                print(writer.getBuffer().toString(), truncate);
                 if (e instanceof InvocationTargetException)
                     e = e.getCause();
                 System.out.println("Exception thrown:");

@@ -80,6 +80,7 @@ public class Tester {
                 if (checkResult.type != Verdict.VerdictType.OK)
                     ok = false;
             } catch (Throwable e) {
+                print(writer.getBuffer().toString(), truncate);
                 if (e instanceof InvocationTargetException)
                     e = e.getCause();
                 System.out.println("Exception thrown:");
