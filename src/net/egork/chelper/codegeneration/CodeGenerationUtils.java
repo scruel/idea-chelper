@@ -11,7 +11,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.GlobalSearchScope;
 import net.egork.chelper.ProjectData;
-import net.egork.chelper.actions.ArchiveAction;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.task.TaskBase;
 import net.egork.chelper.task.TopCoderTask;
@@ -19,6 +18,7 @@ import net.egork.chelper.task.test.TestBase;
 import net.egork.chelper.util.FileUtils;
 import net.egork.chelper.util.OutputWriter;
 import net.egork.chelper.util.ProjectUtils;
+import net.egork.chelper.util.TaskUtils;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -373,7 +373,7 @@ public class CodeGenerationUtils {
                 try {
                     VirtualFile taskFile;
                     if (finalTask instanceof Task) {
-                        taskFile = directory.findOrCreateChildData(null, ArchiveAction.canonize(finalTask.name) + ".task");
+                        taskFile = directory.findOrCreateChildData(null, TaskUtils.canonize(finalTask.name) + ".task");
                     } else {
                         taskFile = directory.findOrCreateChildData(null, finalTask.name + ".tctask");
                     }

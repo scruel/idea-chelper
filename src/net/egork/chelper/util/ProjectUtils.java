@@ -157,13 +157,12 @@ public class ProjectUtils {
                 Library.ModifiableModel libraryModel = library.getModifiableModel();
                 libraryModel.addRoot(jarFile, OrderRootType.CLASSES);
                 libraryModel.commit();
-                addLibray(project, library);
-
+                addLibrary(project, library);
             }
         }, false);
     }
 
-    private static void addLibray(Project project, Library library) {
+    private static void addLibrary(Project project, Library library) {
         final boolean[] res = new boolean[1];
         for (Module module : ModuleManager.getInstance(project).getModules()) {
             ModuleRootManager.getInstance(module).orderEntries().forEachLibrary(new Processor<Library>() {

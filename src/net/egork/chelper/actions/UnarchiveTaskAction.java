@@ -63,7 +63,7 @@ public class UnarchiveTaskAction extends AnAction {
                             return;
                         }
 //                        OutputWriter outputWriter = new OutputWriter(
-//                            baseDirectory.createFile(ArchiveAction.canonize(task.name) + ".task").getVirtualFile().getOutputStream(null));
+//                            baseDirectory.createFile(TaskUtils.canonize(task.name) + ".task").getVirtualFile().getOutputStream(null));
 //                        task.saveTask(outputWriter);
 //                        outputWriter.close();
                         Collection<String> toCopy = new ArrayList<String>();

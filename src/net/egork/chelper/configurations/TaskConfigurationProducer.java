@@ -10,7 +10,6 @@ import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.testFramework.LightVirtualFile;
-import net.egork.chelper.actions.ArchiveAction;
 import net.egork.chelper.task.Task;
 import net.egork.chelper.util.FileUtils;
 import net.egork.chelper.util.ProjectUtils;
@@ -84,7 +83,7 @@ public class TaskConfigurationProducer extends RunConfigurationProducer<TaskConf
 
         final String taskLocation = configuration.getConfiguration().location;
         final String classSimpleName = ProjectUtils.getSimpleName(configuration.getConfiguration().taskClass);
-        final String taskName = ArchiveAction.canonize(configuration.getConfiguration().name);
+        final String taskName = TaskUtils.canonize(configuration.getConfiguration().name);
         final String fileLocation = FileUtils.getRelativePath(context.getProject().getBaseDir(), file.getParent());
         final String fileName = file.getNameWithoutExtension();
         LOG.debugMethodInfo(false, false, taskLocation, fileLocation, classSimpleName, taskName, fileName);

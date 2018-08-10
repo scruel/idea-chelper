@@ -92,7 +92,7 @@ public class ArchiveAction extends AnAction {
 
                     PsiFile taskFile;
                     if (configuration instanceof TaskConfiguration) {
-                        taskFile = FileUtils.getPsiFile(project, ((Task) taskBase).location + "/" + canonize(taskBase.name) + ".task");
+                        taskFile = FileUtils.getPsiFile(project, ((Task) taskBase).location + "/" + TaskUtils.canonize(taskBase.name) + ".task");
                     } else {
                         taskFile = FileUtils.getPsiFile(project, ProjectUtils.getData(project).defaultDirectory + "/" + taskBase.name + ".tctask");
                     }
@@ -120,21 +120,9 @@ public class ArchiveAction extends AnAction {
         if (position != -1)
             yearAndMonth = yearAndMonth.substring(0, position);
         if (task instanceof Task && yearAndMonth.length() == 0) {
-            return canonize(task.contestName.length() == 0 ? "unsorted" : task.contestName);
+            return TaskUtils.canonize(task.contestName.length() == 0 ? "unsorted" : task.contestName);
         }
-        return canonize(yearAndMonth) + "/" + canonize(task.date + " - " + (task.contestName.length() == 0 ? "unsorted" : task.contestName));
+        return TaskUtils.canonize(yearAndMonth) + "/" + TaskUtils.canonize(task.date + " - " + (task.contestName.length() == 0 ? "unsorted" : task.contestName));
     }
 
-    /**
-     * Standardize the file name so that it can be saved.
-     *
-     * @param filename
-     * @return
-     */
-    public static String canonize(String filename) {
-        filename = filename.replaceAll("[\\\\?%*:|\"<>/]", "-");
-        while (filename.endsWith("."))
-            filename = filename.substring(0, filename.length() - 1);
-        return filename;
-    }
 }

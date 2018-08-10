@@ -17,7 +17,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.search.GlobalSearchScope;
-import net.egork.chelper.actions.ArchiveAction;
 import net.egork.chelper.actions.TopCoderAction;
 import net.egork.chelper.codegeneration.SolutionGenerator;
 import net.egork.chelper.task.Task;
@@ -162,7 +161,7 @@ public class TaskConfiguration extends ModuleBasedConfiguration<JavaRunConfigura
         if (parentFile == null) return;
 
         if (!cover) {
-            VirtualFile dataFile = parentFile.findChild(ArchiveAction.canonize(configuration.name) + ".task");
+            VirtualFile dataFile = parentFile.findChild(TaskUtils.canonize(configuration.name) + ".task");
             if (dataFile != null) {
                 try {
                     this.configuration = Task.load(new InputReader(dataFile.getInputStream()));
@@ -173,7 +172,7 @@ public class TaskConfiguration extends ModuleBasedConfiguration<JavaRunConfigura
         }
         VirtualFile taskFile = FileUtils.getFileByFQN(getProject(), configuration.taskClass);
         if (taskFile != null && taskFile.getParent().equals(parentFile))
-            FileUtils.saveConfiguration(configuration.location, ArchiveAction.canonize(configuration.name) + ".task", configuration, getProject());
+            FileUtils.saveConfiguration(configuration.location, TaskUtils.canonize(configuration.name) + ".task", configuration, getProject());
         LOG.debugMethodInfo(false, true, "task", configuration);
     }
 

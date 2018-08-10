@@ -7,7 +7,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiManager;
-import net.egork.chelper.actions.ArchiveAction;
 import net.egork.chelper.checkers.PEStrictChecker;
 import net.egork.chelper.codegeneration.MainFileTemplate;
 import net.egork.chelper.configurations.TaskConfiguration;
@@ -29,6 +28,19 @@ public class TaskUtils {
     public static final String TASK_DATA_KEY = "TASK_DATA_KEY";
 
     private TaskUtils() {
+    }
+
+    /**
+     * Standardize the file name so that it can be saved.
+     *
+     * @param filename
+     * @return
+     */
+    public static String canonize(String filename) {
+        filename = filename.replaceAll("[\\\\?%*:|\"<>/]", "-");
+        while (filename.endsWith("."))
+            filename = filename.substring(0, filename.length() - 1);
+        return filename;
     }
 
     private static String getTaskSourceFileLocation(TaskBase taskBase) {
@@ -62,7 +74,7 @@ public class TaskUtils {
 
     public static String getTaskFileName(String location, String name) {
         if (location != null && name != null)
-            return location + "/" + ArchiveAction.canonize(name) + ".task";
+            return location + "/" + TaskUtils.canonize(name) + ".task";
         return null;
     }
 
