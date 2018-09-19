@@ -14,6 +14,7 @@ import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.ProjectManagerAdapter;
+import com.intellij.openapi.roots.LibraryOrderEntry;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.OrderRootType;
@@ -28,7 +29,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleSettingsManager;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.util.Processor;
 import com.intellij.util.ui.UIUtil;
 import net.egork.chelper.ChromeParser;
 import net.egork.chelper.ProjectData;
@@ -159,25 +159,19 @@ public class ProjectUtils {
                 libraryModel.commit();
                 addLibrary(project, library);
             }
-        }, false);
+        }, true);
     }
 
     private static void addLibrary(Project project, Library library) {
-        final boolean[] res = new boolean[1];
         for (Module module : ModuleManager.getInstance(project).getModules()) {
-            ModuleRootManager.getInstance(module).orderEntries().forEachLibrary(new Processor<Library>() {
-                @Override
-                public boolean process(Library library) {
-                    if (PROJECT_NAME.equals(library.getName()))
-                        res[0] = true;
-                    return true;
-                }
-            });
-            if (!res[0]) {
-                ModifiableRootModel model = ModuleRootManager.getInstance(module).getModifiableModel();
-                model.addLibraryEntry(library);
-                model.commit();
+            ModifiableRootModel model = ModuleRootManager.getInstance(module).getModifiableModel();
+            LibraryOrderEntry libraryOrderEntry = model.findLibraryOrderEntry(library);
+            while (libraryOrderEntry != null) {
+                model.removeOrderEntry(libraryOrderEntry);
+                libraryOrderEntry = model.findLibraryOrderEntry(library);
             }
+            model.addLibraryEntry(library);
+            model.commit();
         }
     }
 
