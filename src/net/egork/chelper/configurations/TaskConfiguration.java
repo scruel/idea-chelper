@@ -40,11 +40,9 @@ public class TaskConfiguration extends ModuleBasedConfiguration<JavaRunConfigura
 
     public TaskConfiguration(Project project, String name, Task configuration, ConfigurationFactory factory) {
         super(name, new JavaRunConfigurationModule(project, false), factory);
-        LOG.debugMethodInfo(true, true, "name", name, "configuration", configuration, "location", configuration.location);
         boolean coverSave = this.configuration != configuration;
         saveConfiguration(configuration, coverSave);
         this.configuration = configuration;
-        LOG.debugMethodInfo(false, true, "name", name, "configuration", configuration, "location", configuration.location);
     }
 
     @Override
@@ -150,12 +148,12 @@ public class TaskConfiguration extends ModuleBasedConfiguration<JavaRunConfigura
     }
 
     private void saveConfiguration(Task configuration, boolean cover) {
-        LOG.debugMethodInfo(true, true, "task", configuration);
         if (configuration == null) return;
         if (configuration.location == null) return;
         if (configuration.taskClass == null) return;
         if (configuration.name == null) return;
         if (configuration.name.length() == 0) return;
+        LOG.debugMethodInfo(true, true, "task", configuration);
 
         VirtualFile parentFile = FileUtils.getFile(getProject(), configuration.location);
         if (parentFile == null) return;
