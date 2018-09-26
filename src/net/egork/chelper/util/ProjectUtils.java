@@ -1,5 +1,8 @@
 package net.egork.chelper.util;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.cojac.CojacAgent;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.impl.RunManagerImpl;
@@ -53,6 +56,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -131,48 +135,53 @@ public class ProjectUtils {
     }
 
     public static void ensureLibrary(final Project project) {
-        final LibraryTable table = ProjectLibraryTable.getInstance(project);
-        String path = TopCoderAction.getJarPathForClass(NewTester.class);
-        if (path == null) {
-            throw new RuntimeException("Could not find " + ProjectUtils.PROJECT_NAME + " jar!");
+        Class[] neededClasses = {NewTester.class, CojacAgent.class, JsonCreator.class, ObjectMapper.class, com.fasterxml.jackson.core.JsonParser.class};
+        List<VirtualFile> jarFiles = new LinkedList<>();
+        for (Class aClass : neededClasses) {
+            String path = TopCoderAction.getJarPathForClass(aClass);
+            if (path == null) {
+                throw new RuntimeException("Could not find " + ProjectUtils.PROJECT_NAME + " jar!");
+            }
+            VirtualFile jar = VirtualFileManager.getInstance().findFileByUrl(VirtualFileManager.constructUrl(JarFileSystem.PROTOCOL, path) + JarFileSystem.JAR_SEPARATOR);
+            if (jar == null) {
+                jar = LocalFileSystem.getInstance().refreshAndFindFileByPath(path);
+            }
+            if (jar == null) {
+                throw new RuntimeException("Could not find " + ProjectUtils.PROJECT_NAME + " jar!");
+            }
+            jarFiles.add(jar);
         }
-        VirtualFile jar;
-        jar = VirtualFileManager.getInstance().findFileByUrl(VirtualFileManager.constructUrl(JarFileSystem.PROTOCOL, path) + JarFileSystem.JAR_SEPARATOR);
-
-        if (jar == null) {
-            jar = LocalFileSystem.getInstance().refreshAndFindFileByPath(path);
-        }
-        if (jar == null) {
-            throw new RuntimeException("Could not find " + ProjectUtils.PROJECT_NAME + " jar!");
-        }
-        final VirtualFile jarFile = jar;
         ExecuteUtils.executeWriteAction(new Runnable() {
             @Override
             public void run() {
+                final LibraryTable table = ProjectLibraryTable.getInstance(project);
                 Library library = table.getLibraryByName(PROJECT_NAME);
+
                 if (library != null) {
-                    table.removeLibrary(library);
+                    LibraryTable.ModifiableModel modifiableModel = table.getModifiableModel();
+                    modifiableModel.removeLibrary(library);
+                    modifiableModel.commit();
+//                    Disposer.dispose(library);
                 }
+
                 library = table.createLibrary(PROJECT_NAME);
                 Library.ModifiableModel libraryModel = library.getModifiableModel();
-                libraryModel.addRoot(jarFile, OrderRootType.CLASSES);
+                for (VirtualFile jarFile : jarFiles) {
+                    libraryModel.addRoot(jarFile, OrderRootType.CLASSES);
+                }
                 libraryModel.commit();
-                addLibrary(project, library);
+                for (Module module : ModuleManager.getInstance(project).getModules()) {
+                    ModifiableRootModel modifiableModel = ModuleRootManager.getInstance(module).getModifiableModel();
+                    LibraryOrderEntry libraryOrderEntry = modifiableModel.findLibraryOrderEntry(library);
+                    while (libraryOrderEntry != null) {
+                        modifiableModel.removeOrderEntry(libraryOrderEntry);
+                        libraryOrderEntry = modifiableModel.findLibraryOrderEntry(library);
+                    }
+                    modifiableModel.addLibraryEntry(library);
+                    modifiableModel.commit();
+                }
             }
         }, true);
-    }
-
-    private static void addLibrary(Project project, Library library) {
-        for (Module module : ModuleManager.getInstance(project).getModules()) {
-            ModifiableRootModel model = ModuleRootManager.getInstance(module).getModifiableModel();
-            LibraryOrderEntry libraryOrderEntry = model.findLibraryOrderEntry(library);
-            while (libraryOrderEntry != null) {
-                model.removeOrderEntry(libraryOrderEntry);
-                libraryOrderEntry = model.findLibraryOrderEntry(library);
-            }
-            model.addLibraryEntry(library);
-            model.commit();
-        }
     }
 
     public static boolean isEligible(DataContext dataContext) {
@@ -231,7 +240,8 @@ public class ProjectUtils {
     }
 
 
-    public static RunnerAndConfigurationSettings createConfiguration(Project project, TaskBase task, boolean setActive) {
+    public static RunnerAndConfigurationSettings createConfiguration(Project project, TaskBase task,
+                                                                     boolean setActive) {
         LOG.debugMethodInfo(true, true, "task", task);
         RunManagerImpl manager = RunManagerImpl.getInstanceImpl(project);
         RunnerAndConfigurationSettings old = manager.findConfigurationByName(task.name);

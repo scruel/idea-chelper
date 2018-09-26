@@ -16,7 +16,9 @@ import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.util.PsiTreeUtil;
 import net.egork.chelper.actions.TopCoderAction;
 import net.egork.chelper.codegeneration.SolutionGenerator;
 import net.egork.chelper.task.Task;
@@ -68,12 +70,12 @@ public class TaskConfiguration extends ModuleBasedConfiguration<JavaRunConfigura
     @Override
     public void checkConfiguration() throws RuntimeConfigurationException {
         ProjectManagerEx projectManager = ProjectManagerEx.getInstanceEx();
-        final JavaRunConfigurationModule configurationModule = getConfigurationModule();
         if (configuration == null) {
             throw new RuntimeConfigurationWarning("configuration method not found in project.");
         }
-        final PsiClass psiClass = configurationModule.findNotNullClass(configuration.taskClass);
-        if (psiClass.findMethodsByName("solve", false).length == 0) {
+        PsiFile taskPsiFile = FileUtils.getPsiFileByFQN(getProject(), configuration.taskClass);
+        final PsiClass psiClass = PsiTreeUtil.findChildOfAnyType(taskPsiFile, PsiClass.class);
+        if (psiClass == null || psiClass.findMethodsByName("solve", false).length == 0) {
             throw new RuntimeConfigurationWarning("solve method not found in class '" + configuration.taskClass + "'.");
         }
         ClassUtils.checkClass(getProject(), configuration.inputClass);
@@ -82,9 +84,8 @@ public class TaskConfiguration extends ModuleBasedConfiguration<JavaRunConfigura
         if (StringUtils.isEmpty(configuration.location)) {
             throw new RuntimeConfigurationWarning("configuration location '" + configuration.location + "' invalid.");
         }
-        VirtualFile taskFile = FileUtils.getFileByFQN(getProject(), configuration.taskClass);
         VirtualFile parentFile = FileUtils.getFile(getProject(), configuration.location);
-        if (!taskFile.getParent().equals(parentFile)) {
+        if (!taskPsiFile.getVirtualFile().getParent().equals(parentFile)) {
             throw new RuntimeConfigurationWarning("configuration location '" + configuration.location + "' not match task class '" + configuration.taskClass + "'.");
         }
         JavaRunConfigurationExtensionManager.checkConfigurationIsValid(this);
