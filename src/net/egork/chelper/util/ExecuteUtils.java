@@ -33,67 +33,55 @@ public class ExecuteUtils {
         }
     }
 
+    // any operations which modify the contents of the document must be wrapped in a command.
     public static void executeWriteCommandAction(final Project project, final Runnable runnable, boolean blocking) {
         LOG.debugMethodInfo(true, true, "thread", Thread.currentThread().getName(), "project", project, "blocking", blocking);
-        final ApplicationEx application = ApplicationManagerEx.getApplicationEx();
         Runnable writeRunnable = new Runnable() {
             @Override
             public void run() {
                 WriteCommandAction.runWriteCommandAction(project, runnable);
             }
         };
-
-        if (!blocking) {
-            application.invokeLater(writeRunnable, ModalityState.NON_MODAL);
-            LOG.debugMethodInfo(false, false);
-            return;
-        }
-        if (application.isDispatchThread()) {
-            if (application.isWriteAccessAllowed())
-                runnable.run();
-            else
-                writeRunnable.run();
-            LOG.debugMethodInfo(false, false);
-            return;
-        }
-        if (!application.isReadAccessAllowed()) {
-            application.invokeAndWait(writeRunnable, ModalityState.NON_MODAL);
-            LOG.debugMethodInfo(false, false);
-            return;
-        }
+        executeWriteRunnable(runnable, writeRunnable, blocking);
         LOG.debugMethodInfo(false, false);
-        LOG.error("Could not run write action with wait.");
-        throw new IllegalStateException("Could not run write action with wait.");
     }
 
     public static void executeWriteAction(final Runnable runnable, boolean blocking) {
         LOG.debugMethodInfo(true, true, "blocking", blocking);
-        final ApplicationEx application = ApplicationManagerEx.getApplicationEx();
         Runnable writeRunnable = new Runnable() {
             @Override
             public void run() {
-                application.runWriteAction(runnable);
+                ApplicationManager.getApplication().runWriteAction(runnable);
             }
         };
+        executeWriteRunnable(runnable, writeRunnable, blocking);
+        LOG.debugMethodInfo(false, false);
+    }
+
+    private static void executeWriteRunnable(final Runnable runnable, final Runnable wrapperRunnable, boolean blocking) {
+        final ApplicationEx application = ApplicationManagerEx.getApplicationEx();
         if (!blocking) {
-            application.invokeLater(writeRunnable, ModalityState.NON_MODAL);
+            application.invokeLater(wrapperRunnable, ModalityState.NON_MODAL);
             LOG.debugMethodInfo(false, false);
             return;
         }
+        // Write actions (in Swing thread only) allow to modify the model.
         if (application.isDispatchThread()) {
-            if (application.isWriteAccessAllowed())
+            // execute with write-safe guarantee.
+            if (application.isWriteAccessAllowed()) {
                 runnable.run();
-            else
-                writeRunnable.run();
+            } else {
+                wrapperRunnable.run();
+            }
             LOG.debugMethodInfo(false, false);
             return;
         }
         if (!holdsReadLock(application)) {
-            application.invokeAndWait(writeRunnable, ModalityState.NON_MODAL);
+            // acts like 'invokeLater' method but with wait operation.
+            application.invokeAndWait(wrapperRunnable, ModalityState.NON_MODAL);
             LOG.debugMethodInfo(false, false);
             return;
         }
-        LOG.debugMethodInfo(false, false);
         LOG.error("Could not run write action with wait.");
         throw new IllegalStateException("Could not run write action with wait.");
     }
