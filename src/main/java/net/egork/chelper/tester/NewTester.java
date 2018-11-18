@@ -22,7 +22,7 @@ import java.util.*;
 @SuppressWarnings("unchecked")
 public class NewTester {
     public static void main(String[] args) throws InterruptedException, InvocationTargetException,
-        ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+            ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         try {
             test(args);
         } catch (TaskCorruptException e) {
@@ -31,7 +31,7 @@ public class NewTester {
     }
 
     public static boolean test(String... args) throws InvocationTargetException, ClassNotFoundException,
-        NoSuchMethodException, InstantiationException, IllegalAccessException, InterruptedException {
+            NoSuchMethodException, InstantiationException, IllegalAccessException, InterruptedException {
         Locale.setDefault(Locale.US);
         List<Verdict> verdicts = new ArrayList<Verdict>();
         long maximalTime = 0;
@@ -128,7 +128,8 @@ public class NewTester {
             System.out.printf("All test passed input %.3f s.%n", maximalTime / 1000.);
             if (singleTest != -1)
                 return test(args[0]);
-        } else {
+        }
+        else {
             if (singleTest == -1) {
                 for (int i = 0; i < verdicts.size(); i++)
                     System.out.println("Test #" + i + ": " + verdicts.get(i));
@@ -162,14 +163,14 @@ public class NewTester {
 
     private static Verdict check(Class checkerClass, String input, String expectedOutput,
                                  String actualOutput, String checkerParameters)
-        throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException {
+            throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException {
         Checker checker = (Checker) checkerClass.getConstructor(String.class).newInstance(checkerParameters);
         return checker.check(input, expectedOutput, actualOutput);
     }
 
     private static void run(Object in, Object out, Class taskClass, Class readerClass, Class writerClass,
                             TestType testType)
-        throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException {
+            throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException {
         Object solver = taskClass.getConstructor().newInstance();
         Method solve = taskClass.getMethod("solve", int.class, readerClass, writerClass);
         if (testType == TestType.SINGLE) {
@@ -198,8 +199,8 @@ public class NewTester {
     }
 
     private static Collection<? extends Test> addGeneratedTests(String fqn, int initialTestCount)
-        throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException,
-        InstantiationException {
+            throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException,
+            InstantiationException {
         fqn += "Checker";
         Class aClass = Class.forName(fqn);
         Object checker = aClass.getConstructor().newInstance();

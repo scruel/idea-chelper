@@ -32,6 +32,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.InputMismatchException;
+import java.util.Objects;
 
 /**
  * @author Egor Kulikov (kulikov@devexperts.com)
@@ -93,7 +94,7 @@ public class TaskConfiguration extends ModuleBasedConfiguration<JavaRunConfigura
 
     @Override
     public RunProfileState getState(@NotNull Executor executor, @NotNull ExecutionEnvironment env)
-        throws ExecutionException {
+            throws ExecutionException {
         saveConfiguration(configuration, false);
         SolutionGenerator.createSourceFile(getProject(), configuration);
         JavaCommandLineState state = new JavaCommandLineState(env) {
@@ -102,8 +103,8 @@ public class TaskConfiguration extends ModuleBasedConfiguration<JavaRunConfigura
                 JavaParameters parameters = new JavaParameters();
                 PsiDirectory directory = FileUtils.getPsiDirectory(getProject(), configuration.location);
                 Module module = ProjectRootManager.getInstance(getProject()).getFileIndex().getModuleForFile(
-                    directory.getVirtualFile());
-                parameters.configureByModule(module, JavaParameters.JDK_AND_CLASSES);
+                        directory.getVirtualFile());
+                parameters.configureByModule(Objects.requireNonNull(module), JavaParameters.JDK_AND_CLASSES);
                 parameters.setWorkingDirectory(getProject().getBaseDir().getPath());
                 parameters.setMainClass("net.egork.chelper.tester.NewTester");
                 String[] vmParameters = configuration.vmArgs.split(" ");
@@ -113,6 +114,7 @@ public class TaskConfiguration extends ModuleBasedConfiguration<JavaRunConfigura
                     String path = TopCoderAction.getJarPathForClass(com.github.cojac.CojacAgent.class);
                     parameters.getVMParametersList().add("-javaagent:" + path + "=-Cints -Clongs -Ccasts -Cmath");
                 }
+                ClassUtils.compileFile(getProject(), Objects.requireNonNull(FileUtils.getFileByFQN(getProject(), configuration.taskClass)));
                 String taskFileName = TaskUtils.getTaskFileName(configuration.location, configuration.name);
                 parameters.getProgramParametersList().add(taskFileName);
                 if (ProjectUtils.getData(getProject()).smartTesting) {
@@ -127,8 +129,7 @@ public class TaskConfiguration extends ModuleBasedConfiguration<JavaRunConfigura
                                     parameters.getProgramParametersList().add(Integer.toString(firstFailed));
                                 }
                             }
-                        } catch (IOException ignored) {
-                        } catch (InputMismatchException ignored) {
+                        } catch (IOException | InputMismatchException ignored) {
                         }
                     }
                 }
@@ -181,7 +182,8 @@ public class TaskConfiguration extends ModuleBasedConfiguration<JavaRunConfigura
         Module[] modules = getModules();
         if (modules.length == 0) {
             return null;
-        } else {
+        }
+        else {
             GlobalSearchScope scope = GlobalSearchScope.moduleRuntimeScope(modules[0], true);
             for (int idx = 1; idx < modules.length; idx++) {
                 Module module = modules[idx];
