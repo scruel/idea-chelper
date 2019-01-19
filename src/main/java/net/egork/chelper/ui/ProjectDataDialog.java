@@ -26,12 +26,15 @@ public class ProjectDataDialog extends JDialog {
     private final JCheckBox enableUnitTests;
     private final JCheckBox smartTesting;
     private final JCheckBox failOnIntegerOverflowForNewTasks;
+    private final JCheckBox useCustomJws;
     private final DirectorySelector testDirectory;
+    private final DirectorySelector jwsDirectory;
     private final ClassSelector inputClass;
     private final ClassSelector outputClass;
     private final JTextField excludePackages;
     private final JTextField author;
     private final JLabel testDirectoryLabel;
+    private final JLabel jwsDirectoryLabel;
     private final int width = new JTextField(20).getPreferredSize().width;
 
     public ProjectDataDialog(final Project project, ProjectData data) {
@@ -44,7 +47,9 @@ public class ProjectDataDialog extends JDialog {
         outputDirectory = new DirectorySelector(project, data.outputDirectory);
         enableUnitTests = new JCheckBox("Enable unit tests", data.enableUnitTests);
         failOnIntegerOverflowForNewTasks = new JCheckBox("Fail on integer overflow for new tasks", data.failOnIntegerOverflowForNewTasks);
+        useCustomJws = new JCheckBox("Specify JWS location for TopCoder Arena", !"".equals(data.jwsDirectory));
         testDirectory = new DirectorySelector(project, data.testDirectory);
+        jwsDirectory = new DirectorySelector(project, data.jwsDirectory);
         inputClass = new ClassSelector(project, data.inputClass);
         outputClass = new ClassSelector(project, data.outputClass);
         excludePackages = new JTextField(ProjectData.join(data.excludedPackages));
@@ -85,6 +90,10 @@ public class ProjectDataDialog extends JDialog {
         testDirectoryLabel = new JLabel("Test directory:");
         main.add(testDirectoryLabel);
         main.add(testDirectory);
+        main.add(useCustomJws);
+        jwsDirectoryLabel = new JLabel("JWS location:");
+        main.add(jwsDirectoryLabel);
+        main.add(jwsDirectory);
         main.add(new JLabel("Input class:"));
         main.add(inputClass);
         main.add(new JLabel("Output class:"));
@@ -102,6 +111,18 @@ public class ProjectDataDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 testDirectory.setVisible(enableUnitTests.isSelected());
                 testDirectoryLabel.setVisible(enableUnitTests.isSelected());
+                pack();
+            }
+        });
+        jwsDirectory.setVisible(useCustomJws.isSelected());
+        jwsDirectoryLabel.setVisible(useCustomJws.isSelected());
+        useCustomJws.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                jwsDirectory.setVisible(useCustomJws.isSelected());
+                jwsDirectoryLabel.setVisible(useCustomJws.isSelected());
+                if (!useCustomJws.isSelected()) {
+                    jwsDirectory.setText("");
+                }
                 pack();
             }
         });
@@ -141,7 +162,7 @@ public class ProjectDataDialog extends JDialog {
     }
 
     private void onChange() {
-        data = new ProjectData(inputClass.getText(), outputClass.getText(), excludePackages.getText().split(","), outputDirectory.getText(), author.getText(), archiveDirectory.getText(), defaultDirectory.getText(), testDirectory.getText(), enableUnitTests.isSelected(), failOnIntegerOverflowForNewTasks.isSelected(), smartTesting.isSelected(), true);
+        data = new ProjectData(inputClass.getText(), outputClass.getText(), excludePackages.getText().split(","), outputDirectory.getText(), author.getText(), archiveDirectory.getText(), defaultDirectory.getText(), testDirectory.getText(), jwsDirectory.getText(), enableUnitTests.isSelected(), failOnIntegerOverflowForNewTasks.isSelected(), smartTesting.isSelected(), true);
     }
 
     @Override
